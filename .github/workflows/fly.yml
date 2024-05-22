@@ -5,23 +5,10 @@ on:
       - main # change to main if needed
 
 jobs:
-  build:
-    name: build
-    runs-on: ubuntu-latest
-    steps:
-      # ...
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-      # run any `bun` or `bunx` command
-      - run: bun install
-      - run: bun run build
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
     concurrency: deploy-group    # optional: ensure only one action runs at a time
-    needs: build
     environment:
       name: production
       url: https://tasksapp.fly.dev/

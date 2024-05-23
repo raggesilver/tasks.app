@@ -48,6 +48,52 @@ export const oauth = pgTable(
 export type OauthEntity = typeof oauth.$inferSelect;
 export type NewOauthEntity = typeof oauth.$inferInsert;
 
+export const workspaces = pgTable(
+  "workspaces",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: varchar("name", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 255 }).notNull(),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id, {
+        // TODO: we do need to handle worspaces and account deletion, but
+        // cascading might not be the right call.
+        // onDelete: "cascade",
+      }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    slugIndex: uniqueIndex().on(table.slug),
+  }),
+);
+
+export type Workspace = typeof workspaces.$inferSelect;
+export type NewWorkspace = typeof workspaces.$inferInsert;
+
+export const collaborators = pgTable(
+  "collaborators",
+  {
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, {
+        onDelete: "cascade",
+      }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
+  },
+  (table) => ({
+    uniqueIndex: uniqueIndex().on(table.workspaceId, table.userId),
+  }),
+);
+
+export type Collaborator = typeof collaborators.$inferSelect;
+export type NewCollaborator = typeof collaborators.$inferInsert;
+
 // Relations
 
 export const oauthRelations = relations(oauth, ({ one }) => ({
@@ -59,4 +105,13 @@ export const oauthRelations = relations(oauth, ({ one }) => ({
 
 export const usersRelations = relations(users, ({ many }) => ({
   oauth: many(oauth),
+}));
+
+export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [workspaces.ownerId],
+    references: [users.id],
+  }),
+  // tickets: many(tickets),
+  collaborators: many(collaborators),
 }));

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useMediaQuery } from "@vueuse/core";
-import Form from "~/components/create-workspace/form.vue";
+import Form from "./form.vue";
 
 const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -32,7 +32,7 @@ const description = "Create a new workspace to organize your tasks.";
         <Form @dismiss="isOpen = false" />
         <DrawerFooter class="pt-2">
           <DrawerClose as-child>
-            <Button variant="outline"> Cancel </Button>
+            <Button variant="outline">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

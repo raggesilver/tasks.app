@@ -2,7 +2,10 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   devServer: {
-    https: true,
+    https: {
+      key: "./cert/server.key",
+      cert: "./cert/server.crt",
+    },
   },
   css: ["@unocss/reset/tailwind-compat.css", "~/assets/css/main.css"],
   nitro: {
@@ -14,6 +17,16 @@ export default defineNuxtConfig({
     "nuxt-auth-utils",
     "nuxt-icon",
     "@vueuse/nuxt",
+    "@hebilicious/vue-query-nuxt",
   ],
+  vueQuery: {
+    queryClientOptions: {
+      defaultOptions: {
+        queries: {
+          staleTime: 1000 * 60 * 5, // 5 minutes
+        },
+      },
+    },
+  },
 });
 

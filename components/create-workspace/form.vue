@@ -2,6 +2,9 @@
 import { useForm } from "vee-validate";
 import { createWorkspaceSchema } from "~/lib/validation";
 import { toTypedSchema } from "@vee-validate/zod";
+import { z } from "zod";
+import { toast } from "vue-sonner";
+import type { FetchError } from "ofetch";
 
 const emit = defineEmits(["dismiss"]);
 
@@ -11,9 +14,41 @@ const form = useForm({
   validationSchema: schema,
 });
 
+const queryClient = useQueryClient();
+
+const { mutateAsync } = useMutation({
+  mutationFn: (data: z.infer<typeof createWorkspaceSchema>) =>
+    $fetch("/workspace", {
+      method: "POST",
+      body: data,
+    }),
+  onSuccess: (data) => {
+    queryClient.setQueryData(["workspace", data.id], data);
+  },
+});
+
+const isSubmitting = ref(false);
+const formError = ref<string | null>(null);
+
 const onSubmit = form.handleSubmit((values) => {
-  console.log({ values });
-  emit("dismiss");
+  if (isSubmitting.value) return;
+
+  formError.value = null;
+  isSubmitting.value = true;
+
+  mutateAsync(values)
+    .then(() => {
+      emit("dismiss");
+      toast.success("Workspace created successfully.");
+    })
+    .catch((error: FetchError) => {
+      // FIXME: Show error message with vue-sonner
+      formError.value =
+        (error.data?.message as string) ?? "Failed to create workspace.";
+    })
+    .finally(() => {
+      isSubmitting.value = false;
+    });
 });
 </script>
 
@@ -33,6 +68,9 @@ const onSubmit = form.handleSubmit((values) => {
         <FormMessage />
       </FormItem>
     </FormField>
+    <p v-if="formError" class="mt-4 text-[0.8rem] font-medium text-destructive">
+      {{ formError }}
+    </p>
     <Button type="submit" class="w-full sm:w-auto mt-6"
       >Create Workspace</Button
     >

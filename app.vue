@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ConfigProvider } from "radix-vue";
+import { Toaster } from "@/components/ui/sonner";
 
 const useIdFunction = () => useId();
 </script>
@@ -11,5 +12,7 @@ const useIdFunction = () => useId();
         <NuxtPage />
       </NuxtLayout>
     </ConfigProvider>
+
+    <Toaster rich-colors close-button class="z-100" />
   </div>
 </template>

@@ -24,10 +24,7 @@
       "indexes": {
         "collaborators_workspace_id_user_id_index": {
           "name": "collaborators_workspace_id_user_id_index",
-          "columns": [
-            "workspace_id",
-            "user_id"
-          ],
+          "columns": ["workspace_id", "user_id"],
           "isUnique": true
         }
       },
@@ -36,12 +33,8 @@
           "name": "collaborators_workspace_id_workspaces_id_fk",
           "tableFrom": "collaborators",
           "tableTo": "workspaces",
-          "columnsFrom": [
-            "workspace_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workspace_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -49,12 +42,8 @@
           "name": "collaborators_user_id_users_id_fk",
           "tableFrom": "collaborators",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -95,10 +84,7 @@
       "indexes": {
         "oauth_provider_user_id_index": {
           "name": "oauth_provider_user_id_index",
-          "columns": [
-            "provider",
-            "user_id"
-          ],
+          "columns": ["provider", "user_id"],
           "isUnique": true
         }
       },
@@ -107,12 +93,8 @@
           "name": "oauth_user_id_users_id_fk",
           "tableFrom": "oauth",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -167,9 +149,7 @@
       "indexes": {
         "users_email_index": {
           "name": "users_email_index",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         }
       },
@@ -224,9 +204,7 @@
       "indexes": {
         "workspaces_slug_index": {
           "name": "workspaces_slug_index",
-          "columns": [
-            "slug"
-          ],
+          "columns": ["slug"],
           "isUnique": true
         }
       },
@@ -235,12 +213,8 @@
           "name": "workspaces_owner_id_users_id_fk",
           "tableFrom": "workspaces",
           "tableTo": "users",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

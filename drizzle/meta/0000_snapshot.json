@@ -37,10 +37,7 @@
       "indexes": {
         "oauth_provider_user_id_index": {
           "name": "oauth_provider_user_id_index",
-          "columns": [
-            "provider",
-            "user_id"
-          ],
+          "columns": ["provider", "user_id"],
           "isUnique": true
         }
       },
@@ -49,12 +46,8 @@
           "name": "oauth_user_id_users_id_fk",
           "tableFrom": "oauth",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -109,9 +102,7 @@
       "indexes": {
         "users_email_index": {
           "name": "users_email_index",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         }
       },

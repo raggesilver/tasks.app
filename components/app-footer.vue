@@ -8,7 +8,7 @@
       &copy; {{ new Date().getFullYear() }}, Paulo Queiroz.
     </p>
     <nav class="sm:ml-auto flex gap-4 sm:gap-6 items-center">
-      <language-switcher />
+      <!-- <language-switcher /> -->
       <router-link
         class="text-xs hover:underline underline-offset-4 flex-shrink-0"
         to="#"

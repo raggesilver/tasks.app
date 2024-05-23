@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@radix-icons/vue": "^1.0.0",
+    "@vueuse/core": "^10.9.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.30.10",
@@ -23,6 +24,7 @@
     "shadcn-nuxt": "^0.10.4",
     "slug": "^9.0.0",
     "tailwind-merge": "^2.3.0",
+    "vaul-vue": "^0.1.2",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
     "zod": "^3.23.8"
@@ -31,6 +33,7 @@
     "@types/slug": "^5.0.8",
     "@unocss/nuxt": "^0.60.3",
     "drizzle-kit": "^0.21.4",
+    "@vueuse/nuxt": "^10.9.0",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^3.2.4",
     "typescript": "^5.4.5",

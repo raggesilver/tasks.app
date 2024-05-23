@@ -5,5 +5,11 @@ export default defineNuxtConfig({
   nitro: {
     preset: "bun",
   },
-  modules: ["shadcn-nuxt", "@unocss/nuxt", "nuxt-auth-utils", "nuxt-icon"],
+  modules: [
+    "shadcn-nuxt",
+    "@unocss/nuxt",
+    "nuxt-auth-utils",
+    "nuxt-icon",
+    "@vueuse/nuxt",
+  ],
 });

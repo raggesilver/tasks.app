@@ -30,8 +30,10 @@ const initials = computed(
   <nav class="border-b px-8 py-2">
     <div class="flex flex-row items-center">
       <nuxt-link class="text-xl font-bold" to="/app">Tasks.app</nuxt-link>
+      <span aria-hidden="true" class="hidden sm:block mx-auto" />
+      <CreateWorkspace />
       <DropdownMenu>
-        <DropdownMenuTrigger as-child class="ml-auto">
+        <DropdownMenuTrigger as-child>
           <Avatar class="cursor-pointer">
             <AvatarImage
               v-if="user?.profilePictureUrl"

@@ -5,9 +5,11 @@ const useIdFunction = () => useId();
 </script>
 
 <template>
-  <ConfigProvider :use-id="useIdFunction">
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </ConfigProvider>
+  <div class="bg-background" vaul-drawer-wrapper>
+    <ConfigProvider :use-id="useIdFunction">
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </ConfigProvider>
+  </div>
 </template>

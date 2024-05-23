@@ -5,7 +5,7 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="flex-grow">
+  <div class="flex-grow p-4">
     <span>App</span>
   </div>
 </template>

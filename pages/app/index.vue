@@ -1,11 +1,11 @@
 <script setup lang="ts">
-const { session } = useUserSession();
-const { logout } = useLogout();
+definePageMeta({
+  layout: "app",
+});
 </script>
 
 <template>
-  <div>
-    <span>Hello, {{ session.user }}</span>
-    <Button @click="logout"> Logout </Button>
+  <div class="flex-grow">
+    <span>App</span>
   </div>
 </template>

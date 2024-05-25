@@ -24,6 +24,16 @@ const { mutateAsync } = useMutation({
     }),
   onSuccess: (data) => {
     queryClient.setQueryData(["workspace", data.id], data);
+    queryClient.setQueryData(
+      ["workspaces"],
+      (workspaces: any[] | undefined) => {
+        if (!workspaces) return;
+        return [
+          ...workspaces.filter((workspace) => workspace.id !== data.id),
+          data,
+        ];
+      },
+    );
   },
 });
 

@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { db } from "../db/db";
 import {
   collaborators,
@@ -34,9 +34,27 @@ export const getWorkspaceById = async (
     .from(workspaces)
     .leftJoin(collaborators, eq(workspaces.id, collaborators.workspaceId))
     .leftJoin(users, eq(users.id, collaborators.userId))
-    .where(and(eq(users.id, userId), eq(workspaces.id, id)))
+    .where(
+      or(
+        and(eq(users.id, userId), eq(workspaces.id, id)),
+        eq(workspaces.ownerId, userId),
+      ),
+    )
     .limit(1)
     .execute();
 
   return workspace ? workspace.workspaces : null;
+};
+
+export const getAllWorkspaces = async (
+  userId: string,
+): Promise<Workspace[]> => {
+  return db
+    .select()
+    .from(workspaces)
+    .leftJoin(collaborators, eq(workspaces.id, collaborators.workspaceId))
+    .leftJoin(users, eq(users.id, collaborators.userId))
+    .where(or(eq(users.id, userId), eq(workspaces.ownerId, userId)))
+    .execute()
+    .then((rows) => rows.map((row) => row.workspaces));
 };

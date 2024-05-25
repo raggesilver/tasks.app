@@ -107,6 +107,17 @@ export const usersRelations = relations(users, ({ many }) => ({
   oauth: many(oauth),
 }));
 
+export const collaboratorsRelations = relations(collaborators, ({ one }) => ({
+  user: one(users, {
+    fields: [collaborators.userId],
+    references: [users.id],
+  }),
+  workspace: one(workspaces, {
+    fields: [collaborators.workspaceId],
+    references: [workspaces.id],
+  }),
+}));
+
 export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
   owner: one(users, {
     fields: [workspaces.ownerId],

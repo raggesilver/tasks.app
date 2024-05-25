@@ -45,6 +45,9 @@
     "unocss-preset-animations": "^1.0.2"
   },
   "trustedDependencies": [
-    "es5-ext"
+    "@hebilicious/vue-query-nuxt",
+    "es5-ext",
+    "esbuild",
+    "vue-demi"
   ]
 }

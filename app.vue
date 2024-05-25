@@ -3,6 +3,10 @@ import { ConfigProvider } from "radix-vue";
 import { Toaster } from "@/components/ui/sonner";
 
 const useIdFunction = () => useId();
+
+useHead({
+  titleTemplate: (title) => (title ? `${title} | Tasks.app` : "Tasks.app"),
+});
 </script>
 
 <template>

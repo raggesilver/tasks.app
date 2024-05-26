@@ -35,9 +35,9 @@ export const getWorkspaceById = async (
     .leftJoin(collaborators, eq(workspaces.id, collaborators.workspaceId))
     .leftJoin(users, eq(users.id, collaborators.userId))
     .where(
-      or(
-        and(eq(users.id, userId), eq(workspaces.id, id)),
-        eq(workspaces.ownerId, userId),
+      and(
+        eq(workspaces.id, id),
+        or(eq(users.id, userId), eq(workspaces.ownerId, userId)),
       ),
     )
     .limit(1)

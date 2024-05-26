@@ -12,6 +12,7 @@
   "dependencies": {
     "@radix-icons/vue": "^1.0.0",
     "@tanstack/vue-query": "^5.37.1",
+    "@tanstack/vue-query-devtools": "^5.38.0",
     "@vee-validate/zod": "^4.12.8",
     "@vueuse/core": "^10.9.0",
     "class-variance-authority": "^0.7.0",

@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const workspace = await getWorkspaceById(session.user.id, id!);
 
   if (!workspace) {
-    throw createError({ status: 404, message: "Not found" });
+    throw createError({ status: 404, message: "Workspace not found" });
   }
 
   return workspace;

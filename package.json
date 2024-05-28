@@ -23,7 +23,7 @@
     "nuxt-auth-utils": "^0.0.25",
     "nuxt-icon": "^0.6.10",
     "postgres": "^3.4.4",
-    "radix-vue": "^1.8.1",
+    "radix-vue": "^1.8.2",
     "shadcn-nuxt": "^0.10.4",
     "slug": "^9.0.0",
     "tailwind-merge": "^2.3.0",

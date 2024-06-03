@@ -40,7 +40,7 @@
     "@unocss/nuxt": "^0.60.3",
     "@vueuse/nuxt": "^10.10.0",
     "drizzle-kit": "^0.21.4",
-    "prettier": "^3.2.5",
+    "prettier": "^3.3.0",
     "prettier-plugin-organize-imports": "^3.2.4",
     "typescript": "^5.4.5",
     "unocss-preset-animations": "^1.0.2"

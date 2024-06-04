@@ -28,7 +28,7 @@ services:
       POSTGRES_USER: user # The PostgreSQL user (useful to connect to the database)
       POSTGRES_PASSWORD: password # The PostgreSQL password (useful to connect to the database)
       POSTGRES_DB: postgres # The PostgreSQL default database (automatically created at first launch)
-
+    user: 1000:1000
     # The `volumes` tag allows us to share a folder with our container
     # Its syntax is as follows: [folder path on our machine]:[folder path to retrieve in the container]
     volumes:

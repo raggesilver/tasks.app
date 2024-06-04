@@ -9,7 +9,12 @@ const client = useQueryClient();
 const { data, isLoading } = useQuery(
   {
     queryKey: ["workspaces"],
-    queryFn: () => $fetch("/api/workspace"),
+    queryFn: () =>
+      $fetch("/api/workspace").catch((err) => {
+        // Prints error in SSR
+        console.error(err);
+        throw err;
+      }),
   },
   client,
 );

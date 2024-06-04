@@ -18,7 +18,7 @@ const queryClient = useQueryClient();
 
 const { mutateAsync } = useMutation({
   mutationFn: (data: z.infer<typeof createWorkspaceSchema>) =>
-    $fetch("/workspace", {
+    $fetch("/api/workspace", {
       method: "POST",
       body: data,
     }),

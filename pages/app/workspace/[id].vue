@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { FetchError } from "ofetch";
-import type { Workspace } from "~/server/db/schema";
 
 definePageMeta({
   layout: "app",
@@ -10,10 +9,10 @@ const route = useRoute();
 const id = computed(() => route.params.id);
 
 const client = useQueryClient();
-const { data, isLoading, error } = useQuery(
+const { data, error } = useQuery(
   {
     queryKey: ["workspace", id],
-    queryFn: () => $fetch(`/workspace/${id.value}`),
+    queryFn: () => $fetch(`/api/workspace/${id.value}`),
   },
   client,
 );

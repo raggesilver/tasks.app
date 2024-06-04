@@ -1,12 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  devServer: {
-    https: {
-      key: "./cert/server.key",
-      cert: "./cert/server.crt",
-    },
-  },
   css: ["@unocss/reset/tailwind-compat.css", "~/assets/css/main.css"],
   nitro: {
     preset: "bun",

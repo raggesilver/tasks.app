@@ -9,7 +9,7 @@ const client = useQueryClient();
 const { data, isLoading } = useQuery(
   {
     queryKey: ["workspaces"],
-    queryFn: () => $fetch("/workspace"),
+    queryFn: () => $fetch("/api/workspace"),
   },
   client,
 );

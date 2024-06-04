@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  integer,
   pgTable,
   timestamp,
   uniqueIndex,
@@ -61,6 +62,8 @@ export const workspaces = pgTable(
         // cascading might not be the right call.
         // onDelete: "cascade",
       }),
+    // TODO: add status columns and sunset status columns' order field.
+    //statusColumnIds: uuid("status_column_ids").array().notNull().default([]),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
@@ -71,6 +74,36 @@ export const workspaces = pgTable(
 
 export type Workspace = typeof workspaces.$inferSelect;
 export type NewWorkspace = typeof workspaces.$inferInsert;
+
+export const statusColumns = pgTable(
+  "status_columns",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, {
+        onDelete: "cascade",
+      }),
+    name: varchar("name", { length: 255 }).notNull(),
+    order: integer("order").notNull(),
+    createdById: uuid("created_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    lastUpdatedById: uuid("last_updated_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    uniqueIndex: uniqueIndex().on(table.workspaceId, table.name),
+    // We cannot have two columns with the same order in the same workspace.
+    orderIndex: uniqueIndex().on(table.workspaceId, table.order),
+  }),
+);
+
+export type StatusColumn = typeof statusColumns.$inferSelect;
+export type NewStatusColumn = typeof statusColumns.$inferInsert;
 
 export const collaborators = pgTable(
   "collaborators",
@@ -123,6 +156,22 @@ export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
     fields: [workspaces.ownerId],
     references: [users.id],
   }),
-  // tickets: many(tickets),
   collaborators: many(collaborators),
+  statusColumns: many(statusColumns),
+}));
+
+export const statusColumnsRelations = relations(statusColumns, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [statusColumns.workspaceId],
+    references: [workspaces.id],
+  }),
+  lastUpdatedBy: one(users, {
+    fields: [statusColumns.lastUpdatedById],
+    references: [users.id],
+  }),
+  createdBy: one(users, {
+    fields: [statusColumns.createdById],
+    references: [users.id],
+  }),
+  // tickets: many(tickets),
 }));

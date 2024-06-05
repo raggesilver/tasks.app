@@ -5,20 +5,9 @@ definePageMeta({
   layout: "app",
 });
 
-const client = useQueryClient();
-const { data, isLoading } = useQuery(
-  {
-    queryKey: ["workspaces"],
-    queryFn: () => $fetch("/api/workspace"),
-  },
-  client,
-);
+const { data, isLoading, suspense } = useWorkspaces();
 
-watch(data, () => {
-  data.value?.forEach((workspace) =>
-    client.setQueryData(["workspace", workspace.id], workspace),
-  );
-});
+await suspense();
 </script>
 
 <template>

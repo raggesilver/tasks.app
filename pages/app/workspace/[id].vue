@@ -6,16 +6,9 @@ definePageMeta({
 });
 
 const route = useRoute();
-const id = computed(() => route.params.id);
+const id = computed(() => route.params.id.toString());
 
-const client = useQueryClient();
-const { data, error } = useQuery(
-  {
-    queryKey: ["workspace", id],
-    queryFn: () => $fetch(`/api/workspace/${id.value}`),
-  },
-  client,
-);
+const { data, error } = useWorkspace(id);
 
 const typedError = computed(
   () =>

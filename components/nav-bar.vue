@@ -13,6 +13,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+//import type { Link } from "@unhead/schema";
 
 const { logout } = useLogout();
 const { user } = useUserSession();
@@ -24,6 +25,16 @@ const initials = computed(
       .map((part) => part[0])
       .join("") ?? "",
 );
+
+//const preload = computed<Link[]>(() =>
+//  user.value?.profilePictureUrl
+//    ? [{ href: user.value.profilePictureUrl, rel: "preload", as: "image" }]
+//    : [],
+//);
+//
+//useHead({
+//  link: preload,
+//});
 </script>
 
 <template>

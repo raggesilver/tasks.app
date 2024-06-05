@@ -39,7 +39,7 @@
     "@types/slug": "^5.0.8",
     "@unocss/nuxt": "^0.60.4",
     "@vueuse/nuxt": "^10.10.0",
-    "drizzle-kit": "^0.21.4",
+    "drizzle-kit": "^0.22.2",
     "prettier": "^3.3.1",
     "prettier-plugin-organize-imports": "^3.2.4",
     "typescript": "^5.4.5",

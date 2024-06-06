@@ -1,7 +1,5 @@
 {
-  "id": "08d89153-71a3-4019-83de-7e3e3be8ee06",
-  "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "tables": {
     "public.oauth": {
@@ -36,20 +34,39 @@
       },
       "indexes": {
         "oauth_provider_user_id_index": {
+          "columns": [
+            {
+              "expression": "provider",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
           "name": "oauth_provider_user_id_index",
-          "columns": ["provider", "user_id"],
-          "isUnique": true
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "oauth_user_id_users_id_fk": {
           "name": "oauth_user_id_users_id_fk",
           "tableFrom": "oauth",
+          "columnsFrom": [
+            "user_id"
+          ],
           "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -101,9 +118,18 @@
       },
       "indexes": {
         "users_email_index": {
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
           "name": "users_email_index",
-          "columns": ["email"],
-          "isUnique": true
+          "isUnique": true,
+          "method": "btree",
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -114,8 +140,10 @@
   "enums": {},
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "08d89153-71a3-4019-83de-7e3e3be8ee06",
+  "prevId": "00000000-0000-0000-0000-000000000000"
 }

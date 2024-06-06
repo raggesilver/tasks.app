@@ -1,4 +1,6 @@
 {
+  "id": "18a9f395-cc63-4e20-9c9d-6efb6e794d95",
+  "prevId": "1863979f-1088-446b-8dbb-f65d8a2318cc",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -21,6 +23,7 @@
       },
       "indexes": {
         "collaborators_workspace_id_user_id_index": {
+          "name": "collaborators_workspace_id_user_id_index",
           "columns": [
             {
               "expression": "workspace_id",
@@ -35,8 +38,8 @@
               "nulls": "last"
             }
           ],
-          "name": "collaborators_workspace_id_user_id_index",
           "isUnique": true,
+          "with": {},
           "method": "btree",
           "concurrently": false
         }
@@ -104,6 +107,7 @@
       },
       "indexes": {
         "oauth_provider_user_id_index": {
+          "name": "oauth_provider_user_id_index",
           "columns": [
             {
               "expression": "provider",
@@ -118,8 +122,8 @@
               "nulls": "last"
             }
           ],
-          "name": "oauth_provider_user_id_index",
           "isUnique": true,
+          "with": {},
           "method": "btree",
           "concurrently": false
         }
@@ -200,6 +204,7 @@
       },
       "indexes": {
         "status_columns_workspace_id_name_index": {
+          "name": "status_columns_workspace_id_name_index",
           "columns": [
             {
               "expression": "workspace_id",
@@ -214,28 +219,8 @@
               "nulls": "last"
             }
           ],
-          "name": "status_columns_workspace_id_name_index",
           "isUnique": true,
-          "method": "btree",
-          "concurrently": false
-        },
-        "status_columns_workspace_id_order_index": {
-          "columns": [
-            {
-              "expression": "workspace_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "order",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "name": "status_columns_workspace_id_order_index",
-          "isUnique": true,
+          "with": {},
           "method": "btree",
           "concurrently": false
         }
@@ -330,6 +315,7 @@
       },
       "indexes": {
         "users_email_index": {
+          "name": "users_email_index",
           "columns": [
             {
               "expression": "email",
@@ -338,8 +324,8 @@
               "nulls": "last"
             }
           ],
-          "name": "users_email_index",
           "isUnique": true,
+          "with": {},
           "method": "btree",
           "concurrently": false
         }
@@ -394,6 +380,7 @@
       },
       "indexes": {
         "workspaces_slug_index": {
+          "name": "workspaces_slug_index",
           "columns": [
             {
               "expression": "slug",
@@ -402,8 +389,8 @@
               "nulls": "last"
             }
           ],
-          "name": "workspaces_slug_index",
           "isUnique": true,
+          "with": {},
           "method": "btree",
           "concurrently": false
         }
@@ -430,10 +417,8 @@
   "enums": {},
   "schemas": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "id": "7d226f8f-831d-4957-8290-ed6b618ea4fe",
-  "prevId": "83ba58c1-ea17-45f0-b6bd-6cb0fcae5ce8"
+    "tables": {}
+  }
 }

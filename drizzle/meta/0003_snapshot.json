@@ -1,4 +1,6 @@
 {
+  "id": "1863979f-1088-446b-8dbb-f65d8a2318cc",
+  "prevId": "7d226f8f-831d-4957-8290-ed6b618ea4fe",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -21,6 +23,7 @@
       },
       "indexes": {
         "collaborators_workspace_id_user_id_index": {
+          "name": "collaborators_workspace_id_user_id_index",
           "columns": [
             {
               "expression": "workspace_id",
@@ -35,38 +38,38 @@
               "nulls": "last"
             }
           ],
-          "name": "collaborators_workspace_id_user_id_index",
           "isUnique": true,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         }
       },
       "foreignKeys": {
         "collaborators_workspace_id_workspaces_id_fk": {
           "name": "collaborators_workspace_id_workspaces_id_fk",
           "tableFrom": "collaborators",
+          "tableTo": "workspaces",
           "columnsFrom": [
             "workspace_id"
           ],
-          "tableTo": "workspaces",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         },
         "collaborators_user_id_users_id_fk": {
           "name": "collaborators_user_id_users_id_fk",
           "tableFrom": "collaborators",
+          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
-          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -104,6 +107,7 @@
       },
       "indexes": {
         "oauth_provider_user_id_index": {
+          "name": "oauth_provider_user_id_index",
           "columns": [
             {
               "expression": "provider",
@@ -118,25 +122,25 @@
               "nulls": "last"
             }
           ],
-          "name": "oauth_provider_user_id_index",
           "isUnique": true,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         }
       },
       "foreignKeys": {
         "oauth_user_id_users_id_fk": {
           "name": "oauth_user_id_users_id_fk",
           "tableFrom": "oauth",
+          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
-          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -200,6 +204,7 @@
       },
       "indexes": {
         "status_columns_workspace_id_name_index": {
+          "name": "status_columns_workspace_id_name_index",
           "columns": [
             {
               "expression": "workspace_id",
@@ -214,71 +219,51 @@
               "nulls": "last"
             }
           ],
-          "name": "status_columns_workspace_id_name_index",
           "isUnique": true,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
-        },
-        "status_columns_workspace_id_order_index": {
-          "columns": [
-            {
-              "expression": "workspace_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "order",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "name": "status_columns_workspace_id_order_index",
-          "isUnique": true,
-          "method": "btree",
-          "concurrently": false
+          "with": {}
         }
       },
       "foreignKeys": {
         "status_columns_workspace_id_workspaces_id_fk": {
           "name": "status_columns_workspace_id_workspaces_id_fk",
           "tableFrom": "status_columns",
+          "tableTo": "workspaces",
           "columnsFrom": [
             "workspace_id"
           ],
-          "tableTo": "workspaces",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         },
         "status_columns_created_by_users_id_fk": {
           "name": "status_columns_created_by_users_id_fk",
           "tableFrom": "status_columns",
+          "tableTo": "users",
           "columnsFrom": [
             "created_by"
           ],
-          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "set null"
+          "onDelete": "set null",
+          "onUpdate": "no action"
         },
         "status_columns_last_updated_by_users_id_fk": {
           "name": "status_columns_last_updated_by_users_id_fk",
           "tableFrom": "status_columns",
+          "tableTo": "users",
           "columnsFrom": [
             "last_updated_by"
           ],
-          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "set null"
+          "onDelete": "set null",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -330,6 +315,7 @@
       },
       "indexes": {
         "users_email_index": {
+          "name": "users_email_index",
           "columns": [
             {
               "expression": "email",
@@ -338,10 +324,10 @@
               "nulls": "last"
             }
           ],
-          "name": "users_email_index",
           "isUnique": true,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         }
       },
       "foreignKeys": {},
@@ -394,6 +380,7 @@
       },
       "indexes": {
         "workspaces_slug_index": {
+          "name": "workspaces_slug_index",
           "columns": [
             {
               "expression": "slug",
@@ -402,25 +389,25 @@
               "nulls": "last"
             }
           ],
-          "name": "workspaces_slug_index",
           "isUnique": true,
+          "concurrently": false,
           "method": "btree",
-          "concurrently": false
+          "with": {}
         }
       },
       "foreignKeys": {
         "workspaces_owner_id_users_id_fk": {
           "name": "workspaces_owner_id_users_id_fk",
           "tableFrom": "workspaces",
+          "tableTo": "users",
           "columnsFrom": [
             "owner_id"
           ],
-          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -430,10 +417,8 @@
   "enums": {},
   "schemas": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "id": "7d226f8f-831d-4957-8290-ed6b618ea4fe",
-  "prevId": "83ba58c1-ea17-45f0-b6bd-6cb0fcae5ce8"
+    "tables": {}
+  }
 }

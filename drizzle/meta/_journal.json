@@ -22,6 +22,20 @@
       "when": 1716744268929,
       "tag": "0002_medical_bastion",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1717684975667,
+      "tag": "0003_chubby_marvel_boy",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1717685044282,
+      "tag": "0004_dusty_hitman",
+      "breakpoints": true
     }
   ]
 }

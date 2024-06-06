@@ -1,4 +1,4 @@
-import { and, eq, gt, lt, not, sql } from "drizzle-orm";
+import { and, eq, gte, lt, not, sql } from "drizzle-orm";
 import type {
   CreateStatusColumnInput,
   UpdateStatusColumnInput,
@@ -98,7 +98,7 @@ export const updateStatusColumn = async (
 
     if (!current) return null;
 
-    if (data.order && data.order !== current.order) {
+    if (typeof data.order === "number" && data.order !== current.order) {
       if (data.order < current.order) {
         // Increment the order of all status columns with an order greater than
         // the new order.
@@ -108,7 +108,7 @@ export const updateStatusColumn = async (
           .where(
             and(
               eq(statusColumns.workspaceId, workspaceId),
-              gt(statusColumns.order, data.order),
+              gte(statusColumns.order, data.order),
               not(eq(statusColumns.id, id)),
             ),
           )

@@ -98,7 +98,9 @@ export const statusColumns = pgTable(
   (table) => ({
     uniqueIndex: uniqueIndex().on(table.workspaceId, table.name),
     // We cannot have two columns with the same order in the same workspace.
-    orderIndex: uniqueIndex().on(table.workspaceId, table.order),
+    // This is now handled with unique constraint created manually in migartion
+    // 0004_dusty_hitman.sql
+    // orderIndex: uniqueIndex().on(table.workspaceId, table.order),
   }),
 );
 

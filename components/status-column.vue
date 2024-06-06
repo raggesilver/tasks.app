@@ -12,7 +12,7 @@ const showEditModal = ref(false);
   <Card class="w-xs flex-shrink-0">
     <CardHeader>
       <CardTitle class="flex flex-row items-center">
-        <span class="flex-grow">{{ column.name }}</span>
+        <span class="flex-grow drag-handle">{{ column.name }}</span>
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
             <Button variant="outline" class="w-8 h-8 p-0">

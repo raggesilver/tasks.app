@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import type { FetchError } from "ofetch";
+import { swap, animations } from "@formkit/drag-and-drop";
+import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
 
 definePageMeta({
   layout: "app",
@@ -27,6 +29,24 @@ const title = computed(() => data.value?.name ?? "Workspace");
 useHead({
   title,
 });
+
+const [boardRef, cols] = useDragAndDrop(columns.value ?? [], {
+  group: "board",
+  sortable: true,
+  //dragHandle: ".drag-handle",
+  plugins: [swap()],
+});
+
+watch(
+  cols,
+  () => {
+    const changedCol = cols.value.find((col, i) => col.order !== i);
+    if (changedCol) {
+      console.log("Changed column", changedCol);
+    }
+  },
+  { deep: true },
+);
 </script>
 
 <template>
@@ -34,13 +54,13 @@ useHead({
     <template v-if="data">
       <h1 class="text-3xl font-extrabold">{{ data.name }}</h1>
       <div class="flex-grow overflow-x-auto overflow-y-hidden min-w-full">
-        <div class="flex flex-row gap-8 items-stretch">
-          <StatusColumn v-for="column in columns" :key="column.id" :column />
-          <span
+        <div class="flex flex-row gap-8 items-stretch" ref="boardRef">
+          <StatusColumn v-for="column in cols" :key="column.id" :column />
+          <!--<span
             class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"
           >
             <CreateColumn />
-          </span>
+</span>-->
         </div>
       </div>
     </template>

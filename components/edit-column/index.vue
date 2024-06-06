@@ -11,8 +11,7 @@ defineProps<{
 
 const isDesktop = useMediaQuery("(min-width: 768px)");
 
-const title = "Create Column";
-const description = "Create a new status column to organize your tasks.";
+const title = "Update Column";
 </script>
 
 <template>
@@ -22,7 +21,6 @@ const description = "Create a new status column to organize your tasks.";
       <DialogContent class="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{{ title }}</DialogTitle>
-          <DialogDescription>{{ description }}</DialogDescription>
         </DialogHeader>
         <Form @dismiss="isOpen = false" :column />
       </DialogContent>
@@ -32,7 +30,6 @@ const description = "Create a new status column to organize your tasks.";
       <DrawerContent>
         <DrawerHeader class="text-left">
           <DrawerTitle>{{ title }}</DrawerTitle>
-          <DrawerDescription>{{ description }}</DrawerDescription>
         </DrawerHeader>
         <Form @dismiss="isOpen = false" :column />
         <DrawerFooter class="pt-2">

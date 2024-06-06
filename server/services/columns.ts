@@ -1,4 +1,5 @@
-import { and, eq } from "drizzle-orm";
+import assert from "assert";
+import { and, eq, gt, lt, not, sql } from "drizzle-orm";
 import { PostgresError } from "postgres";
 import type {
   CreateStatusColumnInput,
@@ -81,15 +82,62 @@ export const updateStatusColumn = async (
   id: string,
   data: UpdateStatusColumnInput,
 ): Promise<StatusColumn> => {
-  return db
-    .update(statusColumns)
-    .set(data)
-    .where(
-      and(eq(statusColumns.workspaceId, workspaceId), eq(statusColumns.id, id)),
-    )
-    .returning()
-    .execute()
-    .then((rows) => rows[0]);
-};
+  const row = await db.transaction(async (tx) => {
+    // TODO: we can optimize this by only executing the query if the order is
+    // being updated.
+    const current = await tx.query.statusColumns
+      .findFirst({
+        where: (table, { eq, and }) =>
+          and(eq(table.workspaceId, workspaceId), eq(table.id, id)),
+      })
+      .execute();
 
-// TODO: Implement deleteStatusColumn
+    assert(current);
+    if (data.order && data.order !== current.order) {
+      if (data.order < current.order) {
+        // Increment the order of all status columns with an order greater than
+        // the new order.
+        await tx
+          .update(statusColumns)
+          .set({ order: sql`${statusColumns.order} + 1` })
+          .where(
+            and(
+              eq(statusColumns.workspaceId, workspaceId),
+              gt(statusColumns.order, data.order),
+              not(eq(statusColumns.id, id)),
+            ),
+          )
+          .execute();
+      } else {
+        // Decrement the order of all status columns with an order greater than
+        // the old order.
+        await tx
+          .update(statusColumns)
+          .set({ order: sql`${statusColumns.order} - 1` })
+          .where(
+            and(
+              eq(statusColumns.workspaceId, workspaceId),
+              lt(statusColumns.order, data.order),
+              not(eq(statusColumns.id, id)),
+            ),
+          )
+          .execute();
+      }
+    }
+
+    return tx
+      .update(statusColumns)
+      .set(data)
+      .where(
+        and(
+          eq(statusColumns.workspaceId, workspaceId),
+          eq(statusColumns.id, id),
+        ),
+      )
+      .returning()
+      .execute()
+      .then((rows) => rows[0]);
+  });
+
+  return row;
+};

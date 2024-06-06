@@ -1,6 +1,5 @@
 import assert from "assert";
 import { and, eq, gt, lt, not, sql } from "drizzle-orm";
-import { PostgresError } from "postgres";
 import type {
   CreateStatusColumnInput,
   UpdateStatusColumnInput,
@@ -24,19 +23,25 @@ import { DuplicateError } from "../lib/errors";
 export const createStatusColumn = async ({
   userId,
   ...data
-}: CreateStatusColumnInput & { userId: string }): Promise<StatusColumn> => {
+}: CreateStatusColumnInput & {
+  workspaceId: string;
+  userId: string;
+}): Promise<StatusColumn> => {
   try {
     return db
       .insert(statusColumns)
       .values({
         ...data,
         createdById: userId,
+        // Set the order to the maximum order + 1, or 0 if there are no status
+        // columns for this workspace.
+        order: sql`COALESCE((SELECT MAX(${statusColumns.order}) + 1 FROM ${statusColumns} WHERE ${statusColumns.workspaceId} = ${data.workspaceId}), 0)`,
       })
       .returning()
       .execute()
       .then((rows) => rows[0]);
-  } catch (e) {
-    if (e instanceof PostgresError && e.code === "23505") {
+  } catch (e: any) {
+    if (e.code === "23505") {
       throw new DuplicateError("name");
     }
     throw e;

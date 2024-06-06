@@ -58,13 +58,9 @@
         "oauth_user_id_users_id_fk": {
           "name": "oauth_user_id_users_id_fk",
           "tableFrom": "oauth",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }

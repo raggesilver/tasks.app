@@ -48,26 +48,18 @@
         "collaborators_workspace_id_workspaces_id_fk": {
           "name": "collaborators_workspace_id_workspaces_id_fk",
           "tableFrom": "collaborators",
-          "columnsFrom": [
-            "workspace_id"
-          ],
+          "columnsFrom": ["workspace_id"],
           "tableTo": "workspaces",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "collaborators_user_id_users_id_fk": {
           "name": "collaborators_user_id_users_id_fk",
           "tableFrom": "collaborators",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -132,13 +124,9 @@
         "oauth_user_id_users_id_fk": {
           "name": "oauth_user_id_users_id_fk",
           "tableFrom": "oauth",
-          "columnsFrom": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -229,39 +217,27 @@
         "status_columns_workspace_id_workspaces_id_fk": {
           "name": "status_columns_workspace_id_workspaces_id_fk",
           "tableFrom": "status_columns",
-          "columnsFrom": [
-            "workspace_id"
-          ],
+          "columnsFrom": ["workspace_id"],
           "tableTo": "workspaces",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "status_columns_created_by_users_id_fk": {
           "name": "status_columns_created_by_users_id_fk",
           "tableFrom": "status_columns",
-          "columnsFrom": [
-            "created_by"
-          ],
+          "columnsFrom": ["created_by"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         },
         "status_columns_last_updated_by_users_id_fk": {
           "name": "status_columns_last_updated_by_users_id_fk",
           "tableFrom": "status_columns",
-          "columnsFrom": [
-            "last_updated_by"
-          ],
+          "columnsFrom": ["last_updated_by"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         }
@@ -399,13 +375,9 @@
         "workspaces_owner_id_users_id_fk": {
           "name": "workspaces_owner_id_users_id_fk",
           "tableFrom": "workspaces",
-          "columnsFrom": [
-            "owner_id"
-          ],
+          "columnsFrom": ["owner_id"],
           "tableTo": "users",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }

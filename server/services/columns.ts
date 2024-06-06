@@ -108,7 +108,6 @@ export const updateStatusColumn = async (
           .where(
             and(
               eq(statusColumns.workspaceId, workspaceId),
-              //I think this has to be gte
               gte(statusColumns.order, data.order),
               not(eq(statusColumns.id, id)),
             ),

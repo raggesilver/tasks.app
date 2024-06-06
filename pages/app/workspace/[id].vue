@@ -75,7 +75,6 @@ useHead({
 const [boardRef, cols, updateConfig] = useDragAndDrop(columns.value ?? [], {
   group: "board",
   sortable: true,
-  //dragHandle: ".drag-handle",
   plugins: [swap()],
 });
 

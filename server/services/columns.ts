@@ -1,4 +1,3 @@
-import assert from "assert";
 import { and, eq, gt, lt, not, sql } from "drizzle-orm";
 import type {
   CreateStatusColumnInput,
@@ -86,7 +85,7 @@ export const updateStatusColumn = async (
   workspaceId: string,
   id: string,
   data: UpdateStatusColumnInput,
-): Promise<StatusColumn> => {
+): Promise<StatusColumn | null> => {
   const row = await db.transaction(async (tx) => {
     // TODO: we can optimize this by only executing the query if the order is
     // being updated.
@@ -97,7 +96,8 @@ export const updateStatusColumn = async (
       })
       .execute();
 
-    assert(current);
+    if (!current) return null;
+
     if (data.order && data.order !== current.order) {
       if (data.order < current.order) {
         // Increment the order of all status columns with an order greater than

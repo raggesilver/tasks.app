@@ -21,23 +21,27 @@ const typedError = computed(
 );
 
 const is404 = computed(() => typedError.value?.statusCode === 404);
+
+const title = computed(() => data.value?.name ?? "Workspace");
+
+useHead({
+  title,
+});
 </script>
 
 <template>
   <div class="flex flex-col flex-grow p-8 gap-8">
     <template v-if="data">
       <h1 class="text-3xl font-extrabold">{{ data.name }}</h1>
-      <div
-        class="flex-grow overflow-x-auto min-w-full flex flex-row gap-8 items-stretch"
-      >
-        <span v-for="column in columns" :key="column.id">
-          {{ column.name }}
-        </span>
-        <span
-          class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed"
-        >
-          <CreateColumn />
-        </span>
+      <div class="flex-grow overflow-x-auto overflow-y-hidden min-w-full">
+        <div class="flex flex-row gap-8 items-stretch">
+          <StatusColumn v-for="column in columns" :key="column.id" :column />
+          <span
+            class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"
+          >
+            <CreateColumn />
+          </span>
+        </div>
       </div>
     </template>
     <template v-else-if="is404" class="">

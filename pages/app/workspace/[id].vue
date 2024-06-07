@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import type { FetchError } from "ofetch";
 import { swap } from "@formkit/drag-and-drop";
 import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
-import type { StatusColumn } from "~/server/db/schema";
+import type { FetchError } from "ofetch";
 import { toast } from "vue-sonner";
+import type { StatusColumn } from "~/server/db/schema";
 
 definePageMeta({
   layout: "app",
@@ -74,6 +74,7 @@ useHead({
 
 const [boardRef, cols, updateConfig] = useDragAndDrop(columns.value ?? [], {
   group: "board",
+  dragHandle: ".drag-handle",
   sortable: true,
   plugins: [swap()],
 });
@@ -103,11 +104,11 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col flex-grow p-8 gap-8">
+  <div class="flex flex-col flex-grow px-8 pt-8 gap-8">
     <template v-if="data">
       <h1 class="text-3xl font-extrabold">{{ data.name }}</h1>
       <div
-        class="flex-grow flex flex-row items-start gap-8 overflow-x-auto overflow-y-hidden min-w-full"
+        class="flex-grow flex flex-row items-start gap-8 overflow-x-auto overflow-y-hidden min-w-full -mx-8 px-8 pb-8"
       >
         <div class="flex flex-row gap-8 items-stretch" ref="boardRef">
           <StatusColumn v-for="column in cols" :key="column.id" :column />

@@ -9,7 +9,7 @@ defineProps<{
   column: StatusColumn;
 }>();
 
-const isDesktop = useMediaQuery("(min-width: 768px)");
+const isDesktop = useMediaQuery("(min-width: 640px)");
 
 const title = "Update Column";
 </script>
@@ -34,7 +34,7 @@ const title = "Update Column";
         <Form @dismiss="isOpen = false" :column />
         <DrawerFooter class="pt-2">
           <DrawerClose as-child>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" class="w-full">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

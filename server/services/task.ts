@@ -22,11 +22,16 @@ export const getTaskById = async (id: string): Promise<Task | null> => {
 };
 
 export const getTasksForStatusColumn = async (
+  workspaceId: string,
   statusColumnId: string,
 ): Promise<Task[]> => {
   return db.query.tasks
     .findMany({
-      where: (table, { eq }) => eq(table.statusColumnId, statusColumnId),
+      where: (table, { eq, and }) =>
+        and(
+          eq(table.statusColumnId, statusColumnId),
+          eq(table.workspaceId, workspaceId),
+        ),
     })
     .execute();
 };

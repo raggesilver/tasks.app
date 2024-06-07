@@ -72,35 +72,38 @@ useHead({
   title,
 });
 
-const [boardRef, cols, updateConfig] = useDragAndDrop(columns.value ?? [], {
-  group: "board",
-  dragHandle: ".drag-handle",
-  sortable: true,
-  plugins: [swap()],
-});
+//const [boardRef, cols, updateConfig] = useDragAndDrop(columns.value ?? [], {
+//  group: "board",
+//  dragHandle: ".drag-handle",
+//  draggable: (child) => {
+//    return child.closest(".task-card") === null;
+//  },
+//  sortable: true,
+//  plugins: [swap()],
+//});
 
-watch(
-  columns,
-  () => {
-    // Updating board
-    updateConfig(columns.value ?? []);
-  },
-  { deep: true },
-);
-
-watch(
-  cols,
-  async () => {
-    const changedIndex = cols.value.findIndex((col, i) => col.order !== i);
-    if (changedIndex === -1) return;
-
-    await mutateAsync({
-      col: cols.value[changedIndex],
-      newOrder: changedIndex,
-    });
-  },
-  { deep: true },
-);
+//watch(
+//  columns,
+//  () => {
+//    // Updating board
+//    updateConfig(columns.value ?? []);
+//  },
+//  { deep: true },
+//);
+//
+//watch(
+//  cols,
+//  async () => {
+//    const changedIndex = cols.value.findIndex((col, i) => col.order !== i);
+//    if (changedIndex === -1) return;
+//
+//    await mutateAsync({
+//      col: cols.value[changedIndex],
+//      newOrder: changedIndex,
+//    });
+//  },
+//  { deep: true },
+//);
 </script>
 
 <template>
@@ -110,8 +113,12 @@ watch(
       <div
         class="flex-grow flex flex-row items-start gap-8 overflow-x-auto overflow-y-hidden min-w-full -mx-8 px-8 pb-8"
       >
-        <div class="flex flex-row gap-8 items-stretch" ref="boardRef">
-          <StatusColumn v-for="column in cols" :key="column.id" :column />
+        <div
+          v-if="columns?.length"
+          class="flex flex-row gap-8 items-stretch"
+          ref="boardRef"
+        >
+          <StatusColumn v-for="column in columns" :key="column.id" :column />
         </div>
         <span
           class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"

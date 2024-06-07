@@ -32,6 +32,8 @@ export const getTasksForStatusColumn = async (
           eq(table.statusColumnId, statusColumnId),
           eq(table.workspaceId, workspaceId),
         ),
+      // Most recently created tasks first
+      orderBy: (table, { desc }) => desc(table.createdAt),
     })
     .execute();
 };

@@ -1,23 +1,77 @@
 <script setup lang="ts">
-import type { StatusColumn } from "~/server/db/schema";
+import { toast } from "vue-sonner";
+import { z } from "zod";
+import type { StatusColumn, Task } from "~/server/db/schema";
 
 const props = defineProps<{
   column: StatusColumn;
 }>();
 
-const { data: tasks, suspense } = useTasks(
-  props.column.workspaceId,
-  props.column.id,
-);
+const {
+  data: tasks,
+  suspense,
+  mutate,
+} = useTasks(props.column.workspaceId, props.column.id);
 
 await suspense();
+
+const dropSchema = z.object({
+  //taskId: z.string().uuid(),
+  task: z.any(),
+  //statusColumnId: z.string().uuid(),
+});
+
+const onDrop = async (event: DragEvent) => {
+  const data = await dropSchema.safeParseAsync({
+    task: JSON.parse(event.dataTransfer!.getData("task")),
+  });
+
+  // Invalid drop
+  if (!data.success) {
+    console.error(data.error);
+    return;
+  }
+
+  const { task } = data.data;
+
+  // No need to move the task if it's already in the same column
+  if (task.statusColumnId === props.column.id) {
+    return;
+  }
+
+  await mutate({
+    task,
+    data: { statusColumnId: props.column.id },
+  })
+    .then(() => {
+      toast.success("Task moved successfully");
+    })
+    .catch((err) => {
+      console.error(err);
+      toast.error("Failed to move task");
+    });
+};
+
+const onDragStart = (event: DragEvent, task: Task) => {
+  console.log({ event, task });
+  event.dataTransfer!.dropEffect = "move";
+  event.dataTransfer!.effectAllowed = "move";
+  //event.dataTransfer!.setData("taskId", task.id);
+  event.dataTransfer?.setData("statusColumnId", props.column.id);
+  event.dataTransfer?.setData("task", JSON.stringify(task));
+};
 
 const showEditModal = ref(false);
 const showCreateTaskModal = ref(false);
 </script>
 
 <template>
-  <Card class="w-xs flex-shrink-0 self-start bg-muted">
+  <Card
+    class="w-xs flex-shrink-0 self-start bg-muted"
+    @drop="onDrop"
+    @dragover.prevent
+    @dragenter.prevent
+  >
     <CardHeader class="px-2 pt-2">
       <CardTitle class="flex flex-row gap-2 items-center">
         <div class="drag-handle text-muted-foreground cursor-grab">
@@ -48,8 +102,14 @@ const showCreateTaskModal = ref(false);
       </CardTitle>
     </CardHeader>
     <CardContent class="px-2">
-      <ol v-if="tasks">
-        <Card v-for="task in tasks" :key="task.id" class="shadow-none text-sm">
+      <ol v-if="tasks" ref="tasksRef" class="flex flex-col gap-2">
+        <Card
+          v-for="task in tasks"
+          :key="task.id"
+          class="shadow-none text-sm task-card"
+          draggable="true"
+          @dragstart="onDragStart($event, task)"
+        >
           <CardHeader>
             <CardTitle class="font-normal">{{ task.title }}</CardTitle>
           </CardHeader>

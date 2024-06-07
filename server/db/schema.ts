@@ -161,6 +161,9 @@ export const tasks = pgTable(
   }),
 );
 
+export type Task = typeof tasks.$inferSelect;
+export type NewTask = typeof tasks.$inferInsert;
+
 // Relations
 
 export const oauthRelations = relations(oauth, ({ one }) => ({

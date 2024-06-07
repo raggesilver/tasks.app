@@ -16,7 +16,18 @@ export const updateStatusColumnSchema = createStatusColumnSchema
   )
   .partial();
 
+export const updateTaskSchema = z
+  .object({
+    name: z.string().min(5).max(255),
+    description: z.string().min(5).max(255),
+    statusColumnId: z.string().uuid(),
+    order: z.number().int(),
+  })
+  .partial();
+
 export type CreateWorkspaceInput = z.infer<typeof createWorkspaceSchema>;
 
 export type CreateStatusColumnInput = z.infer<typeof createStatusColumnSchema>;
 export type UpdateStatusColumnInput = z.infer<typeof updateStatusColumnSchema>;
+
+export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;

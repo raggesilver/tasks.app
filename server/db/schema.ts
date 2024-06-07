@@ -129,6 +129,41 @@ export const collaborators = pgTable(
 export type Collaborator = typeof collaborators.$inferSelect;
 export type NewCollaborator = typeof collaborators.$inferInsert;
 
+export const tasks = pgTable(
+  "tasks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, {
+        onDelete: "cascade",
+      }),
+    statusColumnId: uuid("status_column_id")
+      .notNull()
+      .references(() => statusColumns.id, {
+        onDelete: "cascade",
+      }),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: varchar("description", { length: 255 }),
+    //order: integer("order").notNull(),
+    createdById: uuid("created_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    lastUpdatedById: uuid("last_updated_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    // Tasks are ordered by created_at for now.
+    // uniqueIndex: uniqueIndex().on(table.workspaceId, table.statusColumnId, table.order),
+  }),
+);
+
+export type Task = typeof tasks.$inferSelect;
+export type NewTask = typeof tasks.$inferInsert;
+
 // Relations
 
 export const oauthRelations = relations(oauth, ({ one }) => ({
@@ -162,18 +197,40 @@ export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
   statusColumns: many(statusColumns),
 }));
 
-export const statusColumnsRelations = relations(statusColumns, ({ one }) => ({
+export const statusColumnsRelations = relations(
+  statusColumns,
+  ({ one, many }) => ({
+    workspace: one(workspaces, {
+      fields: [statusColumns.workspaceId],
+      references: [workspaces.id],
+    }),
+    lastUpdatedBy: one(users, {
+      fields: [statusColumns.lastUpdatedById],
+      references: [users.id],
+    }),
+    createdBy: one(users, {
+      fields: [statusColumns.createdById],
+      references: [users.id],
+    }),
+    tasks: many(tasks),
+  }),
+);
+
+export const tasksRelations = relations(tasks, ({ one }) => ({
   workspace: one(workspaces, {
-    fields: [statusColumns.workspaceId],
+    fields: [tasks.workspaceId],
     references: [workspaces.id],
   }),
-  lastUpdatedBy: one(users, {
-    fields: [statusColumns.lastUpdatedById],
-    references: [users.id],
+  statusColumn: one(statusColumns, {
+    fields: [tasks.statusColumnId],
+    references: [statusColumns.id],
   }),
   createdBy: one(users, {
-    fields: [statusColumns.createdById],
+    fields: [tasks.createdById],
     references: [users.id],
   }),
-  // tickets: many(tickets),
+  lastUpdatedBy: one(users, {
+    fields: [tasks.lastUpdatedById],
+    references: [users.id],
+  }),
 }));

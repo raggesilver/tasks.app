@@ -177,17 +177,13 @@ const canDragColumn = ref(false);
     </CardHeader>
     <CardContent class="px-2">
       <ol v-if="tasks" ref="tasksRef" class="flex flex-col gap-2">
-        <Card
+        <MiniTask
           v-for="task in tasks"
           :key="task.id"
-          class="shadow-none text-sm task-card dark:bg-background/40"
+          :task
           draggable="true"
-          @dragstart="onDragStart($event, task)"
-        >
-          <CardHeader>
-            <CardTitle class="font-normal">{{ task.title }}</CardTitle>
-          </CardHeader>
-        </Card>
+          :onDragStart="onDragStart"
+        />
       </ol>
       <!-- List of tasks -->
     </CardContent>

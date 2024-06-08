@@ -16,21 +16,42 @@ const {
 await suspense();
 
 const dropSchema = z.object({
-  //taskId: z.string().uuid(),
   task: z.any(),
-  //statusColumnId: z.string().uuid(),
+  type: z.literal("task"),
 });
 
-const onDrop = async (event: DragEvent) => {
+const handleColumnDrop = async (event: DragEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const columnElement = (event.target as HTMLElement).closest(".status-column");
+
+  if (!columnElement) {
+    return;
+  }
+
+  if (event.offsetX / columnElement.clientWidth > 0.5) {
+    console.log("right");
+  } else {
+    console.log("left");
+  }
+};
+
+const handleTaskDrop = async (event: DragEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+
   const data = await dropSchema.safeParseAsync({
-    task: JSON.parse(event.dataTransfer!.getData("task")),
+    task: JSON.parse(event.dataTransfer!.getData("task") || "null"),
+    type: event.dataTransfer!.getData("type"),
   });
 
   // Invalid drop
   if (!data.success) {
-    console.error(data.error);
     return;
   }
+
+  event.stopPropagation();
 
   const { task } = data.data;
 
@@ -52,29 +73,61 @@ const onDrop = async (event: DragEvent) => {
     });
 };
 
+const onDrop = async (event: DragEvent) => {
+  const type = event.dataTransfer?.getData("type");
+
+  switch (type) {
+    case "task":
+      return await handleTaskDrop(event);
+    case "status-column":
+      return await handleColumnDrop(event);
+    default:
+      break;
+  }
+};
+
 const onDragStart = (event: DragEvent, task: Task) => {
-  console.log({ event, task });
+  event.stopPropagation();
   event.dataTransfer!.dropEffect = "move";
   event.dataTransfer!.effectAllowed = "move";
-  //event.dataTransfer!.setData("taskId", task.id);
+  event.dataTransfer!.setData("type", "task");
   event.dataTransfer?.setData("statusColumnId", props.column.id);
   event.dataTransfer?.setData("task", JSON.stringify(task));
 };
 
+const onColumnDragStart = (event: DragEvent) => {
+  event.stopPropagation();
+  event.dataTransfer!.dropEffect = "move";
+  event.dataTransfer!.effectAllowed = "move";
+  event.dataTransfer!.setData("type", "status-column");
+  event.dataTransfer!.setData("status-column", JSON.stringify(props.column));
+};
+
 const showEditModal = ref(false);
 const showCreateTaskModal = ref(false);
+
+const canDragColumn = ref(false);
 </script>
 
 <template>
   <Card
-    class="w-xs flex-shrink-0 self-start bg-muted"
+    class="w-xs flex-shrink-0 self-start bg-muted status-column"
     @drop="onDrop"
     @dragover.prevent
     @dragenter.prevent
+    :draggable="canDragColumn"
+    @dragstart="onColumnDragStart"
+    v-bind="$attrs"
   >
     <CardHeader class="px-2 pt-2">
       <CardTitle class="flex flex-row gap-2 items-center">
-        <div class="drag-handle text-muted-foreground cursor-grab">
+        <div
+          class="drag-handle text-muted-foreground cursor-grab"
+          @mousedown="canDragColumn = true"
+          @touchstart="canDragColumn = true"
+          @mouseup="canDragColumn = false"
+          @touchend="canDragColumn = false"
+        >
           <Icon name="lucide:ellipsis-vertical" />
           <Icon name="lucide:ellipsis-vertical" style="margin-left: -8px" />
         </div>
@@ -106,7 +159,7 @@ const showCreateTaskModal = ref(false);
         <Card
           v-for="task in tasks"
           :key="task.id"
-          class="shadow-none text-sm task-card"
+          class="shadow-none text-sm task-card dark:bg-background/40"
           draggable="true"
           @dragstart="onDragStart($event, task)"
         >

@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { swap } from "@formkit/drag-and-drop";
-import { useDragAndDrop } from "@formkit/drag-and-drop/vue";
 import type { FetchError } from "ofetch";
 import { toast } from "vue-sonner";
 import type { StatusColumn } from "~/server/db/schema";
@@ -71,39 +69,6 @@ const title = computed(() => data.value?.name ?? "Workspace");
 useHead({
   title,
 });
-
-//const [boardRef, cols, updateConfig] = useDragAndDrop(columns.value ?? [], {
-//  group: "board",
-//  dragHandle: ".drag-handle",
-//  draggable: (child) => {
-//    return child.closest(".task-card") === null;
-//  },
-//  sortable: true,
-//  plugins: [swap()],
-//});
-
-//watch(
-//  columns,
-//  () => {
-//    // Updating board
-//    updateConfig(columns.value ?? []);
-//  },
-//  { deep: true },
-//);
-//
-//watch(
-//  cols,
-//  async () => {
-//    const changedIndex = cols.value.findIndex((col, i) => col.order !== i);
-//    if (changedIndex === -1) return;
-//
-//    await mutateAsync({
-//      col: cols.value[changedIndex],
-//      newOrder: changedIndex,
-//    });
-//  },
-//  { deep: true },
-//);
 </script>
 
 <template>
@@ -117,8 +82,14 @@ useHead({
           v-if="columns?.length"
           class="flex flex-row gap-8 items-stretch"
           ref="boardRef"
+          @drop="onDrop"
         >
-          <StatusColumn v-for="column in columns" :key="column.id" :column />
+          <StatusColumn
+            v-for="column in columns"
+            :key="column.id"
+            :column
+            class="status-column"
+          />
         </div>
         <span
           class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"

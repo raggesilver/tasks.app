@@ -13,6 +13,15 @@ const {
   mutate,
 } = useTasks(props.column.workspaceId, props.column.id);
 
+const { mutateAsync: mutateStatusColumn } = useStatusColumnMutation({
+  onSuccess: () => {
+    toast.success("Column updated successfully");
+  },
+  onError: () => {
+    toast.error("Failed to update column");
+  },
+});
+
 await suspense();
 
 const dropSchema = z.object({
@@ -30,11 +39,23 @@ const handleColumnDrop = async (event: DragEvent) => {
     return;
   }
 
-  if (event.offsetX / columnElement.clientWidth > 0.5) {
-    console.log("right");
-  } else {
-    console.log("left");
+  const droppedColumn = JSON.parse(
+    event.dataTransfer!.getData("status-column"),
+  );
+
+  if (droppedColumn.id === props.column.id) {
+    return;
   }
+
+  const newOrder =
+    event.offsetX / columnElement.clientWidth > 0.5
+      ? props.column.order + 1
+      : props.column.order;
+
+  await mutateStatusColumn({
+    col: droppedColumn,
+    newOrder,
+  });
 };
 
 const handleTaskDrop = async (event: DragEvent) => {

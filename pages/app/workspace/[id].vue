@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import type { FetchError } from "ofetch";
-import { toast } from "vue-sonner";
-import type { StatusColumn } from "~/server/db/schema";
 
 definePageMeta({
   layout: "app",
@@ -12,46 +10,6 @@ const id = computed(() => route.params.id.toString());
 
 const { data, error, suspense } = useWorkspace(id);
 const { data: columns, suspense: statusSuspense } = useStatusColumns(id);
-
-const client = useQueryClient();
-const { mutateAsync } = useMutation(
-  {
-    mutationFn: ({
-      col,
-      newOrder,
-    }: {
-      col: StatusColumn;
-      newOrder: number;
-    }): Promise<StatusColumn | null> => {
-      // @ts-ignore
-      return $fetch(`/api/column/${col.workspaceId}/${col.id}`, {
-        method: "PATCH",
-        body: { order: newOrder },
-      });
-    },
-    onSuccess: async (column) => {
-      if (!column) return;
-
-      await client.invalidateQueries({
-        queryKey: ["workspace-columns", id.value],
-      });
-
-      await client.invalidateQueries({
-        queryKey: ["workspace", id.value],
-      });
-
-      // TODO: we are not doing optimistic updates here since it would require
-      // reimplementing the update logic in the client. We should consider
-      // returning all columns from the server.
-
-      // TODO: We should invalidate individual column queries here as well
-    },
-    onError: () => {
-      toast.error("Failed to update column order");
-    },
-  },
-  client,
-);
 
 await Promise.all([suspense(), statusSuspense()]);
 
@@ -82,7 +40,6 @@ useHead({
           v-if="columns?.length"
           class="flex flex-row gap-8 items-stretch"
           ref="boardRef"
-          @drop="onDrop"
         >
           <StatusColumn
             v-for="column in columns"

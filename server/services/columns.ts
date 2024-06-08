@@ -4,7 +4,7 @@ import type {
   UpdateStatusColumnInput,
 } from "~/lib/validation";
 import { db } from "../db/db";
-import { StatusColumn, statusColumns } from "../db/schema";
+import { statusColumns, type StatusColumn } from "../db/schema";
 import { DuplicateError } from "../lib/errors";
 
 // This service does not perform RBAC checks on users/workspaces before

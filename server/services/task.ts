@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { UpdateTaskInput } from "~/lib/validation";
+import { type UpdateTaskInput } from "~/lib/validation";
 import { db } from "../db/db";
 import { tasks, type NewTask, type Task } from "../db/schema";
 

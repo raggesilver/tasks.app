@@ -1,75 +1,18 @@
-# Nuxt 3 Minimal Starter
+# Tasks.app
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Tasks.app is a Trello clone I'm building as a project for my Software 
+Engineering course at [Infnet](https://www.infnet.edu.br/infnet/home/). The 
+project is being developed using the following technologies:
 
-## Setup
+- [Nuxt.js](https://nuxt.com)
+- [Nuxt Auth Utils](https://github.com/Atinux/nuxt-auth-utils) — OAuth
+- [Uno.css](https://unocss.dev)
+- [Drizzle ORM](https://orm.drizzle.team)
+- PostgreSQL
+- [Bun](https://bun.sh)
+- Docker
 
-Make sure to install the dependencies:
+The goal of this project is to re-implement a subset of Trello's features,
+such as creating boards, lists, and cards, and moving cards between lists.
 
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+[Screenshot of the app's workspace view, featuring two columns with a few tasks, and a third, placeholder column with a button to create a new column](./assets/images/app-screenshot.webp)

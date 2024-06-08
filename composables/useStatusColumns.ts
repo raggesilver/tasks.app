@@ -2,34 +2,7 @@ import type { StatusColumn } from "~/server/db/schema";
 
 export const useStatusColumns = (workspaceId: MaybeRefOrGetter<string>) => {
   const client = useQueryClient();
-  const {
-    data,
-    isLoading,
-    suspense,
-    error,
-    // I have no clue what Vue does with rest destructuring, so I'm just going to
-    // desctructure and return everything one by one.
-    status,
-    isError,
-    isStale,
-    refetch,
-    isPaused,
-    isFetched,
-    isPending,
-    isSuccess,
-    isFetching,
-    fetchStatus,
-    failureCount,
-    isRefetching,
-    dataUpdatedAt,
-    failureReason,
-    errorUpdatedAt,
-    isLoadingError,
-    isRefetchError,
-    errorUpdateCount,
-    isPlaceholderData,
-    isFetchedAfterMount,
-  } = useQuery(
+  const { ...rest } = useQuery(
     {
       queryKey: ["workspace-columns", workspaceId],
       queryFn: () =>
@@ -63,30 +36,60 @@ export const useStatusColumns = (workspaceId: MaybeRefOrGetter<string>) => {
   );
 
   return {
-    data,
-    isLoading,
-    suspense,
     client,
-    error,
-    status,
-    isError,
-    isStale,
-    refetch,
-    isPaused,
-    isFetched,
-    isPending,
-    isSuccess,
-    isFetching,
-    fetchStatus,
-    failureCount,
-    isRefetching,
-    dataUpdatedAt,
-    failureReason,
-    errorUpdatedAt,
-    isLoadingError,
-    isRefetchError,
-    errorUpdateCount,
-    isPlaceholderData,
-    isFetchedAfterMount,
+    ...rest,
   };
+};
+
+export const useStatusColumnMutation = (
+  options: {
+    onSuccess?: (column: StatusColumn) => void;
+    onError?: (error: Error) => void;
+  } = {},
+) => {
+  const client = useQueryClient();
+  const { mutateAsync } = useMutation(
+    {
+      mutationFn: ({
+        col,
+        newOrder,
+      }: {
+        col: StatusColumn;
+        newOrder: number;
+      }): Promise<StatusColumn | null> => {
+        // @ts-ignore
+        return $fetch(`/api/column/${col.workspaceId}/${col.id}`, {
+          method: "PATCH",
+          body: { order: newOrder },
+        });
+      },
+      onSuccess: async (column: StatusColumn | null) => {
+        if (!column) return;
+
+        // TODO: we are not doing optimistic updates here since it would require
+        // reimplementing the update logic in the client. We should consider
+        // returning all columns from the server.
+
+        // TODO: We should invalidate individual column queries here as well
+
+        //await client.setQueryData(["status-column", column.id], column);
+
+        await client.invalidateQueries({
+          queryKey: ["workspace-columns", column.workspaceId],
+        });
+
+        await client.invalidateQueries({
+          queryKey: ["workspace", column.workspaceId],
+        });
+
+        options.onSuccess?.(column);
+      },
+      onError: (error) => {
+        options.onError?.(error);
+      },
+    },
+    client,
+  );
+
+  return { mutateAsync };
 };

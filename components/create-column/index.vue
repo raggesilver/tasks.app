@@ -2,7 +2,7 @@
 import { useMediaQuery } from "@vueuse/core";
 import Form from "./form.vue";
 
-const isDesktop = useMediaQuery("(min-width: 768px)");
+const isDesktop = useMediaQuery("(min-width: 640px)");
 
 const isOpen = ref(false);
 

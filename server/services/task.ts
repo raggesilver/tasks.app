@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { UpdateTaskInput } from "~/lib/validation";
+import { type UpdateTaskInput } from "~/lib/validation";
 import { db } from "../db/db";
 import { tasks, type NewTask, type Task } from "../db/schema";
 
@@ -22,11 +22,18 @@ export const getTaskById = async (id: string): Promise<Task | null> => {
 };
 
 export const getTasksForStatusColumn = async (
+  workspaceId: string,
   statusColumnId: string,
 ): Promise<Task[]> => {
   return db.query.tasks
     .findMany({
-      where: (table, { eq }) => eq(table.statusColumnId, statusColumnId),
+      where: (table, { eq, and }) =>
+        and(
+          eq(table.statusColumnId, statusColumnId),
+          eq(table.workspaceId, workspaceId),
+        ),
+      // Most recently created tasks first
+      orderBy: (table, { desc }) => desc(table.createdAt),
     })
     .execute();
 };

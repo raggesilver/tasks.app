@@ -2,12 +2,16 @@
 import { useMediaQuery } from "@vueuse/core";
 import Form from "./form.vue";
 
+const isOpen = defineModel<boolean>("isOpen", { default: false });
+
+defineProps<{
+  statusColumnId: string;
+  workspaceId: string;
+}>();
+
 const isDesktop = useMediaQuery("(min-width: 640px)");
 
-const isOpen = ref(false);
-
-const title = "Create Workspace";
-const description = "Create a new workspace to organize your tasks.";
+const title = "Create Task";
 </script>
 
 <template>
@@ -17,9 +21,8 @@ const description = "Create a new workspace to organize your tasks.";
       <DialogContent class="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{{ title }}</DialogTitle>
-          <DialogDescription>{{ description }}</DialogDescription>
         </DialogHeader>
-        <Form @dismiss="isOpen = false" />
+        <Form @dismiss="isOpen = false" :workspaceId :statusColumnId />
       </DialogContent>
     </Dialog>
     <!-- And an iOS-like bottom sheet on mobile -->
@@ -27,9 +30,8 @@ const description = "Create a new workspace to organize your tasks.";
       <DrawerContent>
         <DrawerHeader class="text-left">
           <DrawerTitle>{{ title }}</DrawerTitle>
-          <DrawerDescription>{{ description }}</DrawerDescription>
         </DrawerHeader>
-        <Form @dismiss="isOpen = false" />
+        <Form @dismiss="isOpen = false" :workspaceId :statusColumnId />
         <DrawerFooter class="pt-2">
           <DrawerClose as-child>
             <Button variant="outline">Cancel</Button>
@@ -38,8 +40,4 @@ const description = "Create a new workspace to organize your tasks.";
       </DrawerContent>
     </Drawer>
   </ClientOnly>
-
-  <Button variant="outline" @click="isOpen = true" size="sm">
-    Create <Icon name="lucide:plus" />
-  </Button>
 </template>

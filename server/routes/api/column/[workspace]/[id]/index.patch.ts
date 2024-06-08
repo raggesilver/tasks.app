@@ -1,5 +1,5 @@
 import { updateStatusColumnSchema } from "~/lib/validation";
-import { StatusColumn } from "~/server/db/schema";
+import { type StatusColumn } from "~/server/db/schema";
 import { updateStatusColumn } from "~/server/services/columns";
 import { getWorkspaceById } from "~/server/services/workspace";
 

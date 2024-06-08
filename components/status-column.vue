@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { walkUpBindingElementsAndPatterns } from "typescript";
 import { toast } from "vue-sonner";
 import { z } from "zod";
 import type { StatusColumn, Task } from "~/server/db/schema";
@@ -15,7 +16,7 @@ const {
 
 const { mutateAsync: mutateStatusColumn } = useStatusColumnMutation({
   onSuccess: () => {
-    toast.success("Column updated successfully");
+    toast("Column updated successfully");
   },
   onError: () => {
     toast.error("Failed to update column");
@@ -23,6 +24,11 @@ const { mutateAsync: mutateStatusColumn } = useStatusColumnMutation({
 });
 
 await suspense();
+
+const hasDragOver = ref(false);
+const showEditModal = ref(false);
+const showCreateTaskModal = ref(false);
+const canDragColumn = ref(false);
 
 const dropSchema = z.object({
   task: z.any(),
@@ -86,7 +92,7 @@ const handleTaskDrop = async (event: DragEvent) => {
     data: { statusColumnId: props.column.id },
   })
     .then(() => {
-      toast.success("Task moved successfully");
+      toast("Task moved successfully");
     })
     .catch((err) => {
       console.error(err);
@@ -95,6 +101,7 @@ const handleTaskDrop = async (event: DragEvent) => {
 };
 
 const onDrop = async (event: DragEvent) => {
+  hasDragOver.value = false;
   const type = event.dataTransfer?.getData("type");
 
   switch (type) {
@@ -109,8 +116,8 @@ const onDrop = async (event: DragEvent) => {
 
 const onDragStart = (event: DragEvent, task: Task) => {
   event.stopPropagation();
-  event.dataTransfer!.dropEffect = "move";
   event.dataTransfer!.effectAllowed = "move";
+  event.dataTransfer!.dropEffect = "move";
   event.dataTransfer!.setData("type", "task");
   event.dataTransfer?.setData("statusColumnId", props.column.id);
   event.dataTransfer?.setData("task", JSON.stringify(task));
@@ -118,24 +125,39 @@ const onDragStart = (event: DragEvent, task: Task) => {
 
 const onColumnDragStart = (event: DragEvent) => {
   event.stopPropagation();
-  event.dataTransfer!.dropEffect = "move";
   event.dataTransfer!.effectAllowed = "move";
+  event.dataTransfer!.dropEffect = "move";
   event.dataTransfer!.setData("type", "status-column");
   event.dataTransfer!.setData("status-column", JSON.stringify(props.column));
 };
 
-const showEditModal = ref(false);
-const showCreateTaskModal = ref(false);
+const onDragOver = (event: DragEvent) => {
+  // TODO: switch on the type of data being dragged and add styles for
+  // columns as well
+  if (
+    event.dataTransfer?.getData("type") !== "task" ||
+    event.dataTransfer?.getData("statusColumnId") === props.column.id
+  ) {
+    return;
+  }
 
-const canDragColumn = ref(false);
+  hasDragOver.value = true;
+};
+
+const onDragLeave = () => {
+  hasDragOver.value = false;
+};
 </script>
 
 <template>
   <Card
-    class="w-xs flex-shrink-0 self-start bg-muted status-column"
+    class="w-xs flex-shrink-0 self-start bg-muted status-column drag border-2 border-dashed"
+    :class="hasDragOver ? 'border-blue-400' : 'border-transparent'"
     @drop="onDrop"
-    @dragover.prevent
+    @dragover.prevent="onDragOver"
     @dragenter.prevent
+    @dragleave="onDragLeave"
+    @dragend="onDragLeave"
     :draggable="canDragColumn"
     @dragstart="onColumnDragStart"
     v-bind="$attrs"

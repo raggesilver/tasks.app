@@ -15,4 +15,4 @@ project is being developed using the following technologies:
 The goal of this project is to re-implement a subset of Trello's features,
 such as creating boards, lists, and cards, and moving cards between lists.
 
-[Screenshot of the app's workspace view, featuring two columns with a few tasks, and a third, placeholder column with a button to create a new column](./assets/images/app-screenshot.webp)
+![Screenshot of the app's workspace view, featuring two columns with a few tasks, and a third, placeholder column with a button to create a new column](./assets/images/app-screenshot.webp)

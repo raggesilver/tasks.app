@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import useMarkdownParser from "@/composables/useMarkdownParser";
+
 const props = defineProps<{
   taskId: string;
 }>();
@@ -22,20 +24,37 @@ watch(isOpen, (value) => {
     emit("close");
   }
 });
+
+const parser = useMarkdownParser();
+const markdown = ref(await parser(task.value?.description || ""));
+
+watch(
+  () => task.value?.description,
+  async (value) => {
+    markdown.value = await parseMarkdown(value || "");
+  },
+);
 </script>
 
 <template>
   <Dialog v-if="task" v-model:open="isOpen">
-    <DialogContent>
+    <DialogContent
+      class="grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90dvh] overflow-x-hidden"
+    >
       <DialogHeader>
         <DialogTitle class="text-xl font-bold">{{ task.title }}</DialogTitle>
       </DialogHeader>
-      <div class="flex gap-4 py-4">
+      <div class="flex gap-4 py-4 overflow-y-auto max-w-full">
         <div class="flex flex-col gap-8 flex-grow-1">
           <section>
             <p class="text-sm text-muted-foreground">Description</p>
-            <DialogDescription>
-              <p class="text-base text-foreground">{{ task.description }}</p>
+            <DialogDescription class="text-base text-foreground">
+              <!-- <p class="text-base text-foreground">{{ task.description }}</p> -->
+              <MDCRenderer
+                :body="markdown.body"
+                :data="markdown.data"
+                class="markdown"
+              />
             </DialogDescription>
           </section>
 

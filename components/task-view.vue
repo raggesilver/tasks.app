@@ -13,6 +13,10 @@ const isOpen = ref(true);
 
 await suspense();
 
+useHead({
+  title: task.value?.title,
+});
+
 watch(isOpen, (value) => {
   if (!value) {
     emit("close");

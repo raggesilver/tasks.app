@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   integer,
   pgTable,
+  text,
   timestamp,
   uniqueIndex,
   uuid,
@@ -144,7 +145,7 @@ export const tasks = pgTable(
         onDelete: "cascade",
       }),
     title: varchar("title", { length: 255 }).notNull(),
-    description: varchar("description", { length: 255 }),
+    description: text("description"),
     //order: integer("order").notNull(),
     createdById: uuid("created_by").references(() => users.id, {
       onDelete: "set null",

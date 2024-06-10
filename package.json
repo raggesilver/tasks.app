@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@radix-icons/vue": "^1.0.0",
-    "@tanstack/vue-query": "^5.40.1",
-    "@tanstack/vue-query-devtools": "^5.40.1",
+    "@tanstack/vue-query": "^5.41.0",
+    "@tanstack/vue-query-devtools": "^5.41.0",
     "@vee-validate/zod": "^4.13.1",
     "@vueuse/core": "^10.10.0",
     "class-variance-authority": "^0.7.0",
@@ -39,12 +39,12 @@
     "@types/slug": "^5.0.8",
     "@unocss/nuxt": "^0.60.4",
     "@vueuse/nuxt": "^10.10.0",
-    "drizzle-kit": "^0.22.5",
+    "drizzle-kit": "^0.22.6",
     "prettier": "^3.3.1",
     "prettier-plugin-organize-imports": "^3.2.4",
     "typescript": "^5.4.5",
     "unocss-preset-animations": "^1.0.2",
-    "vue-tsc": "^2.0.19"
+    "vue-tsc": "^2.0.21"
   },
   "trustedDependencies": [
     "@hebilicious/vue-query-nuxt",

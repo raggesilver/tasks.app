@@ -70,3 +70,62 @@
 body {
   @apply bg-background text-foreground;
 }
+
+pre.shiki {
+  white-space: pre-wrap;
+}
+
+.markdown {
+  & h1,
+  & h2,
+  & h3,
+  & hr {
+    @apply mt-6 mb-3;
+  }
+
+  & p {
+    @apply my-4;
+  }
+
+  & h1 {
+    @apply text-xl font-bold;
+  }
+
+  & h2 {
+    @apply text-lg font-bold;
+  }
+
+  & h3 {
+    @apply text-base font-bold;
+  }
+
+  & pre {
+    @apply p-4 rounded-lg bg-[var(--shiki-default-bg)];
+    --shiki-default-bg: #faf4ed;
+  }
+
+  & ul,
+  & ol {
+    @apply list-disc list-inside;
+
+    &.contains-task-list {
+      @apply list-none;
+    }
+  }
+
+  & ol {
+    @apply list-decimal tabular-nums;
+  }
+
+  & blockquote {
+    @apply border-l-4 border-accent p-2 pl-4 my-4;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .markdown {
+    & pre {
+      --shiki-default-bg: #232136;
+    }
+  }
+}

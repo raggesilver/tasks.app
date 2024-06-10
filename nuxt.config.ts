@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     "nuxt-icon",
     "@vueuse/nuxt",
     "@hebilicious/vue-query-nuxt",
+    "@nuxtjs/mdc",
   ],
   vueQuery: {
     queryClientOptions: {

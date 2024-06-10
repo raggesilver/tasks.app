@@ -130,6 +130,15 @@ export async function getOrCreateUser(
   return user;
 }
 
+export const getUserById = async (userId: string): Promise<User | null> => {
+  return db.query.users
+    .findFirst({
+      where: (table, { eq }) => eq(table.id, userId),
+    })
+    .execute()
+    .then((user) => user ?? null);
+};
+
 export const updateUserSchema = z
   .object({
     email: z.string().email(),

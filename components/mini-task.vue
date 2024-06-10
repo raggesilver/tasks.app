@@ -26,8 +26,10 @@ const onDragEnd = () => {
     @dragstart="onDragStart"
     @dragend="onDragEnd"
   >
-    <CardHeader>
-      <CardTitle class="font-normal">{{ task.title }}</CardTitle>
-    </CardHeader>
+    <NuxtLink :to="`?view-task=${task.id}`">
+      <CardHeader>
+        <CardTitle class="font-normal">{{ task.title }}</CardTitle>
+      </CardHeader>
+    </NuxtLink>
   </Card>
 </template>

@@ -6,7 +6,11 @@ definePageMeta({
 });
 
 const route = useRoute();
+const router = useRouter();
 const id = computed(() => route.params.id.toString());
+const viewTask = computed<string | null>(
+  () => route.query["view-task"]?.toString() ?? null,
+);
 
 const { data, error, suspense } = useWorkspace(id);
 const { data: columns, suspense: statusSuspense } = useStatusColumns(id);
@@ -27,6 +31,10 @@ const title = computed(() => data.value?.name ?? "Workspace");
 useHead({
   title,
 });
+
+const onTaskClosed = () => {
+  router.push({ query: { ...route.query, "view-task": undefined } });
+};
 </script>
 
 <template>
@@ -64,4 +72,5 @@ useHead({
       </div>
     </template>
   </div>
+  <TaskView v-if="viewTask" :taskId="viewTask" @close="onTaskClosed" />
 </template>

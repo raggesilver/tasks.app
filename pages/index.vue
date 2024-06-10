@@ -1,9 +1,6 @@
 <script lang="ts" setup>
-// import { CheckIcon, MenuIcon } from "lucide-vue-next";
 import heroOne from "~/assets/images/app-screenshot.webp?url";
 import { Sheet, SheetTrigger, SheetContent } from "~/components/ui/sheet";
-
-const t = (str: string) => str;
 
 const links = {
   tos: "Terms of Service",

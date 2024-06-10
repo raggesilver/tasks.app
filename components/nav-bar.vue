@@ -40,7 +40,10 @@ const initials = computed(
 <template>
   <nav class="border-b px-8 py-2">
     <div class="flex flex-row items-center gap-4">
-      <nuxt-link class="text-xl font-bold" to="/app">Tasks.app</nuxt-link>
+      <nuxt-link class="text-xl font-bold" to="/app">
+        <Icon name="lucide:check" class="h-6 w-6" />
+        Tasks.app
+      </nuxt-link>
       <span aria-hidden="true" class="mx-auto" />
       <CreateWorkspace />
       <DropdownMenu>

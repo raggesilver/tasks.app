@@ -2,17 +2,24 @@
 import type { HTMLAttributes } from "vue";
 import { cn } from "@/lib/utils";
 
-const props = defineProps<{
-  class?: HTMLAttributes["class"];
-}>();
+const props = withDefaults(
+  defineProps<{
+    class?: HTMLAttributes["class"];
+    as?: string;
+  }>(),
+  {
+    as: "div",
+  },
+);
 </script>
 
 <template>
-  <div
+  <component
+    :is="props.as"
     :class="
       cn('rounded-xl border bg-card text-card-foreground shadow', props.class)
     "
   >
     <slot />
-  </div>
+  </component>
 </template>

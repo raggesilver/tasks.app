@@ -15,7 +15,7 @@ const {
 
 const { mutateAsync: mutateStatusColumn } = useStatusColumnMutation({
   onSuccess: () => {
-    toast.success("Column updated successfully");
+    toast("Column updated successfully");
   },
   onError: () => {
     toast.error("Failed to update column");
@@ -23,6 +23,11 @@ const { mutateAsync: mutateStatusColumn } = useStatusColumnMutation({
 });
 
 await suspense();
+
+const showEditModal = ref(false);
+const showCreateTaskModal = ref(false);
+const canDragColumn = ref(false);
+const dragOverType = ref<"task" | "left" | "right" | null>(null);
 
 const dropSchema = z.object({
   task: z.any(),
@@ -47,10 +52,18 @@ const handleColumnDrop = async (event: DragEvent) => {
     return;
   }
 
+  const isLeft = event.offsetX / columnElement.clientWidth < 0.5;
+  const leftToRight = droppedColumn.order < props.column.order;
   const newOrder =
-    event.offsetX / columnElement.clientWidth > 0.5
-      ? props.column.order + 1
-      : props.column.order;
+    isLeft && leftToRight
+      ? props.column.order - 1
+      : !isLeft && !leftToRight
+        ? props.column.order + 1
+        : props.column.order;
+
+  if (newOrder === droppedColumn.order) {
+    return;
+  }
 
   await mutateStatusColumn({
     col: droppedColumn,
@@ -86,7 +99,7 @@ const handleTaskDrop = async (event: DragEvent) => {
     data: { statusColumnId: props.column.id },
   })
     .then(() => {
-      toast.success("Task moved successfully");
+      toast("Task moved successfully");
     })
     .catch((err) => {
       console.error(err);
@@ -95,6 +108,7 @@ const handleTaskDrop = async (event: DragEvent) => {
 };
 
 const onDrop = async (event: DragEvent) => {
+  dragOverType.value = null;
   const type = event.dataTransfer?.getData("type");
 
   switch (type) {
@@ -109,33 +123,96 @@ const onDrop = async (event: DragEvent) => {
 
 const onDragStart = (event: DragEvent, task: Task) => {
   event.stopPropagation();
-  event.dataTransfer!.dropEffect = "move";
+
   event.dataTransfer!.effectAllowed = "move";
+  event.dataTransfer!.dropEffect = "move";
+
+  event.dataTransfer!.setData("drop-type/task", "task");
+  event.dataTransfer!.setData(
+    "status-column-id/" + task.statusColumnId,
+    task.statusColumnId,
+  );
+
+  // We can only access these in the `drop` event
   event.dataTransfer!.setData("type", "task");
-  event.dataTransfer?.setData("statusColumnId", props.column.id);
-  event.dataTransfer?.setData("task", JSON.stringify(task));
+  event.dataTransfer!.setData("task", JSON.stringify(task));
 };
 
 const onColumnDragStart = (event: DragEvent) => {
   event.stopPropagation();
-  event.dataTransfer!.dropEffect = "move";
   event.dataTransfer!.effectAllowed = "move";
+  event.dataTransfer!.dropEffect = "move";
+
   event.dataTransfer!.setData("type", "status-column");
   event.dataTransfer!.setData("status-column", JSON.stringify(props.column));
+
+  event.dataTransfer!.setData("drop-type/status-column", "status-column");
+  event.dataTransfer!.setData(
+    "status-column-id/" + props.column.id,
+    props.column.id,
+  );
 };
 
-const showEditModal = ref(false);
-const showCreateTaskModal = ref(false);
+const onDragOver = (event: DragEvent) => {
+  // The HTML DnD API doesn't allow for dataTransfer stuff to be read on evetns
+  // other than drop, so we have to do this hacky thing to get the data we need.
+  //
+  // We happen to be able to access types, which gives us access to "keys" in a
+  // key-value pair.
+  const dropType = event.dataTransfer?.types
+    .find((type) => type.startsWith("drop-type/"))
+    ?.split("/")?.[1];
+  const statusColumnId = event.dataTransfer?.types
+    .find((type) => type.startsWith("status-column-id/"))
+    ?.split("/")?.[1];
 
-const canDragColumn = ref(false);
+  switch (dropType) {
+    case "task":
+      if (statusColumnId && statusColumnId !== props.column.id) {
+        dragOverType.value = "task";
+      }
+      break;
+    case "status-column":
+      if (statusColumnId && statusColumnId !== props.column.id) {
+        const columnElement = (event.target as HTMLElement).closest(
+          ".status-column",
+        );
+        const isLeft = event.offsetX / columnElement!.clientWidth < 0.5;
+        dragOverType.value = isLeft ? "left" : "right";
+      }
+      break;
+    default:
+      break;
+  }
+};
+
+const onDragLeave = () => {
+  dragOverType.value = null;
+};
+
+const classesForDragOverType = computed(() => {
+  switch (dragOverType.value) {
+    case "task":
+      return "border-blue-400";
+    case "left":
+      return "border-l-blue-400 border-solid";
+    case "right":
+      return "border-r-blue-400 border-solid";
+    default:
+      return "border-transparent";
+  }
+});
 </script>
 
 <template>
   <Card
-    class="w-xs flex-shrink-0 self-start bg-muted status-column"
+    class="w-xs flex-shrink-0 self-start bg-muted status-column drag border-3 border-dashed"
+    :class="classesForDragOverType"
     @drop="onDrop"
-    @dragover.prevent
+    @dragover.prevent="onDragOver"
     @dragenter.prevent
+    @dragleave="onDragLeave"
+    @dragend="onDragLeave"
     :draggable="canDragColumn"
     @dragstart="onColumnDragStart"
     v-bind="$attrs"
@@ -177,17 +254,13 @@ const canDragColumn = ref(false);
     </CardHeader>
     <CardContent class="px-2">
       <ol v-if="tasks" ref="tasksRef" class="flex flex-col gap-2">
-        <Card
+        <MiniTask
           v-for="task in tasks"
           :key="task.id"
-          class="shadow-none text-sm task-card dark:bg-background/40"
+          :task
           draggable="true"
-          @dragstart="onDragStart($event, task)"
-        >
-          <CardHeader>
-            <CardTitle class="font-normal">{{ task.title }}</CardTitle>
-          </CardHeader>
-        </Card>
+          :onDragStart="onDragStart"
+        />
       </ol>
       <!-- List of tasks -->
     </CardContent>

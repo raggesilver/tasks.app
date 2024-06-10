@@ -65,6 +65,8 @@ export const useTasks = (
           },
         );
 
+        client.setQueryData<Task>(["task", updatedTask.id], normalized);
+
         if (task.statusColumnId !== updatedTask.statusColumnId) {
           client.setQueryData<Task[]>(
             ["status-column-tasks", task.statusColumnId],

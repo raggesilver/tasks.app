@@ -59,10 +59,34 @@ export const useTask = (taskId: MaybeRefOrGetter<string>) => {
       }),
   });
 
+  const {
+    mutateAsync: deleteTask,
+    error: deletionError,
+    isPending: isDeleting,
+  } = useMutation({
+    mutationFn: (task: Task) =>
+      // @ts-ignore
+      useRequestFetch()(`/api/task/${task.id}`, { method: "DELETE" }),
+    onSuccess: (_, task: Task) => {
+      // Remove individual task query
+      client.removeQueries({
+        queryKey: ["task", task.id],
+      });
+      // Remove task from it's status column
+      client.setQueryData(
+        ["status-column-tasks", task.statusColumnId],
+        (tasks: Task[]) => tasks?.filter((t) => t.id !== task.id),
+      );
+    },
+  });
+
   return {
     data,
     mutate,
     mutationError,
+    deleteTask,
+    deletionError,
+    isDeleting,
     ...rest,
   };
 };

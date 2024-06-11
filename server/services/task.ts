@@ -60,6 +60,7 @@ export const deleteTask = async (id: string): Promise<boolean> => {
   return db
     .delete(tasks)
     .where(eq(tasks.id, id))
+    .returning()
     .execute()
     .then((result) => result.length > 0);
 };

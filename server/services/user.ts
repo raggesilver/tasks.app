@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import assert from "node:assert";
 import { z } from "zod";
+import { SearchUsersInput } from "~/lib/validation";
 import { oauth, users, type User } from "~/server/db/schema";
 import { db } from "../db/db";
 
@@ -167,4 +168,16 @@ export async function deleteUser(userId: string): Promise<boolean> {
     .execute();
 
   return _users.length > 0;
+}
+
+export async function searchUsers(data: SearchUsersInput): Promise<User[]> {
+  return db.query.users
+    .findMany({
+      where: (table, { ilike, or }) =>
+        or(
+          ilike(table.fullName, `%${data.name}%`),
+          ilike(table.email, `%${data.email}%`),
+        ),
+    })
+    .execute();
 }

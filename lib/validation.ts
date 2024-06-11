@@ -30,9 +30,25 @@ export const updateTaskSchema = z
   })
   .partial();
 
+export const searchUsersSchema = z.object({
+  name: z.string().optional(),
+  email: z.string().optional(),
+});
+
+export const publicUserSchema = z.object({
+  id: z.string().uuid(),
+  fullName: z.string(),
+  email: z.string().email().optional(),
+  profilePictureUrl: z.string().url().optional(),
+});
+
 export type CreateWorkspaceInput = z.infer<typeof createWorkspaceSchema>;
 
 export type CreateStatusColumnInput = z.infer<typeof createStatusColumnSchema>;
 export type UpdateStatusColumnInput = z.infer<typeof updateStatusColumnSchema>;
 
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
+
+export type SearchUsersInput = z.infer<typeof searchUsersSchema>;
+
+export type PublicUser = z.infer<typeof publicUserSchema>;

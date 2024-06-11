@@ -1,4 +1,5 @@
-import { and, eq, or } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
+import { union } from "drizzle-orm/pg-core";
 import { UpdateWorkspaceInput } from "~/lib/validation";
 import { db } from "../db/db";
 import {
@@ -6,6 +7,7 @@ import {
   users,
   workspaces,
   type NewWorkspace,
+  type User,
   type Workspace,
 } from "../db/schema";
 
@@ -55,6 +57,41 @@ export async function getAllWorkspaces(userId: string): Promise<Workspace[]> {
     .where(or(eq(users.id, userId), eq(workspaces.ownerId, userId)))
     .execute()
     .then((rows) => rows.map((row) => row.workspaces));
+}
+
+export async function getWorkspaceCollaborators(
+  workspaceId: string,
+): Promise<User[]> {
+  return union(
+    db
+      .select({
+        id: users.id,
+        email: users.email,
+        fullName: users.fullName,
+        profilePictureUrl: users.profilePictureUrl,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      })
+      .from(users)
+      .leftJoin(collaborators, eq(users.id, collaborators.userId))
+      .where(eq(collaborators.workspaceId, workspaceId)),
+    db
+      .select({
+        id: users.id,
+        email: users.email,
+        fullName: users.fullName,
+        profilePictureUrl: users.profilePictureUrl,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      })
+      .from(users)
+      .where(
+        eq(
+          users.id,
+          sql`(SELECT owner_id FROM workspaces WHERE id = ${workspaceId})`,
+        ),
+      ),
+  );
 }
 
 export async function updateWorkspaceById(

@@ -40,7 +40,10 @@ const onTaskClosed = () => {
 <template>
   <div class="flex flex-col flex-grow px-8 pt-8 gap-8">
     <template v-if="data">
-      <h1 class="text-3xl font-extrabold">{{ data.name }}</h1>
+      <div class="flex flex-row gap-4 items-center">
+        <h1 class="text-3xl font-extrabold">{{ data.name }}</h1>
+        <CollaboratorsAvatars :workspaceId="id" />
+      </div>
       <div
         class="flex-grow flex flex-row items-start gap-8 overflow-x-auto overflow-y-hidden min-w-full -mx-8 px-8 pb-8"
       >

@@ -44,8 +44,15 @@ const initials = computed(
         <Icon name="lucide:check" class="h-6 w-6" />
         Tasks.app
       </nuxt-link>
-      <span aria-hidden="true" class="mx-auto" />
       <CreateWorkspace />
+      <span aria-hidden="true" class="mx-auto" />
+      <!-- This div is used as a target for component teleports -->
+      <div
+        class="flex flex-row gap-inherit items-inherit"
+        id="nav-bar-right-items"
+      >
+        <slot name="right-items" />
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <Avatar class="cursor-pointer">

@@ -3,18 +3,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bun --bun nuxt build",
-    "dev": "bun --bun nuxt dev",
-    "generate": "bun --bun nuxt generate",
-    "preview": "bun --bun nuxt preview",
-    "postinstall": "bun --bun nuxt prepare"
+    "build": "nuxt build",
+    "dev": "dotenvx run -- nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@radix-icons/vue": "^1.0.0",
-    "@tanstack/vue-query": "^5.41.0",
-    "@tanstack/vue-query-devtools": "^5.41.0",
+    "@tanstack/vue-query": "^5.44.0",
+    "@tanstack/vue-query-devtools": "^5.44.0",
     "@vee-validate/zod": "^4.13.1",
-    "@vueuse/core": "^10.10.0",
+    "@vueuse/core": "^10.10.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.31.2",
@@ -35,10 +35,11 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^0.44.1",
     "@hebilicious/vue-query-nuxt": "^0.3.0",
     "@types/slug": "^5.0.8",
-    "@unocss/nuxt": "^0.60.4",
-    "@vueuse/nuxt": "^10.10.0",
+    "@unocss/nuxt": "^0.61.0",
+    "@vueuse/nuxt": "^10.10.1",
     "drizzle-kit": "^0.22.7",
     "prettier": "^3.3.2",
     "prettier-plugin-organize-imports": "^3.2.4",
@@ -51,5 +52,10 @@
     "es5-ext",
     "esbuild",
     "vue-demi"
-  ]
+  ],
+  "pnpm": {
+    "patchedDependencies": {
+      "nuxt-auth-utils@0.0.25": "patches/nuxt-auth-utils@0.0.25.patch"
+    }
+  }
 }

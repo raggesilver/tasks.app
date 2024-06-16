@@ -46,6 +46,15 @@ export const publicUserSchema = z.object({
   profilePictureUrl: z.string().url().optional(),
 });
 
+export const createInvitationSchema = z.object({
+  workspaceId: z.string().uuid(),
+});
+
+export const deactivateInvitationSchema = z.object({
+  invitationId: z.string().uuid(),
+  workspaceId: z.string().uuid(),
+});
+
 export type CreateWorkspaceInput = z.infer<typeof createWorkspaceSchema>;
 export type UpdateWorkspaceInput = z.infer<typeof updateWorkspaceSchema>;
 
@@ -57,3 +66,8 @@ export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 export type SearchUsersInput = z.infer<typeof searchUsersSchema>;
 
 export type PublicUser = z.infer<typeof publicUserSchema>;
+
+export type CreateInvitationInput = z.infer<typeof createInvitationSchema>;
+export type DeactivateInvitationInput = z.infer<
+  typeof deactivateInvitationSchema
+>;

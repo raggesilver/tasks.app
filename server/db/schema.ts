@@ -1,7 +1,9 @@
-import { relations } from "drizzle-orm";
+import { eq, relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -124,6 +126,7 @@ export const collaborators = pgTable(
   },
   (table) => ({
     uniqueIndex: uniqueIndex().on(table.workspaceId, table.userId),
+    pk: primaryKey({ columns: [table.workspaceId, table.userId] }),
   }),
 );
 
@@ -164,6 +167,33 @@ export const tasks = pgTable(
 
 export type Task = typeof tasks.$inferSelect;
 export type NewTask = typeof tasks.$inferInsert;
+
+export const invitationLinks = pgTable(
+  "invitation_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    // In the future we may allow restricting invitations to specific email(s)
+    // email: varchar("email", { length: 255 }).notNull(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, {
+        onDelete: "cascade",
+      }),
+    // expiresAt: timestamp("expires_at").notNull(),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    // We need to make sure that we don't have multiple active invitation links
+    // for the same workspace.
+    uniqueIndex: uniqueIndex()
+      .on(table.workspaceId, table.active)
+      .where(eq(table.active, true)),
+  }),
+);
+
+export type InvitationLink = typeof invitationLinks.$inferSelect;
+export type NewInvitationLink = typeof invitationLinks.$inferInsert;
 
 // Relations
 

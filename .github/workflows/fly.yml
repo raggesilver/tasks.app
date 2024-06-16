@@ -9,14 +9,17 @@ jobs:
     name: build
     runs-on: ubuntu-latest
     steps:
-      # ...
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
-      # run any `bun` or `bunx` command
-      - run: bun install
-      - run: bun run build
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest

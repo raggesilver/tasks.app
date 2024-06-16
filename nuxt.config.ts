@@ -5,9 +5,6 @@ export default defineNuxtConfig({
     https: true,
   },
   css: ["@unocss/reset/tailwind-compat.css", "~/assets/css/main.css"],
-  nitro: {
-    preset: "bun",
-  },
   modules: [
     "shadcn-nuxt",
     "@unocss/nuxt",

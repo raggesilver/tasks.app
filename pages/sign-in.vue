@@ -98,5 +98,3 @@ redirectCookie.value = route.query.redirectTo as string | undefined;
     </div>
   </div>
 </template>
-
-<style scoped></style>

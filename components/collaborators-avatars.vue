@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { UnwrapRef } from "vue";
 import {
   Tooltip,
   TooltipContent,
@@ -36,7 +35,10 @@ const getFullNameInitials = (fullName: string) =>
 </script>
 
 <template>
-  <ul v-if="collaborators?.length" class="flex flex-row items-center wrapper">
+  <ul
+    v-if="collaborators?.length"
+    class="flex flex-row items-center collaborators-avatars wrapper"
+  >
     <li
       v-for="collaborator of sortedCollaborators"
       :key="collaborator.id"
@@ -62,20 +64,19 @@ const getFullNameInitials = (fullName: string) =>
       </TooltipProvider>
     </li>
   </ul>
-  <!-- TODO: render round Skeletons during loading -->
 </template>
 
-<style scoped>
-.wrapper li:first-child {
+<style>
+.collaborators-avatars.wrapper li:first-child {
   @apply z-10;
 }
 
-.wrapper li:not(:first-child) .avatar {
+.collaborators-avatars.wrapper li:not(:first-child) .avatar {
   @apply -ml-2 transition-all;
 }
 
-.wrapper:hover li:not(:first-child) .avatar,
-.wrapper:focus-within li:not(:first-child) .avatar {
+.collaborators-avatars.wrapper:hover li:not(:first-child) .avatar,
+.collaborators-avatars.wrapper:focus-within li:not(:first-child) .avatar {
   @apply ml-1;
 }
 </style>

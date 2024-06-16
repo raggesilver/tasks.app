@@ -9,7 +9,6 @@ project is being developed using the following technologies:
 - [Uno.css](https://unocss.dev)
 - [Drizzle ORM](https://orm.drizzle.team)
 - PostgreSQL
-- [Bun](https://bun.sh)
 - Docker
 
 The goal of this project is to re-implement a subset of Trello's features,

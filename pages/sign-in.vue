@@ -6,6 +6,15 @@ definePageMeta({
 useHead({
   title: "Sign In",
 });
+
+const route = useRoute();
+
+const redirectCookie = useCookie("signInRedirect", {
+  path: "/",
+  maxAge: 60 * 5,
+});
+
+redirectCookie.value = route.query.redirectTo as string | undefined;
 </script>
 
 <template>

@@ -7,7 +7,25 @@ const schema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const { user } = await requireUserSession(event);
+  const session = await getUserSession(event);
+
+  if (!session.user) {
+    const currentURL = getRequestURL(event);
+
+    const redirectURL = new URL("/sign-in", currentURL);
+    redirectURL.searchParams.set(
+      "redirectTo",
+      currentURL.pathname + currentURL.search,
+    );
+    // I still seem to be getting this error
+    // https://github.com/nuxt/nuxt/issues/25108
+    redirectURL.protocol = "https:";
+
+    return sendRedirect(event, redirectURL.toString());
+  }
+
+  const { user } = session;
+
   const query = await getValidatedQuery(event, schema.parseAsync);
 
   const invitation = await getInvitationByToken(query.token);

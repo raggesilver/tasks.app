@@ -57,6 +57,13 @@
       "when": 1718193718313,
       "tag": "0007_mysterious_whiplash",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1718558274176,
+      "tag": "0008_slippery_puck",
+      "breakpoints": true
     }
   ]
 }

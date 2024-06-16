@@ -3,6 +3,7 @@ import {
   boolean,
   integer,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -125,6 +126,7 @@ export const collaborators = pgTable(
   },
   (table) => ({
     uniqueIndex: uniqueIndex().on(table.workspaceId, table.userId),
+    pk: primaryKey({ columns: [table.workspaceId, table.userId] }),
   }),
 );
 

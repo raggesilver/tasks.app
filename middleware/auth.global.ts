@@ -21,6 +21,6 @@ export default defineNuxtRouteMiddleware((to) => {
   ) {
     const path = redirectTo.value;
     redirectTo.value = null;
-    return navigateTo({ path });
+    return navigateTo({ path }, { external: path.startsWith("/api") });
   }
 });

@@ -1,3 +1,5 @@
+import type { User } from "~/server/db/schema";
+
 export const useWorkspaceCollaborators = (
   workspaceId: MaybeRefOrGetter<string>,
 ) => {
@@ -9,7 +11,7 @@ export const useWorkspaceCollaborators = (
       queryFn: () =>
         useRequestFetch()(
           `/api/workspace/${toValue(workspaceId)}/collaborators`,
-        ),
+        ).then((users) => users as User[]),
     },
     client,
   );

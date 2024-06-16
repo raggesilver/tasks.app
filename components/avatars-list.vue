@@ -5,26 +5,11 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "~/components/ui/tooltip";
+import type { User } from "~/server/db/schema";
 
-const props = defineProps<{
-  workspaceId: string;
+defineProps<{
+  users: User[];
 }>();
-
-const { user } = useUserSession();
-
-const { data: collaborators, suspense } = useWorkspaceCollaborators(
-  props.workspaceId,
-);
-
-await suspense();
-
-const sortedCollaborators = computed(
-  () =>
-    // Move the current user to the front of the list. Everthing else is untouched.
-    collaborators.value?.toSorted((a, b) =>
-      a.id === user.value?.id ? -1 : b.id === user.value?.id ? 1 : 0,
-    ) ?? [],
-);
 
 const getFullNameInitials = (fullName: string) =>
   fullName
@@ -35,15 +20,8 @@ const getFullNameInitials = (fullName: string) =>
 </script>
 
 <template>
-  <ul
-    v-if="collaborators?.length"
-    class="flex flex-row items-center collaborators-avatars wrapper"
-  >
-    <li
-      v-for="collaborator of sortedCollaborators"
-      :key="collaborator.id"
-      class="flex"
-    >
+  <ul class="flex flex-row items-center collaborators-avatars wrapper">
+    <li v-for="collaborator of users" :key="collaborator.id" class="flex">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger as-child>
@@ -51,6 +29,7 @@ const getFullNameInitials = (fullName: string) =>
               <AvatarImage
                 v-if="collaborator.profilePictureUrl"
                 :src="collaborator.profilePictureUrl"
+                :alt="`${collaborator.fullName}'s profile picture`"
               />
               <AvatarFallback>{{
                 getFullNameInitials(collaborator.fullName)

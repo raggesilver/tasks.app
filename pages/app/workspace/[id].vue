@@ -86,7 +86,9 @@ const onTaskClosed = () => {
         <div
           class="flex-grow flex flex-row items-start gap-8 overflow-x-auto overflow-y-hidden min-w-full -mx-8 px-8 pb-8"
         >
-          <div
+          <TransitionGroup
+            name="list"
+            tag="div"
             v-if="columns?.length"
             class="flex flex-row gap-8 items-stretch"
             ref="boardRef"
@@ -97,7 +99,7 @@ const onTaskClosed = () => {
               :column
               class="status-column"
             />
-          </div>
+          </TransitionGroup>
           <span
             class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"
           >

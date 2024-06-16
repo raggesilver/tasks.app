@@ -263,6 +263,11 @@ const classesForDragOverType = computed(() => {
         />
       </ol>
       <!-- List of tasks -->
+      <EditColumn :column v-model:is-open="showEditModal" />
+      <CreateTask
+        v-bind="{ workspaceId: column.workspaceId, statusColumnId: column.id }"
+        v-model:is-open="showCreateTaskModal"
+      />
     </CardContent>
     <CardFooter class="pb-2 px-2">
       <Button
@@ -274,9 +279,4 @@ const classesForDragOverType = computed(() => {
       >
     </CardFooter>
   </Card>
-  <EditColumn :column v-model:is-open="showEditModal" />
-  <CreateTask
-    v-bind="{ workspaceId: column.workspaceId, statusColumnId: column.id }"
-    v-model:is-open="showCreateTaskModal"
-  />
 </template>

@@ -14,7 +14,7 @@ const { activeInvitationLink, isLoading, createInvitationLink } =
 const isOwner = computed(() => props.workspace.ownerId === user.value?.id);
 
 const fullLink = computed(() => {
-  const url = new URL(window.location.href);
+  const url = useRequestURL();
 
   url.pathname = "/api/invitation/accept";
   url.searchParams.set("token", activeInvitationLink.value?.id ?? "");

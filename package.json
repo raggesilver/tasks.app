@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@radix-icons/vue": "^1.0.0",
-    "@tanstack/vue-query": "^5.44.0",
+    "@tanstack/vue-query": "^5.45.0",
     "@tanstack/vue-query-devtools": "^5.44.0",
     "@vee-validate/zod": "^4.13.1",
     "@vueuse/core": "^10.10.1",

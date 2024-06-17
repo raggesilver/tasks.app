@@ -13,13 +13,20 @@ export const useTasks = (
       queryFn: () =>
         useRequestFetch()(
           `/api/column/${workspaceId}/${statusColumnId}/get-tasks`,
-        ).then((res) =>
-          res.map<Task>((task) => ({
-            ...task,
-            createdAt: new Date(task.createdAt),
-            updatedAt: new Date(task.updatedAt),
-          })),
-        ),
+        )
+          .then((res) =>
+            res.map<Task>((task) => ({
+              ...task,
+              createdAt: new Date(task.createdAt),
+              updatedAt: new Date(task.updatedAt),
+            })),
+          )
+          .then((tasks) => {
+            tasks.forEach((task) =>
+              client.setQueryData<Task>(["task", task.id], task),
+            );
+            return tasks;
+          }),
     },
     client,
   );

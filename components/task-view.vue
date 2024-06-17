@@ -101,6 +101,7 @@ whenever(metaE, () => (isEditing.value = true));
 <template>
   <Dialog v-if="task && !isDeleting" v-model:open="isOpen">
     <DialogContent :no-close-button="!isEditing">
+      <!-- Extract this form into its own component -->
       <form v-if="isEditing" @submit="editTask" class="flex flex-col gap-4">
         <DialogTitle class="text-xl font-bold">Edit Task</DialogTitle>
         <DialogDescription class="sr-only">

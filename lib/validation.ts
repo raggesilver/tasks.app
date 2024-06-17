@@ -27,7 +27,7 @@ export const createTaskSchema = z.object({
 
 export const updateTaskSchema = z
   .object({
-    name: z.string().min(4),
+    title: z.string().min(4),
     description: z.string().min(5),
     statusColumnId: z.string().uuid(),
     order: z.number().int(),

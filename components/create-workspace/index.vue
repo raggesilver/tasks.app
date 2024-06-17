@@ -39,7 +39,12 @@ const description = "Create a new workspace to organize your tasks.";
     </Drawer>
   </ClientOnly>
 
-  <Button variant="outline" @click="isOpen = true" size="sm">
+  <Button
+    variant="outline"
+    @click="isOpen = true"
+    size="sm"
+    class="flex items-center gap-2"
+  >
     Create <Icon name="lucide:plus" />
   </Button>
 </template>

@@ -7,6 +7,8 @@ export default defineEventHandler(async (event) => {
   const taskId = getRouterParam(event, "id")!;
   const data = await readValidatedBody(event, updateTaskSchema.parse);
 
+  console.log({ data });
+
   const task = await updateTask(taskId, session.user.id, data);
 
   if (!task) {

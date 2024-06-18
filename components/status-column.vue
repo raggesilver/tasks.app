@@ -22,6 +22,16 @@ const { mutateAsync: mutateStatusColumn } = useStatusColumnMutation({
   },
 });
 
+const { mutateAsync: deleteColumn, isPending: isDeleting } =
+  useDeleteStatusColumn({
+    onSuccess: () => {
+      toast("Column deleted successfully");
+    },
+    onError: () => {
+      toast.error("Failed to delete column");
+    },
+  });
+
 await suspense();
 
 const showEditModal = ref(false);
@@ -202,6 +212,12 @@ const classesForDragOverType = computed(() => {
       return "border-transparent";
   }
 });
+
+const doDeleteColumn = async () => {
+  if (isDeleting.value) return;
+
+  await deleteColumn(props.column);
+};
 </script>
 
 <template>
@@ -252,8 +268,8 @@ const classesForDragOverType = computed(() => {
               <Icon name="lucide:pencil" /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem
-              disabled
-              class="grid grid-cols-subgrid col-span-full"
+              class="text-red-500 grid grid-cols-subgrid col-span-full"
+              @click="doDeleteColumn"
             >
               <Icon name="lucide:trash" /> Delete
             </DropdownMenuItem>

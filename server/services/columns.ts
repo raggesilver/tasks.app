@@ -142,3 +142,47 @@ export const updateStatusColumn = async (
 
   return row;
 };
+
+export const deleteStatusColumn = async (
+  workspaceId: string,
+  id: string,
+): Promise<boolean> => {
+  return await db.transaction(async (tx) => {
+    const current = await tx.query.statusColumns
+      .findFirst({
+        where: (table, { eq, and }) =>
+          and(eq(table.workspaceId, workspaceId), eq(table.id, id)),
+      })
+      .execute();
+
+    if (!current) return false;
+
+    const deleted = await tx
+      .delete(statusColumns)
+      .where(
+        and(
+          eq(statusColumns.workspaceId, workspaceId),
+          eq(statusColumns.id, id),
+        ),
+      )
+      .returning()
+      .execute();
+
+    if (deleted.length === 0) return false;
+
+    // Update the order of all columns with an order greater than the deleted
+    // column.
+    await tx
+      .update(statusColumns)
+      .set({ order: sql`${statusColumns.order} - 1` })
+      .where(
+        and(
+          eq(statusColumns.workspaceId, workspaceId),
+          gt(statusColumns.order, current.order),
+        ),
+      )
+      .execute();
+
+    return true;
+  });
+};

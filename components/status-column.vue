@@ -238,16 +238,39 @@ const classesForDragOverType = computed(() => {
               <Icon name="lucide:ellipsis" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel class="pr-8">Column Actions</DropdownMenuLabel>
-            <DropdownMenuItem @click="showEditModal = true">
-              Edit
+          <DropdownMenuContent
+            align="end"
+            class="grid grid-cols-[min-content_auto_min-content] gap-x-2"
+          >
+            <DropdownMenuLabel class="pr-8 col-span-full">
+              Column Actions
+            </DropdownMenuLabel>
+            <DropdownMenuItem
+              @click="showEditModal = true"
+              class="grid grid-cols-subgrid col-span-full"
+            >
+              <Icon name="lucide:pencil" /> Edit
             </DropdownMenuItem>
-            <DropdownMenuItem disabled>Delete</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel>Tasks</DropdownMenuLabel>
-            <DropdownMenuItem disabled>Create Task</DropdownMenuItem>
-            <DropdownMenuItem disabled>Archive All Tasks</DropdownMenuItem>
+            <DropdownMenuItem
+              disabled
+              class="grid grid-cols-subgrid col-span-full"
+            >
+              <Icon name="lucide:trash" /> Delete
+            </DropdownMenuItem>
+            <DropdownMenuSeparator class="col-span-full" />
+            <DropdownMenuLabel class="col-span-full">Tasks</DropdownMenuLabel>
+            <DropdownMenuItem
+              disabled
+              class="grid grid-cols-subgrid col-span-full"
+            >
+              <Icon name="lucide:plus" /> Create Task
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled
+              class="grid grid-cols-subgrid col-span-full"
+            >
+              <Icon name="lucide:archive" /> Archive All Tasks
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </CardTitle>

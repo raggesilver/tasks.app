@@ -93,3 +93,41 @@ export const useStatusColumnMutation = (
 
   return { mutateAsync };
 };
+
+export const useDeleteStatusColumn = (
+  options: {
+    /**
+     * @param column - The old column.
+     */
+    onSuccess?: (column: StatusColumn) => void;
+    onError?: (error: Error) => void;
+  } = {},
+) => {
+  const client = useQueryClient();
+
+  return useMutation(
+    {
+      mutationFn: async (column: StatusColumn) =>
+        await useRequestFetch()(
+          `/api/column/${column.workspaceId}/${column.id}`,
+          { method: "DELETE" },
+        ).then((response) => response as null),
+      onSuccess: async (_, column) => {
+        // We need to invalidate all columns as their order might have changed.
+        await client.invalidateQueries({
+          queryKey: ["workspace-columns", column.workspaceId],
+        });
+
+        client.removeQueries({
+          queryKey: ["status-column", column.id],
+        });
+
+        options.onSuccess?.(column);
+      },
+      onError: (error) => {
+        options.onError?.(error);
+      },
+    },
+    client,
+  );
+};

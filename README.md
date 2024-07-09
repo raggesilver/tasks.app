@@ -1,7 +1,7 @@
 # Tasks.app
 
-Tasks.app is a Trello clone I'm building as a project for my Software 
-Engineering course at [Infnet](https://www.infnet.edu.br/infnet/home/). The 
+Tasks.app is a Trello clone I'm building as a project for my Software
+Engineering course at [Infnet](https://www.infnet.edu.br/infnet/home/). The
 project is being developed using the following technologies:
 
 - [Nuxt.js](https://nuxt.com)

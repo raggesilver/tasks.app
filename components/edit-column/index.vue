@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useMediaQuery } from "@vueuse/core";
-import Form from "./form.vue";
 import type { StatusColumn } from "~/server/db/schema";
+import Form from "./form.vue";
 
 const isOpen = defineModel<boolean>("isOpen", { default: false });
 

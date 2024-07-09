@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { useForm } from "vee-validate";
-import { createTaskSchema } from "~/lib/validation";
 import { toTypedSchema } from "@vee-validate/zod";
-import { z } from "zod";
-import { toast } from "vue-sonner";
 import type { FetchError } from "ofetch";
+import { useForm } from "vee-validate";
+import { toast } from "vue-sonner";
+import { z } from "zod";
+import { createTaskSchema } from "~/lib/validation";
 import type { Task } from "~/server/db/schema";
 import { Textarea } from "../ui/textarea";
 

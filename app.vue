@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ConfigProvider } from "radix-vue";
 import { Toaster } from "@/components/ui/sonner";
+import { ConfigProvider } from "radix-vue";
 // import { VueQueryDevtools } from "@tanstack/vue-query-devtools";
 
 const useIdFunction = () => useId();

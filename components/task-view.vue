@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { toast } from "vue-sonner";
-import { useMagicKeys, whenever } from "@vueuse/core";
-import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
-import { updateTaskSchema } from "~/lib/validation";
+import { useMagicKeys, whenever } from "@vueuse/core";
 import type { FetchError } from "ofetch";
+import { useForm } from "vee-validate";
+import { toast } from "vue-sonner";
+import { updateTaskSchema } from "~/lib/validation";
 
 const props = defineProps<{
   taskId: string;

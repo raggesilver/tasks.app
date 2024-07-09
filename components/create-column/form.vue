@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { useForm } from "vee-validate";
-import { createStatusColumnSchema } from "~/lib/validation";
 import { toTypedSchema } from "@vee-validate/zod";
-import { z } from "zod";
-import { toast } from "vue-sonner";
 import type { FetchError } from "ofetch";
+import { useForm } from "vee-validate";
+import { toast } from "vue-sonner";
+import { z } from "zod";
+import { createStatusColumnSchema } from "~/lib/validation";
 import type { StatusColumn } from "~/server/db/schema";
 
 const localSchema = createStatusColumnSchema.pick({ name: true });

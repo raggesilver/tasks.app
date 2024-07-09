@@ -5,10 +5,9 @@ export const FORM_ITEM_INJECTION_KEY = Symbol() as InjectionKey<string>;
 </script>
 
 <script lang="ts" setup>
-import { provide } from "vue";
+iimport { cn } from "@/lib/utils";
 import { useId } from "radix-vue";
-import { cn } from "@/lib/utils";
-
+import { provide } from "vue";
 const props = defineProps<{
   class?: HTMLAttributes["class"];
 }>();

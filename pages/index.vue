@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import heroOne from "~/assets/images/app-screenshot.webp?url";
-import { Sheet, SheetTrigger, SheetContent } from "~/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
 
 const links = {
   tos: "Terms of Service",

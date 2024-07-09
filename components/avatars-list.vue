@@ -2,8 +2,8 @@
 import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
   TooltipProvider,
+  TooltipTrigger,
 } from "~/components/ui/tooltip";
 import type { User } from "~/server/db/schema";
 

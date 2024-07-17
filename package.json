@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@radix-icons/vue": "^1.0.0",
-    "@tanstack/vue-query": "^5.51.1",
-    "@tanstack/vue-query-devtools": "^5.51.1",
+    "@tanstack/vue-query": "^5.51.3",
+    "@tanstack/vue-query-devtools": "^5.51.3",
     "@vee-validate/zod": "^4.13.2",
     "@vueuse/core": "^10.11.0",
     "class-variance-authority": "^0.7.0",
@@ -37,10 +37,10 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@dotenvx/dotenvx": "^1.6.2",
+    "@dotenvx/dotenvx": "^1.6.4",
     "@hebilicious/vue-query-nuxt": "^0.3.0",
     "@types/slug": "^5.0.8",
-    "@unocss/nuxt": "^0.61.3",
+    "@unocss/nuxt": "^0.61.5",
     "@vueuse/nuxt": "^10.11.0",
     "drizzle-kit": "^0.23.0",
     "nuxt": "^3.12.3",

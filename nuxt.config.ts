@@ -1,10 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true, componentInspector: true },
+
   devServer: {
     https: true,
   },
+
   css: ["@unocss/reset/tailwind-compat.css", "~/assets/css/main.css"],
+
   modules: [
     "shadcn-nuxt",
     "@unocss/nuxt",
@@ -13,6 +16,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "@hebilicious/vue-query-nuxt",
   ],
+
   vueQuery: {
     queryClientOptions: {
       defaultOptions: {
@@ -22,4 +26,6 @@ export default defineNuxtConfig({
       },
     },
   },
+
+  compatibilityDate: "2024-07-09",
 });

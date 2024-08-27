@@ -1,4 +1,8 @@
 export default defineNitroPlugin((nitro) => {
+  if (import.meta.prerender) {
+    return;
+  }
+
   nitro.hooks.hook("request", async (event) => {
     event.node.req.headers["start-time"] = new Date().toISOString();
   });

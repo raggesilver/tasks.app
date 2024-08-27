@@ -6,16 +6,13 @@ export default defineNuxtConfig({
     https: true,
   },
 
-  routeRules: {
-    "/legal/**": {
-      prerender: true,
-    },
-    "/": {
-      prerender: true,
-    },
-    "/app/**": {
-      ssr: true,
-      prerender: false,
+  nitro: {
+    prerender: {
+      crawlLinks: true,
+      routes: ["/", "/sign-in", "/legal/privacy-policy", "/legal/tos"],
+      ignore: ["/app", "/auth"],
+      retryDelay: 0,
+      concurrency: 4,
     },
   },
 
@@ -41,6 +38,5 @@ export default defineNuxtConfig({
       },
     },
   },
-
   compatibilityDate: "2024-07-09",
 });

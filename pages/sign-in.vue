@@ -82,16 +82,16 @@ redirectCookie.value = route.query.redirectTo as string | undefined;
 
         <p class="px-8 text-center text-sm text-muted-foreground">
           By signing in, you agree to our
-          <a
+          <router-link
             class="underline underline-offset-4 hover:text-primary"
-            href="/terms"
-            >terms of service</a
+            to="/legal/tos"
+            >terms of service</router-link
           >
           and
-          <a
+          <router-link
             class="underline underline-offset-4 hover:text-primary"
-            href="/privacy"
-            >privacy policy</a
+            to="/legal/privacy-policy"
+            >privacy policy</router-link
           >.
         </p>
       </div>

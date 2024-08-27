@@ -11,6 +11,8 @@ defineProps<{
   users: User[];
 }>();
 
+const { user } = useUserSession();
+
 const getFullNameInitials = (fullName: string) =>
   fullName
     .split(" ")
@@ -37,7 +39,10 @@ const getFullNameInitials = (fullName: string) =>
             </Avatar>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            <p>{{ collaborator.fullName }}</p>
+            <p>
+              {{ collaborator.fullName
+              }}{{ collaborator.id === user?.id ? " (you)" : "" }}
+            </p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

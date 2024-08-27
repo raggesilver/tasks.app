@@ -1,7 +1,3 @@
-# A Docker Compose must always start with the version tag.
-# We use '3' because it's the last version.
-version: "3"
-
 # You should know that Docker Compose works with services.
 # 1 service = 1 container.
 # For example, a service, a server, a client, a database...
@@ -12,7 +8,7 @@ services:
   # Note: This may change the commands you are going to use a little bit.
   database:
     # Official Postgres image from DockerHub (we use the last version)
-    image: "postgres:latest"
+    image: "postgres:16-alpine"
 
     # By default, a Postgres database is running on the 5432 port.
     # If we want to access the database from our computer (outside the container),

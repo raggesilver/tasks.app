@@ -11,13 +11,13 @@
       <!-- <language-switcher /> -->
       <router-link
         class="text-xs hover:underline underline-offset-4 flex-shrink-0"
-        to="#"
+        to="/legal/tos"
       >
         Terms of Service
       </router-link>
       <router-link
         class="text-xs hover:underline underline-offset-4 flex-shrink-0"
-        to="#"
+        to="/legal/privacy-policy"
       >
         Privacy Policy
       </router-link>

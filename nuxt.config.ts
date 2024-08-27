@@ -6,6 +6,19 @@ export default defineNuxtConfig({
     https: true,
   },
 
+  routeRules: {
+    "/legal/**": {
+      prerender: true,
+    },
+    "/": {
+      prerender: true,
+    },
+    "/app/**": {
+      ssr: true,
+      prerender: false,
+    },
+  },
+
   css: ["@unocss/reset/tailwind-compat.css", "~/assets/css/main.css"],
 
   modules: [
@@ -15,6 +28,8 @@ export default defineNuxtConfig({
     "nuxt-icon",
     "@vueuse/nuxt",
     "@hebilicious/vue-query-nuxt",
+    "@nuxt/content",
+    "@nuxt/image",
   ],
 
   vueQuery: {

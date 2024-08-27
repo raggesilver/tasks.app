@@ -1,5 +1,5 @@
 import transformDirectives from "@unocss/transformer-directives";
-import { defineConfig, presetWind } from "unocss";
+import { defineConfig, presetTypography, presetWind } from "unocss";
 import presetAnimations from "unocss-preset-animations";
 
 export default defineConfig({
@@ -13,6 +13,7 @@ export default defineConfig({
       dark: "media",
     }),
     presetAnimations(),
+    presetTypography(),
   ],
   transformers: [transformDirectives()],
   theme: {

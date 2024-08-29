@@ -8,34 +8,8 @@ import type { Workspace } from "~/server/db/schema";
  */
 export const useWorkspace = (id: MaybeRefOrGetter<string>) => {
   const client = useQueryClient();
-  const {
-    data,
-    isLoading,
-    suspense,
-    error,
-    // I have no clue what Vue does with rest destructuring, so I'm just going to
-    // desctructure and return everything one by one.
-    status,
-    isError,
-    isStale,
-    refetch,
-    isPaused,
-    isFetched,
-    isPending,
-    isSuccess,
-    isFetching,
-    fetchStatus,
-    failureCount,
-    isRefetching,
-    dataUpdatedAt,
-    failureReason,
-    errorUpdatedAt,
-    isLoadingError,
-    isRefetchError,
-    errorUpdateCount,
-    isPlaceholderData,
-    isFetchedAfterMount,
-  } = useQuery(
+
+  return useQuery(
     {
       queryKey: ["workspace", id],
       queryFn: () =>
@@ -67,31 +41,4 @@ export const useWorkspace = (id: MaybeRefOrGetter<string>) => {
     },
     client,
   );
-
-  return {
-    data,
-    isLoading,
-    suspense,
-    error,
-    status,
-    isError,
-    isStale,
-    refetch,
-    isPaused,
-    isFetched,
-    isPending,
-    isSuccess,
-    isFetching,
-    fetchStatus,
-    failureCount,
-    isRefetching,
-    dataUpdatedAt,
-    failureReason,
-    errorUpdatedAt,
-    isLoadingError,
-    isRefetchError,
-    errorUpdateCount,
-    isPlaceholderData,
-    isFetchedAfterMount,
-  };
 };

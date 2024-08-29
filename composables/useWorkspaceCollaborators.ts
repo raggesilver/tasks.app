@@ -16,3 +16,33 @@ export const useWorkspaceCollaborators = (
     client,
   );
 };
+
+export const useRemoveWorkspaceCollaborator = () => {
+  const client = useQueryClient();
+
+  return useMutation(
+    {
+      mutationFn: ({
+        workspaceId,
+        userId,
+      }: {
+        workspaceId: string;
+        userId: string;
+      }) =>
+        useRequestFetch()(
+          `/api/workspace/${workspaceId}/collaborator/${userId}`,
+          {
+            method: "DELETE",
+          },
+        ).then(() => {
+          // Remove the user from the workspace collaborators cache.
+          client.setQueryData(
+            ["workspace-collaborators", workspaceId],
+            (users: User[]) =>
+              users?.filter((user) => user.id !== userId) ?? [],
+          );
+        }),
+    },
+    client,
+  );
+};

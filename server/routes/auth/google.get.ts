@@ -1,8 +1,12 @@
 import { AUTHORIZED_REDIRECT } from "~/lib/constants";
 import { getOrCreateUser } from "~/server/services/user";
 
-export default oauth.googleEventHandler({
-  config: {},
+export default oauthGoogleEventHandler({
+  config: {
+    ...(import.meta.dev && {
+      redirectURL: "https://localhost:3000/auth/google",
+    }),
+  },
   async onSuccess(event, { user: profile }) {
     const user = await getOrCreateUser("google", profile);
     await setUserSession(event, {

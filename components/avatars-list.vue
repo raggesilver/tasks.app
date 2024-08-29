@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DotsHorizontalIcon } from "@radix-icons/vue";
 import {
   Tooltip,
   TooltipContent,
@@ -9,6 +10,11 @@ import type { User } from "~/server/db/schema";
 
 defineProps<{
   users: User[];
+  isOwner: boolean;
+}>();
+
+const emit = defineEmits<{
+  manageCollaborators: [];
 }>();
 
 const { user } = useUserSession();
@@ -47,6 +53,22 @@ const getFullNameInitials = (fullName: string) =>
         </Tooltip>
       </TooltipProvider>
     </li>
+    <li v-if="isOwner" class="flex">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button
+              variant="outline"
+              size="icon"
+              @click="() => emit('manageCollaborators')"
+            >
+              <DotsHorizontalIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Manage collaborators</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </li>
   </ul>
 </template>
 
@@ -55,12 +77,20 @@ const getFullNameInitials = (fullName: string) =>
   @apply z-10;
 }
 
-.collaborators-avatars.wrapper li:not(:first-child) .avatar {
+.collaborators-avatars.wrapper li:not(:first-child) > * {
   @apply -ml-2 transition-all;
 }
 
-.collaborators-avatars.wrapper:hover li:not(:first-child) .avatar,
-.collaborators-avatars.wrapper:focus-within li:not(:first-child) .avatar {
-  @apply ml-1;
+.collaborators-avatars.wrapper li:not(:first-child) > button {
+  @apply opacity-0 invisible;
+}
+
+.collaborators-avatars.wrapper:hover li:not(:first-child) > *,
+.collaborators-avatars.wrapper:focus-within li:not(:first-child) > * {
+  @apply ml-1 opacity-100 visible;
+
+  &:is(button) {
+    @apply ml-2;
+  }
 }
 </style>

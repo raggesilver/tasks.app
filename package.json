@@ -22,7 +22,7 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.32.2",
     "drizzle-zod": "^0.5.1",
-    "nuxt-auth-utils": "^0.1.0",
+    "nuxt-auth-utils": "^0.3.4",
     "nuxt-icon": "^0.6.10",
     "postgres": "^3.4.4",
     "radix-vue": "^1.9.5",

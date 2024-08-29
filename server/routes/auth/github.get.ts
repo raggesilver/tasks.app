@@ -1,7 +1,7 @@
 import { AUTHORIZED_REDIRECT } from "~/lib/constants";
 import { getOrCreateUser } from "~/server/services/user";
 
-export default oauth.githubEventHandler({
+export default oauthGitHubEventHandler({
   config: {
     emailRequired: true,
     ...(import.meta.dev && {

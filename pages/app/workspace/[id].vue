@@ -17,7 +17,7 @@ const viewTask = computed<string | null>(
   () => route.query["view-task"]?.toString() ?? null,
 );
 
-const { data, error, suspense } = useWorkspace(id);
+const { data: workspace, error, suspense } = useWorkspace(id);
 const { data: columns, suspense: statusSuspense } = useStatusColumns(id);
 const { data: collaborators, suspense: collaboratorsSuspense } =
   useWorkspaceCollaborators(id);
@@ -40,11 +40,13 @@ const collaboratorsSorted = computed(
 
 const is404 = computed(() => typedError.value?.statusCode === 404);
 
-const title = computed(() => data.value?.name ?? "Workspace");
+const title = computed(() => workspace.value?.name ?? "Workspace");
 
 useHead({
   title,
 });
+
+const showManageCollaborators = ref(false);
 
 const onTaskClosed = () => {
   router.push({ query: { ...route.query, "view-task": undefined } });
@@ -55,7 +57,7 @@ const onTaskClosed = () => {
   <!-- start of app layout re-implementation -->
   <div class="flex flex-col min-h-screen bg-background">
     <NavBar>
-      <template #right-items v-if="data">
+      <template #right-items v-if="workspace">
         <Popover>
           <PopoverTrigger as-child>
             <Button
@@ -68,19 +70,21 @@ const onTaskClosed = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" class="w-full sm:w-[435px]">
-            <ShareWorkspace :workspace="data" />
+            <ShareWorkspace :workspace />
           </PopoverContent>
         </Popover>
       </template>
     </NavBar>
     <!-- actual content of this page -->
     <div class="flex flex-col flex-grow px-8 pt-8 gap-8">
-      <template v-if="data">
+      <template v-if="workspace">
         <div class="flex flex-row gap-4 items-center">
-          <h1 class="text-3xl font-extrabold">{{ data.name }}</h1>
+          <h1 class="text-3xl font-extrabold">{{ workspace.name }}</h1>
           <AvatarsList
             :users="collaboratorsSorted"
+            :isOwner="workspace.ownerId === user?.id"
             aria-label="List of workspace collaborators"
+            @manage-collaborators="showManageCollaborators = true"
           />
         </div>
         <div
@@ -121,4 +125,9 @@ const onTaskClosed = () => {
     <!-- end of app layout re-implementation -->
   </div>
   <TaskView v-if="viewTask" :taskId="viewTask" @close="onTaskClosed" />
+  <EditCollaborators
+    v-if="workspace && collaborators"
+    v-bind="{ workspace, collaborators }"
+    v-model="showManageCollaborators"
+  />
 </template>

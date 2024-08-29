@@ -17,5 +17,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return "OK";
+  return sendNoContent(event, 204);
 });

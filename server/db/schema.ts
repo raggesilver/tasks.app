@@ -1,4 +1,4 @@
-import { eq, relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -188,7 +188,7 @@ export const invitationLinks = pgTable(
     // for the same workspace.
     uniqueIndex: uniqueIndex()
       .on(table.workspaceId, table.active)
-      .where(eq(table.active, true)),
+      .where(sql`${table.active} = true`),
   }),
 );
 

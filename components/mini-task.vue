@@ -20,7 +20,7 @@ const onDragEnd = () => {
 
 <template>
   <Card
-    class="shadow-none text-sm task-card dark:bg-background/40 select-none"
+    class="shadow-none text-sm task-card dark:bg-muted/20 select-none"
     :class="isDragging ? 'cursor-move' : 'cursor-pointer'"
     as="li"
     @dragstart="onDragStart"

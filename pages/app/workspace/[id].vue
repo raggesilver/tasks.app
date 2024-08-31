@@ -76,7 +76,7 @@ const onTaskClosed = () => {
       </template>
     </NavBar>
     <!-- actual content of this page -->
-    <div class="flex flex-col flex-grow px-8 pt-8 gap-8">
+    <div class="flex flex-col flex-grow px-8 pt-8 gap-8 dark:bg-muted/40">
       <template v-if="workspace">
         <div class="flex flex-row gap-4 items-center">
           <h1 class="text-3xl font-extrabold">{{ workspace.name }}</h1>

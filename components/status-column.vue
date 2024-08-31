@@ -222,7 +222,7 @@ const doDeleteColumn = async () => {
 
 <template>
   <Card
-    class="w-xs flex-shrink-0 self-start bg-muted status-column drag border-3 border-dashed"
+    class="w-xs flex-shrink-0 self-start bg-muted dark:bg-background status-column drag border-3 border-dashed dark:[&_*]:border-muted/50"
     :class="classesForDragOverType"
     @drop="onDrop"
     @dragover.prevent="onDragOver"

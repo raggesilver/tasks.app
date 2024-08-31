@@ -1,0 +1,2 @@
+DROP INDEX IF EXISTS "invitation_links_workspace_id_active_index";--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "invitation_links_workspace_id_active_index" ON "invitation_links" USING btree ("workspace_id","active") WHERE "invitation_links"."active" = true;

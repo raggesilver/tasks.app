@@ -168,6 +168,28 @@ export const tasks = pgTable(
 export type Task = typeof tasks.$inferSelect;
 export type NewTask = typeof tasks.$inferInsert;
 
+export const assignees = pgTable(
+  "assignees",
+  {
+    taskId: uuid("task_id")
+      .notNull()
+      .references(() => tasks.id, {
+        onDelete: "cascade",
+      }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
+  },
+  (table) => ({
+    index: primaryKey({ columns: [table.taskId, table.userId] }),
+  }),
+);
+
+export type Assignee = typeof assignees.$inferSelect;
+export type NewAssignee = typeof assignees.$inferInsert;
+
 export const invitationLinks = pgTable(
   "invitation_links",
   {
@@ -247,7 +269,7 @@ export const statusColumnsRelations = relations(
   }),
 );
 
-export const tasksRelations = relations(tasks, ({ one }) => ({
+export const tasksRelations = relations(tasks, ({ one, many }) => ({
   workspace: one(workspaces, {
     fields: [tasks.workspaceId],
     references: [workspaces.id],
@@ -264,4 +286,18 @@ export const tasksRelations = relations(tasks, ({ one }) => ({
     fields: [tasks.lastUpdatedById],
     references: [users.id],
   }),
+  assignees: many(assignees),
 }));
+
+export const assigneesRelations = relations(assignees, ({ one }) => ({
+  task: one(tasks, {
+    fields: [assignees.taskId],
+    references: [tasks.id],
+  }),
+  user: one(users, {
+    fields: [assignees.userId],
+    references: [users.id],
+  }),
+}));
+
+export type TaskWithAssignees = Task & { assignees: Assignee[] };

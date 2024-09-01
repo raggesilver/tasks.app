@@ -242,8 +242,7 @@ const doDeleteColumn = async () => {
           @mouseup="canDragColumn = false"
           @touchend="canDragColumn = false"
         >
-          <Icon name="lucide:ellipsis-vertical" />
-          <Icon name="lucide:ellipsis-vertical" style="margin-left: -8px" />
+          <Icon name="lucide:grip-vertical" />
         </div>
         <span class="flex-grow">
           {{ column.name }}

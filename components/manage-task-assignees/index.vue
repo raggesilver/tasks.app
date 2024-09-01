@@ -79,65 +79,70 @@ const onRemoveAssignee = async (userId: string) => {
         </DialogDescription>
       </DialogHeader>
 
-      <Command v-if="availableCollaborators.length > 0">
-        <CommandInput placeholder="Search for collaborators" />
-        <CommandList>
-          <CommandEmpty>No collaborators found.</CommandEmpty>
-          <CommandGroup>
-            <CommandItem
-              v-for="collaborator in availableCollaborators"
-              :key="collaborator.id"
-              :value="collaborator.fullName"
-              @select="() => onAddAssignee(collaborator.id)"
-            >
-              <UserAvatar :user-id="collaborator.id" class="w-10 h-10 mr-2" />
-              {{ collaborator.fullName }}
-            </CommandItem>
-          </CommandGroup>
-        </CommandList>
-      </Command>
+      <div v-if="availableCollaborators.length > 0">
+        <h3 class="font-semibold">Add assignee</h3>
+        <Command>
+          <CommandInput placeholder="Search for collaborators" />
+          <CommandList>
+            <CommandEmpty>No collaborators found.</CommandEmpty>
+            <CommandGroup>
+              <CommandItem
+                v-for="collaborator in availableCollaborators"
+                :key="collaborator.id"
+                :value="`${collaborator.fullName} (${collaborator.id})`"
+                @select="() => onAddAssignee(collaborator.id)"
+              >
+                <UserAvatar :user-id="collaborator.id" class="w-10 h-10 mr-2" />
+                {{ collaborator.fullName }}
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </div>
 
       <p v-else class="text-sm text-center my-4">
         All available collaborators on this workspace are already assigned to
         this task.
       </p>
 
-      <Table class="w-full text-sm">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Current Assignees</TableHead>
-            <TableHead></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow v-for="{ userId } of task?.assignees" :key="userId">
-            <TableCell>
-              <div class="flex items-center pl-2">
-                <Avatar size="sm" class="mr-2 w-10 h-10">
-                  <AvatarImage
-                    v-if="collaboratorsMap[userId]?.profilePictureUrl"
-                    :src="collaboratorsMap[userId]?.profilePictureUrl"
-                  />
-                  <AvatarFallback v-else>{{
-                    getInitials(collaboratorsMap[userId]?.fullName)
-                  }}</AvatarFallback>
-                </Avatar>
-                <span>{{ collaboratorsMap[userId]?.fullName }}</span>
-              </div>
-            </TableCell>
-            <TableCell class="text-right">
-              <Button
-                variant="destructive"
-                :aria-label="`Unassign ${collaboratorsMap[userId]?.fullName} from this task`"
-                size="sm"
-                @click="() => onRemoveAssignee(userId)"
-              >
-                Remove
-              </Button>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <template v-if="task?.assignees && task.assignees.length > 0">
+        <Table class="w-full text-sm">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Current Assignees</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="{ userId } of task.assignees" :key="userId">
+              <TableCell>
+                <div class="flex items-center pl-1">
+                  <Avatar size="sm" class="mr-2 w-10 h-10">
+                    <AvatarImage
+                      v-if="collaboratorsMap[userId]?.profilePictureUrl"
+                      :src="collaboratorsMap[userId]?.profilePictureUrl"
+                    />
+                    <AvatarFallback v-else>{{
+                      getInitials(collaboratorsMap[userId]?.fullName)
+                    }}</AvatarFallback>
+                  </Avatar>
+                  <span>{{ collaboratorsMap[userId]?.fullName }}</span>
+                </div>
+              </TableCell>
+              <TableCell class="text-right">
+                <Button
+                  variant="destructive"
+                  :aria-label="`Unassign ${collaboratorsMap[userId]?.fullName} from this task`"
+                  size="sm"
+                  @click="() => onRemoveAssignee(userId)"
+                >
+                  Remove
+                </Button>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </template>
     </DialogContent>
   </Dialog>
 </template>

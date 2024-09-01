@@ -64,8 +64,8 @@ export const useTasks = (
             }
             copy.sort(
               (a, b) =>
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime(),
+                new Date(b.updatedAt ?? b.createdAt).getTime() -
+                new Date(a.updatedAt ?? a.createdAt).getTime(),
             );
 
             return copy;

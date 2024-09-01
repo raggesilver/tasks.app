@@ -48,7 +48,8 @@ export const getTasksForStatusColumn = async (
         assignees: true,
       },
       // Most recently created tasks first
-      orderBy: (table, { desc }) => desc(table.createdAt),
+      orderBy: (table, { desc }) =>
+        desc(sql`coalesce(${table.updatedAt}, ${table.createdAt})`),
     })
     .execute();
 };

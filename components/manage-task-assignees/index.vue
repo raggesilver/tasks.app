@@ -49,7 +49,7 @@ const availableCollaborators = computed<User[]>(
     ) ?? [],
 );
 
-const somethingSelected = async (value: string) => {
+const onAddAssignee = async (value: string) => {
   if (isPending.value) {
     return;
   }
@@ -88,7 +88,7 @@ const onRemoveAssignee = async (userId: string) => {
               v-for="collaborator in availableCollaborators"
               :key="collaborator.id"
               :value="collaborator.fullName"
-              @select="() => somethingSelected(collaborator.id)"
+              @select="() => onAddAssignee(collaborator.id)"
             >
               <UserAvatar :user-id="collaborator.id" class="w-10 h-10 mr-2" />
               {{ collaborator.fullName }}

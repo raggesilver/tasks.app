@@ -1,7 +1,14 @@
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { type UpdateTaskInput } from "~/lib/validation";
 import { db } from "../db/db";
-import { tasks, type NewTask, type TaskWithAssignees } from "../db/schema";
+import {
+  Assignee,
+  assignees,
+  tasks,
+  type NewTask,
+  type TaskWithAssignees,
+} from "../db/schema";
+import { DuplicateError, NotFoundError } from "../lib/errors";
 
 export const createTask = async (data: NewTask): Promise<TaskWithAssignees> => {
   return db
@@ -97,6 +104,40 @@ export const deleteTask = async (id: string): Promise<boolean> => {
   return db
     .delete(tasks)
     .where(eq(tasks.id, id))
+    .returning()
+    .execute()
+    .then((result) => result.length > 0);
+};
+
+export const addAssigneeToTask = async (
+  taskId: string,
+  userId: string,
+): Promise<Assignee | null> => {
+  try {
+    return db
+      .insert(assignees)
+      .values({ taskId, userId })
+      .returning()
+      .execute()
+      .then((assignee) => assignee[0]);
+  } catch (e: any) {
+    // Check if constraint violation error (Task does not exist).
+    if (e.code === "23503") {
+      throw new NotFoundError("Task not found");
+    } else if (e.code === "23505") {
+      throw new DuplicateError("userId", "User is already assigned to task");
+    }
+    throw e;
+  }
+};
+
+export const removeAssigneeFromTask = async (
+  taskId: string,
+  userId: string,
+): Promise<boolean> => {
+  return db
+    .delete(assignees)
+    .where(and(eq(assignees.taskId, taskId), eq(assignees.userId, userId)))
     .returning()
     .execute()
     .then((result) => result.length > 0);

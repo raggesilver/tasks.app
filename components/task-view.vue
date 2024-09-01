@@ -24,6 +24,8 @@ const {
 
 const isOpen = ref(true);
 const isEditing = ref(false);
+const route = useRoute();
+const workspaceId = computed(() => route.params.id.toString());
 
 const result = await suspense();
 
@@ -154,7 +156,10 @@ whenever(metaE, () => (isEditing.value = true));
           <DialogTitle class="text-xl font-bold">{{ task.title }}</DialogTitle>
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
-              <Button variant="outline" class="w-6 h-6 p-0 ml-auto">
+              <Button
+                variant="outline"
+                class="w-6 h-6 p-0 ml-auto flex-shrink-0"
+              >
                 <Icon name="lucide:ellipsis" />
               </Button>
             </DropdownMenuTrigger>
@@ -180,7 +185,7 @@ whenever(metaE, () => (isEditing.value = true));
             </DropdownMenuContent>
           </DropdownMenu>
           <DialogClose as-child>
-            <Button variant="outline" class="w-6 h-6 p-0">
+            <Button variant="outline" class="w-6 h-6 p-0 flex-shrink-0">
               <Icon name="lucide:x" />
             </Button>
           </DialogClose>
@@ -211,6 +216,11 @@ whenever(metaE, () => (isEditing.value = true));
                 </li>
               </ol>
             </section>
+
+            <ManageTaskAssignees
+              :task-id="task.id"
+              :workspace-id="workspaceId"
+            />
           </div>
           <!-- Sidebar -->
           <!--<Separator orientation="vertical" />

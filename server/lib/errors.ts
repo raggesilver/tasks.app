@@ -10,3 +10,10 @@ export class DuplicateError extends Error {
     this.field = field;
   }
 }
+
+export class NotFoundError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = "NotFoundError";
+  }
+}

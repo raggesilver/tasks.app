@@ -1,5 +1,5 @@
 import type { UpdateTaskInput } from "~/lib/validation";
-import { type Task } from "~/server/db/schema";
+import { type Task, type TaskWithAssignees } from "~/server/db/schema";
 
 export const useTask = (taskId: MaybeRefOrGetter<string>) => {
   const client = useQueryClient();
@@ -14,7 +14,7 @@ export const useTask = (taskId: MaybeRefOrGetter<string>) => {
               ...task,
               createdAt: new Date(task.createdAt),
               updatedAt: new Date(task.updatedAt),
-            }) as Task,
+            }) as TaskWithAssignees,
         ),
     },
     client,
@@ -89,4 +89,69 @@ export const useTask = (taskId: MaybeRefOrGetter<string>) => {
     isDeleting,
     ...rest,
   };
+};
+
+export const useTaskAddAssigneeMutation = () => {
+  const client = useQueryClient();
+
+  return useMutation(
+    {
+      mutationFn: ({ taskId, userId }: { taskId: string; userId: string }) =>
+        useRequestFetch()(`/api/task/${taskId}/assignee`, {
+          method: "POST",
+          body: {
+            userId,
+          },
+        }),
+      onSuccess: (response, { taskId }) => {
+        if (!response) return;
+
+        const statusColumnId = client.getQueryData<TaskWithAssignees>([
+          "task",
+          taskId,
+        ])?.statusColumnId;
+
+        client.invalidateQueries({
+          queryKey: ["task", taskId],
+        });
+
+        if (statusColumnId) {
+          client.invalidateQueries({
+            queryKey: ["status-column-tasks", statusColumnId],
+          });
+        }
+      },
+    },
+    client,
+  );
+};
+
+export const useTaskRemoveAssigneeMutation = () => {
+  const client = useQueryClient();
+
+  return useMutation(
+    {
+      mutationFn: ({ taskId, userId }: { taskId: string; userId: string }) =>
+        useRequestFetch()(`/api/task/${taskId}/assignee/${userId}`, {
+          method: "DELETE",
+        }),
+      onSuccess: (_, { taskId }) => {
+        const statusColumnId = client.getQueryData<TaskWithAssignees>([
+          "task",
+          taskId,
+        ])?.statusColumnId;
+
+        client.invalidateQueries({
+          queryKey: ["task", taskId],
+        });
+
+        if (statusColumnId) {
+          client.invalidateQueries({
+            queryKey: ["status-column-tasks", statusColumnId],
+          });
+        }
+      },
+    },
+    client,
+  );
 };

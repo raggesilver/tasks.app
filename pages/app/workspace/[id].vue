@@ -55,7 +55,7 @@ const onTaskClosed = () => {
 
 <template>
   <!-- start of app layout re-implementation -->
-  <div class="flex flex-col min-h-screen bg-background">
+  <div class="flex flex-col h-screen bg-background">
     <NavBar>
       <template #right-items v-if="workspace">
         <Popover>
@@ -76,7 +76,9 @@ const onTaskClosed = () => {
       </template>
     </NavBar>
     <!-- actual content of this page -->
-    <div class="flex flex-col flex-grow px-8 pt-8 gap-8 dark:bg-muted/40">
+    <div
+      class="flex flex-col flex-grow px-8 pt-8 gap-8 dark:bg-muted/40 overflow-hidden"
+    >
       <template v-if="workspace">
         <div class="flex flex-row gap-4 items-center">
           <h1 class="text-3xl font-extrabold">{{ workspace.name }}</h1>
@@ -87,29 +89,27 @@ const onTaskClosed = () => {
             @manage-collaborators="showManageCollaborators = true"
           />
         </div>
-        <div
-          class="flex-grow flex flex-row items-start gap-8 overflow-x-auto overflow-y-hidden min-w-full -mx-8 px-8 pb-8"
+        <TransitionGroup
+          name="list"
+          tag="ol"
+          v-if="columns?.length"
+          class="flex flex-row gap-8 items-start max-h-full -mx-8 px-8 pb-8 overflow-x-auto overflow-y-hidden"
+          ref="boardRef"
         >
-          <TransitionGroup
-            name="list"
-            tag="div"
-            v-if="columns?.length"
-            class="flex flex-row gap-8 items-stretch"
-            ref="boardRef"
-          >
-            <StatusColumn
-              v-for="column in columns"
-              :key="column.id"
-              :column
-              class="status-column"
-            />
-          </TransitionGroup>
-          <span
+          <StatusColumn
+            v-for="column in columns"
+            :key="column.id"
+            :column
+            class="shrink-0"
+            as="li"
+          />
+          <li
             class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"
+            key="create-column"
           >
             <CreateColumn />
-          </span>
-        </div>
+          </li>
+        </TransitionGroup>
       </template>
       <template v-else-if="is404" class="">
         <div class="flex-1 flex flex-col items-center justify-center">

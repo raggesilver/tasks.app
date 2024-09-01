@@ -71,6 +71,13 @@
       "when": 1725064364537,
       "tag": "0009_volatile_doctor_doom",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1725121165851,
+      "tag": "0010_same_zodiak",
+      "breakpoints": true
     }
   ]
 }

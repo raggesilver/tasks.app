@@ -49,7 +49,7 @@ const { mutateAsync } = useMutation({
       ["status-column-tasks", props.statusColumnId],
       (old) => {
         if (!old) return [normalized];
-        return [...old, normalized];
+        return [normalized, ...old];
       },
     );
   },

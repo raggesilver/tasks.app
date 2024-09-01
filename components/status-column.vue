@@ -222,14 +222,14 @@ const doDeleteColumn = async () => {
 
 <template>
   <Card
-    class="w-xs flex-shrink-0 self-start bg-muted dark:bg-background status-column drag border-3 border-dashed dark:[&_*]:border-muted/50"
+    class="w-xs max-h-full flex flex-col bg-muted dark:bg-background drag border-3 border-dashed dark:[&_*]:border-muted/50 status-column"
     :class="classesForDragOverType"
+    :draggable="canDragColumn"
     @drop="onDrop"
     @dragover.prevent="onDragOver"
     @dragenter.prevent
     @dragleave="onDragLeave"
     @dragend="onDragLeave"
-    :draggable="canDragColumn"
     @dragstart="onColumnDragStart"
     v-bind="$attrs"
   >
@@ -242,8 +242,7 @@ const doDeleteColumn = async () => {
           @mouseup="canDragColumn = false"
           @touchend="canDragColumn = false"
         >
-          <Icon name="lucide:ellipsis-vertical" />
-          <Icon name="lucide:ellipsis-vertical" style="margin-left: -8px" />
+          <Icon name="lucide:grip-vertical" />
         </div>
         <span class="flex-grow">
           {{ column.name }}
@@ -291,7 +290,7 @@ const doDeleteColumn = async () => {
         </DropdownMenu>
       </CardTitle>
     </CardHeader>
-    <CardContent class="px-2">
+    <CardContent class="px-2 overflow-y-auto">
       <ol v-if="tasks" ref="tasksRef" class="flex flex-col gap-2">
         <MiniTask
           v-for="task in tasks"

@@ -55,6 +55,10 @@ export const deactivateInvitationSchema = z.object({
   workspaceId: z.string().uuid(),
 });
 
+export const addAssigneeSchema = z.object({
+  userId: z.string().uuid(),
+});
+
 export type CreateWorkspaceInput = z.infer<typeof createWorkspaceSchema>;
 export type UpdateWorkspaceInput = z.infer<typeof updateWorkspaceSchema>;
 
@@ -71,3 +75,5 @@ export type CreateInvitationInput = z.infer<typeof createInvitationSchema>;
 export type DeactivateInvitationInput = z.infer<
   typeof deactivateInvitationSchema
 >;
+
+export type AddAssigneeInput = z.infer<typeof addAssigneeSchema>;

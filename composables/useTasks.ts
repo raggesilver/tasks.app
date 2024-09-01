@@ -1,5 +1,5 @@
 import type { UpdateTaskInput } from "~/lib/validation";
-import { type Task } from "~/server/db/schema";
+import { type Task, type TaskWithAssignees } from "~/server/db/schema";
 
 export const useTasks = (
   workspaceId: MaybeRefOrGetter<string>,
@@ -15,7 +15,7 @@ export const useTasks = (
           `/api/column/${workspaceId}/${statusColumnId}/get-tasks`,
         )
           .then((res) =>
-            res.map<Task>((task) => ({
+            res.map<TaskWithAssignees>((task) => ({
               ...task,
               createdAt: new Date(task.createdAt),
               updatedAt: new Date(task.updatedAt),
@@ -23,7 +23,7 @@ export const useTasks = (
           )
           .then((tasks) => {
             tasks.forEach((task) =>
-              client.setQueryData<Task>(["task", task.id], task),
+              client.setQueryData<TaskWithAssignees>(["task", task.id], task),
             );
             return tasks;
           }),
@@ -50,7 +50,7 @@ export const useTasks = (
           updatedAt: new Date(updatedTask.updatedAt),
         };
 
-        client.setQueryData<Task[]>(
+        client.setQueryData<TaskWithAssignees[]>(
           ["status-column-tasks", updatedTask.statusColumnId],
           (tasks) => {
             if (!tasks) return;
@@ -64,15 +64,18 @@ export const useTasks = (
             }
             copy.sort(
               (a, b) =>
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime(),
+                new Date(b.updatedAt ?? b.createdAt).getTime() -
+                new Date(a.updatedAt ?? a.createdAt).getTime(),
             );
 
             return copy;
           },
         );
 
-        client.setQueryData<Task>(["task", updatedTask.id], normalized);
+        client.setQueryData<TaskWithAssignees>(
+          ["task", updatedTask.id],
+          normalized,
+        );
 
         if (task.statusColumnId !== updatedTask.statusColumnId) {
           client.setQueryData<Task[]>(

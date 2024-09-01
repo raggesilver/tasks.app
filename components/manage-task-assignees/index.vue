@@ -9,6 +9,8 @@ import {
   CommandList,
 } from "~/components/ui/command";
 import { getInitials } from "~/lib/utils";
+import PopoverTrigger from "../ui/popover/PopoverTrigger.vue";
+import PopoverContent from "../ui/popover/PopoverContent.vue";
 
 const props = defineProps<{
   taskId: string;
@@ -24,125 +26,90 @@ const { data: task, suspense: taskSuspense } = useTask(props.taskId);
 // already in cache, so awaiting for suspense here is fine.
 await Promise.all([suspense(), taskSuspense()]);
 
-const { mutateAsync: addAssignee, isPending } = useTaskAddAssigneeMutation();
-const { mutateAsync: removeAssignee, isPending: isRemovePending } =
-  useTaskRemoveAssigneeMutation();
+const { mutateAsync: addAssignee } = useTaskAddAssigneeMutation();
+const { mutateAsync: removeAssignee } = useTaskRemoveAssigneeMutation();
 
-const collaboratorsMap = computed(
-  () =>
-    collaborators.value?.reduce(
-      (acc, collaborator) => {
-        acc[collaborator.id] = collaborator;
-        return acc;
-      },
-      {} as Record<string, User>,
-    ) ?? {},
-);
+const toggleStatuses = reactive<{ [key: string]: boolean }>({});
 
-const availableCollaborators = computed<User[]>(
-  () =>
-    collaborators.value?.filter(
-      (collaborator) =>
-        !task.value?.assignees.find(
-          (assignee) => assignee.userId === collaborator.id,
-        ),
-    ) ?? [],
-);
+const users = computed(() => {
+  const assignedUsers: Record<string, boolean> = {};
 
-const onAddAssignee = async (value: string) => {
-  if (isPending.value) {
+  task.value?.assignees.forEach((a) => {
+    assignedUsers[a.userId] = true;
+  });
+
+  return (
+    collaborators.value?.map((c) => ({
+      ...c,
+      isAssigned: c.id in assignedUsers,
+    })) ?? []
+  );
+});
+
+const toggleUser = async (user: User & { isAssigned: boolean }) => {
+  if (toggleStatuses[user.id]) {
     return;
   }
 
-  await addAssignee({ taskId: props.taskId, userId: value });
-};
+  toggleStatuses[user.id] = true;
 
-const onRemoveAssignee = async (userId: string) => {
-  if (isRemovePending.value) {
-    return;
+  const start = Date.now();
+  try {
+    await (user.isAssigned ? removeAssignee : addAssignee)({
+      taskId: props.taskId,
+      userId: user.id,
+    });
+  } finally {
+    const end = Date.now();
+    if (end - start < 500) {
+      await new Promise((resolve) => setTimeout(resolve, 140 - (end - start)));
+    }
+    toggleStatuses[user.id] = false;
   }
-
-  await removeAssignee({ taskId: props.taskId, userId });
 };
 </script>
 
 <template>
-  <Dialog>
-    <DialogTrigger as-child>
-      <Button variant="secondary" size="sm">Manage Assignees</Button>
-    </DialogTrigger>
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Manage Assignees</DialogTitle>
-        <DialogDescription>
-          Add or remove assignees from this task.
-        </DialogDescription>
-      </DialogHeader>
+  <Popover>
+    <PopoverTrigger as-child>
+      <slot>
+        <Button variant="secondary" size="sm">Manage Assignees</Button>
+      </slot>
+    </PopoverTrigger>
+    <PopoverContent class="p-0">
+      <Command>
+        <CommandInput placeholder="Search collaborators" />
+        <CommandList>
+          <CommandEmpty>No collaborators found.</CommandEmpty>
+          <CommandItem
+            v-for="user in users"
+            :key="user.id"
+            :value="`${user.fullName} (${user.id})`"
+            :aria-label="
+              user.isAssigned
+                ? `Unassign ${user.fullName} from this task`
+                : `Assign ${user.fullName} to this task`
+            "
+            @select="() => toggleUser(user)"
+          >
+            <UserAvatar :user-id="user.id" class="w-8 h-8 mr-2" />
+            <span>{{ user.fullName }}</span>
 
-      <div v-if="availableCollaborators.length > 0">
-        <h3 class="font-semibold">Add assignee</h3>
-        <Command>
-          <CommandInput placeholder="Search for collaborators" />
-          <CommandList>
-            <CommandEmpty>No collaborators found.</CommandEmpty>
-            <CommandGroup>
-              <CommandItem
-                v-for="collaborator in availableCollaborators"
-                :key="collaborator.id"
-                :value="`${collaborator.fullName} (${collaborator.id})`"
-                @select="() => onAddAssignee(collaborator.id)"
-              >
-                <UserAvatar :user-id="collaborator.id" class="w-10 h-10 mr-2" />
-                {{ collaborator.fullName }}
-              </CommandItem>
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </div>
-
-      <p v-else class="text-sm text-center my-4">
-        All available collaborators on this workspace are already assigned to
-        this task.
-      </p>
-
-      <template v-if="task?.assignees && task.assignees.length > 0">
-        <Table class="w-full text-sm">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Current Assignees</TableHead>
-              <TableHead></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="{ userId } of task.assignees" :key="userId">
-              <TableCell>
-                <div class="flex items-center pl-1">
-                  <Avatar size="sm" class="mr-2 w-10 h-10">
-                    <AvatarImage
-                      v-if="collaboratorsMap[userId]?.profilePictureUrl"
-                      :src="collaboratorsMap[userId]?.profilePictureUrl"
-                    />
-                    <AvatarFallback v-else>{{
-                      getInitials(collaboratorsMap[userId]?.fullName)
-                    }}</AvatarFallback>
-                  </Avatar>
-                  <span>{{ collaboratorsMap[userId]?.fullName }}</span>
-                </div>
-              </TableCell>
-              <TableCell class="text-right">
-                <Button
-                  variant="destructive"
-                  :aria-label="`Unassign ${collaboratorsMap[userId]?.fullName} from this task`"
-                  size="sm"
-                  @click="() => onRemoveAssignee(userId)"
-                >
-                  Remove
-                </Button>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </template>
-    </DialogContent>
-  </Dialog>
+            <div class="ml-auto">
+              <Icon
+                v-if="toggleStatuses[user.id]"
+                name="lucide:loader-circle"
+                class="w-4 h-4 animate-spin"
+              />
+              <Icon
+                v-else-if="user.isAssigned"
+                name="lucide:check"
+                class="w-4 h-4 ml-auto"
+              />
+            </div>
+          </CommandItem>
+        </CommandList>
+      </Command>
+    </PopoverContent>
+  </Popover>
 </template>

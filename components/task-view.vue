@@ -152,7 +152,7 @@ whenever(metaE, () => (isEditing.value = true));
         </div>
       </form>
       <template v-else>
-        <DialogHeader class="flex flex-row gap-2 items-center">
+        <DialogHeader class="flex flex-row gap-2 items-baseline">
           <DialogTitle class="text-xl font-bold">{{ task.title }}</DialogTitle>
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
@@ -190,6 +190,28 @@ whenever(metaE, () => (isEditing.value = true));
             </Button>
           </DialogClose>
         </DialogHeader>
+
+        <div class="flex flex-row-reversep-1 mr-auto gap-2">
+          <UserAvatar
+            v-for="(assignee, i) in task.assignees"
+            :key="assignee.userId"
+            :userId="assignee.userId"
+            class="w-8 h-8 border avatar"
+            :class="i === 0 ? '' : '-ml-5 transition-all'"
+          />
+          <ManageTaskAssignees :task-id="task.id" :workspace-id="workspaceId">
+            <Button variant="outline" class="w-8 h-8 p-0 rounded-full shrink-0">
+              <Icon
+                :name="
+                  task?.assignees.length === 0
+                    ? 'lucide:user-plus'
+                    : 'lucide:ellipsis'
+                "
+              />
+            </Button>
+          </ManageTaskAssignees>
+        </div>
+
         <div class="flex gap-4 py-4">
           <div class="flex flex-col gap-8 flex-grow-1">
             <section>
@@ -216,11 +238,6 @@ whenever(metaE, () => (isEditing.value = true));
                 </li>
               </ol>
             </section>
-
-            <ManageTaskAssignees
-              :task-id="task.id"
-              :workspace-id="workspaceId"
-            />
           </div>
           <!-- Sidebar -->
           <!--<Separator orientation="vertical" />

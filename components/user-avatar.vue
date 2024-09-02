@@ -7,13 +7,17 @@ const props = defineProps<{
 }>();
 
 const client = useQueryClient();
-const { data, isPending } = useQuery<User>(
+const { data, isPending, suspense } = useQuery<User>(
   {
     queryKey: ["user", props.userId],
     queryFn: async () => useRequestFetch()(`/api/user/${props.userId}`),
   },
   client,
 );
+
+onServerPrefetch(async () => {
+  await suspense();
+});
 </script>
 
 <template>

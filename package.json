@@ -13,17 +13,17 @@
     "db:migrate": "dotenvx run -- drizzle-kit migrate"
   },
   "dependencies": {
+    "@nuxt/icon": "^1.5.0",
     "@radix-icons/vue": "^1.0.0",
-    "@tanstack/vue-query": "^5.53.1",
-    "@tanstack/vue-query-devtools": "^5.53.1",
+    "@tanstack/vue-query": "^5.53.3",
+    "@tanstack/vue-query-devtools": "^5.54.0",
     "@vee-validate/zod": "^4.13.2",
-    "@vueuse/core": "^10.11.1",
+    "@vueuse/core": "^11.0.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "drizzle-orm": "^0.32.2",
+    "drizzle-orm": "^0.33.0",
     "drizzle-zod": "^0.5.1",
     "nuxt-auth-utils": "^0.3.5",
-    "nuxt-icon": "^0.6.10",
     "postgres": "^3.4.4",
     "radix-vue": "^1.9.5",
     "shadcn-nuxt": "^0.10.4",
@@ -31,32 +31,27 @@
     "tailwind-merge": "^2.5.2",
     "vaul-vue": "^0.2.0",
     "vee-validate": "^4.13.2",
-    "vue": "^3.4.38",
+    "vue": "^3.5.0",
     "vue-router": "^4.4.3",
     "vue-sonner": "^1.1.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@dotenvx/dotenvx": "^1.11.5",
+    "@dotenvx/dotenvx": "^1.13.2",
     "@hebilicious/vue-query-nuxt": "^0.3.0",
     "@nuxt/content": "^2.13.2",
     "@nuxt/image": "^1.8.0",
     "@types/slug": "^5.0.9",
-    "@unocss/nuxt": "^0.61.9",
-    "@vueuse/nuxt": "^10.11.1",
-    "drizzle-kit": "^0.23.2",
+    "@unocss/nuxt": "^0.62.3",
+    "@vueuse/nuxt": "^11.0.3",
+    "drizzle-kit": "^0.24.2",
     "nuxt": "^3.13.0",
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.0.0",
+    "prettier-plugin-sql": "^0.18.1",
     "typescript": "^5.5.4",
     "unocss-preset-animations": "^1.1.0",
-    "vue-tsc": "^2.1.2"
+    "vue-tsc": "^2.1.4"
   },
-  "trustedDependencies": [
-    "@hebilicious/vue-query-nuxt",
-    "es5-ext",
-    "esbuild",
-    "vue-demi"
-  ],
   "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
 }

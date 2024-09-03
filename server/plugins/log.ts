@@ -1,5 +1,5 @@
 export default defineNitroPlugin((nitro) => {
-  if (import.meta.prerender) {
+  if (import.meta.prerender || import.meta.dev) {
     return;
   }
 

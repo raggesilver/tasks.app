@@ -22,7 +22,7 @@ export default defineNuxtConfig({
     "shadcn-nuxt",
     "@unocss/nuxt",
     "nuxt-auth-utils",
-    "nuxt-icon",
+    "@nuxt/icon",
     "@vueuse/nuxt",
     "@hebilicious/vue-query-nuxt",
     "@nuxt/content",
@@ -30,6 +30,9 @@ export default defineNuxtConfig({
   ],
 
   vueQuery: {
+    // vueQueryPluginOptions: {
+    //   enableDevtoolsV6Plugin: true,
+    // },
     queryClientOptions: {
       defaultOptions: {
         queries: {

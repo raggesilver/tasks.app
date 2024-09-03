@@ -92,7 +92,6 @@ const onTaskClosed = () => {
         <TransitionGroup
           name="list"
           tag="ol"
-          v-if="columns?.length"
           class="flex flex-row gap-8 items-start max-h-full -mx-8 px-8 pb-8 overflow-x-auto overflow-y-hidden"
           ref="boardRef"
         >

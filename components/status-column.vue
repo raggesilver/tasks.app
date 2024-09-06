@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { toast } from "vue-sonner";
 import { z } from "zod";
+import { cn } from "~/lib/utils";
 import type { StatusColumn, Task } from "~/server/db/schema";
 
 const props = defineProps<{
@@ -38,6 +39,7 @@ const showEditModal = ref(false);
 const showCreateTaskModal = ref(false);
 const canDragColumn = ref(false);
 const dragOverType = ref<"task" | "left" | "right" | null>(null);
+const collapsed = ref(false);
 
 const dropSchema = z.object({
   task: z.any(),
@@ -223,7 +225,7 @@ const doDeleteColumn = async () => {
 <template>
   <Card
     class="w-xs max-h-full flex flex-col bg-muted dark:bg-background drag border-3 border-dashed dark:[&_*]:border-muted/50 status-column"
-    :class="classesForDragOverType"
+    :class="cn(classesForDragOverType, { collapsed })"
     :draggable="canDragColumn"
     @drop="onDrop"
     @dragover.prevent="onDragOver"
@@ -233,8 +235,8 @@ const doDeleteColumn = async () => {
     @dragstart="onColumnDragStart"
     v-bind="$attrs"
   >
-    <CardHeader class="px-2 pt-2">
-      <CardTitle class="flex flex-row gap-2 items-center">
+    <CardHeader class="px-2 pt-2 card-header">
+      <div class="flex flex-row gap-1 items-center card-title">
         <div
           class="drag-handle text-muted-foreground cursor-grab"
           @mousedown="canDragColumn = true"
@@ -244,12 +246,22 @@ const doDeleteColumn = async () => {
         >
           <Icon name="lucide:grip-vertical" />
         </div>
-        <span class="flex-grow">
+        <CardTitle class="flex-grow title">
           {{ column.name }}
-        </span>
+        </CardTitle>
+        <EasyTooltip tooltip="Collapse Column">
+          <Button
+            variant="outline"
+            class="w-6 h-6 p-0 collapse-toggle"
+            size="sm"
+            @click="() => (collapsed = !collapsed)"
+          >
+            <Icon name="lucide:chevrons-right-left" />
+          </Button>
+        </EasyTooltip>
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
-            <Button variant="outline" class="w-8 h-8 p-0" size="sm">
+            <Button variant="outline" class="w-6 h-6 p-0" size="sm">
               <Icon name="lucide:ellipsis" />
             </Button>
           </DropdownMenuTrigger>
@@ -288,9 +300,9 @@ const doDeleteColumn = async () => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </CardTitle>
+      </div>
     </CardHeader>
-    <CardContent class="px-2 overflow-y-auto">
+    <CardContent class="px-2 overflow-y-auto card-content">
       <ol v-if="tasks" ref="tasksRef" class="flex flex-col gap-2">
         <MiniTask
           v-for="task in tasks"
@@ -307,7 +319,7 @@ const doDeleteColumn = async () => {
         v-model:is-open="showCreateTaskModal"
       />
     </CardContent>
-    <CardFooter class="pb-2 px-2">
+    <CardFooter class="pb-2 px-2 card-footer">
       <Button
         variant="outline"
         class="w-full"
@@ -318,3 +330,31 @@ const doDeleteColumn = async () => {
     </CardFooter>
   </Card>
 </template>
+
+<style>
+.status-column.collapsed {
+  @apply w-12 min-h-[50vh];
+
+  & .card-header {
+    @apply p-2;
+  }
+
+  & .card-footer,
+  & .card-content {
+    display: none;
+  }
+
+  & .card-title {
+    flex-direction: column;
+
+    & .title {
+      text-orientation: mixed;
+      writing-mode: vertical-rl;
+    }
+  }
+
+  & .collapse-toggle {
+    @apply mt-4;
+  }
+}
+</style>

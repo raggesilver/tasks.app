@@ -1,5 +1,9 @@
-import transformDirectives from "@unocss/transformer-directives";
-import { defineConfig, presetTypography, presetWind } from "unocss";
+import {
+  defineConfig,
+  presetTypography,
+  presetWind,
+  transformerDirectives,
+} from "unocss";
 import presetAnimations from "unocss-preset-animations";
 
 export default defineConfig({
@@ -15,7 +19,7 @@ export default defineConfig({
     presetAnimations(),
     presetTypography(),
   ],
-  transformers: [transformDirectives()],
+  transformers: [transformerDirectives()],
   theme: {
     container: {
       center: true,

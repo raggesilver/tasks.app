@@ -27,6 +27,7 @@ export default defineNuxtConfig({
     "@hebilicious/vue-query-nuxt",
     "@nuxt/content",
     "@nuxt/image",
+    "@pinia/nuxt",
   ],
 
   vueQuery: {
@@ -43,3 +44,4 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2024-07-09",
 });
+

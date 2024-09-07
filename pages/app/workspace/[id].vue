@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { FetchError } from "ofetch";
+import AppLayout from "~/layouts/app.vue";
 
 definePageMeta({
   // We need to access the NavBar's slot to add a button to it. While we could
@@ -54,30 +55,37 @@ const onTaskClosed = () => {
 </script>
 
 <template>
-  <!-- start of app layout re-implementation -->
-  <div class="flex flex-col h-screen bg-background">
-    <NavBar>
-      <template #right-items v-if="workspace">
-        <Popover>
-          <PopoverTrigger as-child>
-            <Button
-              size="sm"
-              variant="outline"
-              class="flex items-center gap-2"
-              title="Share workspace"
-            >
-              Share <Icon name="lucide:share" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" class="w-full sm:w-[435px]">
-            <ShareWorkspace :workspace />
-          </PopoverContent>
-        </Popover>
-      </template>
-    </NavBar>
-    <!-- actual content of this page -->
+  <AppLayout>
+    <template #left-items>
+      <AppBreadcrumbs
+        :entries="[
+          { title: 'Home', link: '/app' },
+          {
+            title: workspace?.name ?? 'Workspace',
+            link: `/app/workspace/${route.params.id}`,
+          },
+        ]"
+      />
+    </template>
+    <template #right-items v-if="workspace">
+      <Popover>
+        <PopoverTrigger as-child>
+          <Button
+            size="sm"
+            variant="outline"
+            class="flex items-center gap-2"
+            title="Share workspace"
+          >
+            Share <Icon name="lucide:share" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="end" class="w-full sm:w-[435px]">
+          <ShareWorkspace :workspace />
+        </PopoverContent>
+      </Popover>
+    </template>
     <div
-      class="flex flex-col flex-grow px-8 pt-8 gap-8 dark:bg-muted/40 overflow-hidden"
+      class="flex flex-col flex-grow px-8 gap-8 dark:bg-muted/40 overflow-hidden"
     >
       <template v-if="workspace">
         <div class="flex flex-row gap-4 items-center">
@@ -119,10 +127,7 @@ const onTaskClosed = () => {
         </div>
       </template>
     </div>
-    <!-- end of actual content of this page -->
-    <AppFooter />
-    <!-- end of app layout re-implementation -->
-  </div>
+  </AppLayout>
   <TaskView v-if="viewTask" :taskId="viewTask" @close="onTaskClosed" />
   <EditCollaborators
     v-if="workspace && collaborators"

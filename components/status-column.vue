@@ -53,8 +53,6 @@ const collapsed = computed<boolean>({
   },
 });
 
-console.log({ collapsedColumns });
-
 const dropSchema = z.object({
   task: z.any(),
   type: z.literal("task"),

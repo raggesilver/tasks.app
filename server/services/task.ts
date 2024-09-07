@@ -4,7 +4,9 @@ import { db } from "../db/db";
 import {
   Assignee,
   assignees,
+  taskLabels,
   tasks,
+  TaskWithEverything,
   type NewTask,
   type TaskWithAssignees,
 } from "../db/schema";
@@ -21,12 +23,13 @@ export const createTask = async (data: NewTask): Promise<TaskWithAssignees> => {
 
 export const getTaskById = async (
   id: string,
-): Promise<TaskWithAssignees | null> => {
+): Promise<TaskWithEverything | null> => {
   return db.query.tasks
     .findFirst({
       where: (table, { eq }) => eq(table.id, id),
       with: {
         assignees: true,
+        labels: true,
       },
     })
     .execute()
@@ -36,7 +39,7 @@ export const getTaskById = async (
 export const getTasksForStatusColumn = async (
   workspaceId: string,
   statusColumnId: string,
-): Promise<TaskWithAssignees[]> => {
+): Promise<TaskWithEverything[]> => {
   return db.query.tasks
     .findMany({
       where: (table, { eq, and }) =>
@@ -46,6 +49,7 @@ export const getTasksForStatusColumn = async (
         ),
       with: {
         assignees: true,
+        labels: true,
       },
       // Most recently created tasks first
       orderBy: (table, { desc }) =>
@@ -58,47 +62,23 @@ export const updateTask = async (
   id: string,
   userId: string,
   data: UpdateTaskInput,
-): Promise<TaskWithAssignees | null> => {
-  // We can use the following query to update a task and return it along with
-  // its assignees, however, I cannot find a way to do this with drizzle.
-  // Drizzle does not seem to support update statements as CTEs.
-  //
-  // WITH updated AS (
-  // 	UPDATE
-  // 		tasks
-  // 	SET
-  // 		workspace_id = 'b1c79cb1-9a36-4859-b630-39bb25e5f534'
-  // 	WHERE
-  // 		id = 'e5654d44-37a8-4c88-88f4-509f4ddf25f8'
-  // 	RETURNING
-  // 		*
-  // )
-  // SELECT
-  // 	*
-  // FROM
-  // 	updated
-  // 	LEFT JOIN assignees a ON a.task_id = updated.id
+): Promise<TaskWithEverything | null> => {
+  // Drizzle does not support update queries as CTEs, so we have to update and
+  // then fetch the updated task.
+  const task = await db
+    .update(tasks)
+    .set({
+      ...data,
+      lastUpdatedById: userId,
+      updatedAt: sql`now()`,
+    })
+    .where(eq(tasks.id, id))
+    // TODO: since we are not using the task, we should probably remove this.
+    .returning()
+    .execute()
+    .then((task) => task[0] ?? null);
 
-  const [task, assignees] = await Promise.all([
-    db
-      .update(tasks)
-      .set({
-        ...data,
-        lastUpdatedById: userId,
-        updatedAt: sql`now()`,
-      })
-      .where(eq(tasks.id, id))
-      .returning()
-      .execute()
-      .then((task) => task[0] ?? null),
-    db.query.assignees
-      .findMany({
-        where: (table, { eq }) => eq(table.taskId, id),
-      })
-      .execute(),
-  ]);
-
-  return task ? { ...task, assignees } : null;
+  return task ? getTaskById(id) : null;
 };
 
 export const deleteTask = async (id: string): Promise<boolean> => {
@@ -142,4 +122,29 @@ export const removeAssigneeFromTask = async (
     .returning()
     .execute()
     .then((result) => result.length > 0);
+};
+
+export const addLabelToTask = async (
+  taskId: string,
+  labelId: string,
+): Promise<void> => {
+  await db
+    .insert(taskLabels)
+    .values({ taskId, labelId })
+    .onConflictDoNothing({
+      target: [taskLabels.taskId, taskLabels.labelId],
+    })
+    .execute();
+};
+
+export const removeLabelFromTask = async (
+  taskId: string,
+  labelId: string,
+): Promise<boolean> => {
+  return db
+    .delete(taskLabels)
+    .where(and(eq(taskLabels.taskId, taskId), eq(taskLabels.labelId, labelId)))
+    .returning({ id: sql`1` })
+    .execute()
+    .then((results) => results.length > 0);
 };

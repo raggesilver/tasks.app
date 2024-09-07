@@ -190,6 +190,44 @@ export const assignees = pgTable(
 export type Assignee = typeof assignees.$inferSelect;
 export type NewAssignee = typeof assignees.$inferInsert;
 
+export const labels = pgTable("labels", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  color: varchar("color", { length: 255 }).notNull(),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, {
+      onDelete: "cascade",
+    }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type Label = typeof labels.$inferSelect;
+export type NewLabel = typeof labels.$inferInsert;
+
+export const taskLabels = pgTable(
+  "task_labels",
+  {
+    taskId: uuid("task_id")
+      .notNull()
+      .references(() => tasks.id, {
+        onDelete: "cascade",
+      }),
+    labelId: uuid("label_id")
+      .notNull()
+      .references(() => labels.id, {
+        onDelete: "cascade",
+      }),
+  },
+  (table) => ({
+    index: primaryKey({ columns: [table.taskId, table.labelId] }),
+  }),
+);
+
+export type TaskLabel = typeof taskLabels.$inferSelect;
+export type NewTaskLabel = typeof taskLabels.$inferInsert;
+
 export const invitationLinks = pgTable(
   "invitation_links",
   {
@@ -287,6 +325,26 @@ export const tasksRelations = relations(tasks, ({ one, many }) => ({
     references: [users.id],
   }),
   assignees: many(assignees),
+  labels: many(taskLabels),
+}));
+
+export const labelsRelations = relations(labels, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [labels.workspaceId],
+    references: [workspaces.id],
+  }),
+  tasks: many(taskLabels),
+}));
+
+export const taskLabelsRelations = relations(taskLabels, ({ one }) => ({
+  task: one(tasks, {
+    fields: [taskLabels.taskId],
+    references: [tasks.id],
+  }),
+  label: one(labels, {
+    fields: [taskLabels.labelId],
+    references: [labels.id],
+  }),
 }));
 
 export const assigneesRelations = relations(assignees, ({ one }) => ({
@@ -301,3 +359,13 @@ export const assigneesRelations = relations(assignees, ({ one }) => ({
 }));
 
 export type TaskWithAssignees = Task & { assignees: Assignee[] };
+
+/**
+ * This is a type that represents a task with all the related data.
+ * It's useful when we want to fetch a task with all the related data in one
+ * query.
+ */
+export type TaskWithEverything = Task & {
+  labels: TaskLabel[];
+  assignees: Assignee[];
+};

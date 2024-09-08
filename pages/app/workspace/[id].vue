@@ -16,13 +16,20 @@ const { data: workspace, error, suspense } = useWorkspace(id);
 const { data: columns, suspense: statusSuspense } = useStatusColumns(id);
 const { data: collaborators, suspense: collaboratorsSuspense } =
   useWorkspaceCollaborators(id);
+const { data: labels, suspense: labelsSuspense } = useWorkspaceLabels(id);
 
-await Promise.all([suspense(), statusSuspense(), collaboratorsSuspense()]);
+await Promise.all([
+  suspense(),
+  statusSuspense(),
+  collaboratorsSuspense(),
+  labelsSuspense(),
+]);
 
 provide(WORKSPACE_DATA_KEY, {
   workspace,
   columns,
   collaborators,
+  labels,
   /* labels */
 });
 

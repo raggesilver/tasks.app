@@ -186,12 +186,13 @@ const getUserInitials = (name: string) =>
               </div>
             </div>
           </div>
-          <img
-            :src="heroOne"
-            alt="Hero"
-            class="mx-auto aspect-[2/1] md:aspect[3/1] overflow-hidden rounded-xl object-cover object-[center_10%]"
-            height="300"
+          <NuxtImg
             width="1270"
+            src="https://utfs.io/f/824defbc-2546-47fe-abc9-c29873c08771-qb97hq.webp"
+            class="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-cover object-[center_10%]"
+            densities="x1 x2 x3"
+            alt="Screenshot of the app"
+            :placeholder="[240, 160, 90, 5]"
           />
         </div>
       </section>

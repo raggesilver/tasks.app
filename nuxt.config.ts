@@ -20,7 +20,7 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ["@unocss/reset/tailwind-compat.css", "~/assets/css/main.css"],
+  css: ["@unocss/reset/tailwind.css", "~/assets/css/main.css"],
 
   modules: [
     "shadcn-nuxt",

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-background">
+  <div class="flex flex-col h-screen bg-background">
     <NavBarNew>
       <template #left-items>
         <slot name="left-items" />

@@ -25,8 +25,6 @@ const nonSelfCollaborators = computed(() =>
   ),
 );
 
-const open = defineModel<boolean>({ required: true });
-
 const { mutateAsync, status: mutationStatus } =
   useRemoveWorkspaceCollaborator();
 
@@ -52,63 +50,61 @@ const onRemoveCollaborator = (collaborator: User) => {
 </script>
 
 <template>
-  <Sheet v-model:open="open">
-    <SheetContent>
-      <SheetHeader>
-        <SheetTitle>Manage Collaborators</SheetTitle>
-        <SheetDescription>
-          Add or remove collaborators to the {{ workspace.name }} workspace.
-        </SheetDescription>
-      </SheetHeader>
+  <div>
+    <SheetHeader>
+      <SheetTitle>Manage Collaborators</SheetTitle>
+      <SheetDescription>
+        Add or remove collaborators to the {{ workspace.name }} workspace.
+      </SheetDescription>
+    </SheetHeader>
 
-      <!-- content -->
+    <!-- content -->
 
-      <div class="my-4">
-        <span
-          v-if="nonSelfCollaborators.length === 0"
-          class="block text-center text-sm"
-        >
-          There are no collaborators on this workspace besides you.
-        </span>
+    <div class="my-4">
+      <span
+        v-if="nonSelfCollaborators.length === 0"
+        class="block text-center text-sm"
+      >
+        There are no collaborators on this workspace besides you.
+      </span>
 
-        <Table v-else class="w-full text-sm">
-          <TableHeader>
-            <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="user of nonSelfCollaborators" :key="user.id">
-              <TableCell>
-                <div class="flex items-center">
-                  <Avatar size="sm" class="mr-2">
-                    <AvatarImage
-                      v-if="user.profilePictureUrl"
-                      :src="user.profilePictureUrl"
-                    />
-                    <AvatarFallback v-else>{{
-                      getInitials(user.fullName)
-                    }}</AvatarFallback>
-                  </Avatar>
-                  <span>{{ user.fullName }}</span>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Button
-                  type="submit"
-                  variant="destructive"
-                  :aria-label="`Remove ${user.fullName} from the workspace`"
-                  size="sm"
-                  @click="() => onRemoveCollaborator(user)"
-                >
-                  Remove
-                </Button>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </div>
-    </SheetContent>
-  </Sheet>
+      <Table v-else class="w-full text-sm">
+        <TableHeader>
+          <TableRow>
+            <TableHead>User</TableHead>
+            <TableHead></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow v-for="user of nonSelfCollaborators" :key="user.id">
+            <TableCell>
+              <div class="flex items-center">
+                <Avatar size="sm" class="mr-2">
+                  <AvatarImage
+                    v-if="user.profilePictureUrl"
+                    :src="user.profilePictureUrl"
+                  />
+                  <AvatarFallback v-else>{{
+                    getInitials(user.fullName)
+                  }}</AvatarFallback>
+                </Avatar>
+                <span>{{ user.fullName }}</span>
+              </div>
+            </TableCell>
+            <TableCell>
+              <Button
+                type="submit"
+                variant="destructive"
+                :aria-label="`Remove ${user.fullName} from the workspace`"
+                size="sm"
+                @click="() => onRemoveCollaborator(user)"
+              >
+                Remove
+              </Button>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </div>
+  </div>
 </template>

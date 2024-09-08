@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { FetchError } from "ofetch";
 import AppLayout from "~/layouts/app.vue";
+import { WORKSPACE_DATA_KEY } from "~/lib/injection-keys";
 
 definePageMeta({
   // We need to access the NavBar's slot to add a button to it. While we could
@@ -9,14 +10,7 @@ definePageMeta({
   layout: false,
 });
 
-const route = useRoute();
-const router = useRouter();
-const { user } = useUserSession();
-
-const id = computed(() => route.params.id.toString());
-const viewTask = computed<string | null>(
-  () => route.query["view-task"]?.toString() ?? null,
-);
+const id = useRouteParams("id") as Ref<string>;
 
 const { data: workspace, error, suspense } = useWorkspace(id);
 const { data: columns, suspense: statusSuspense } = useStatusColumns(id);
@@ -25,6 +19,23 @@ const { data: collaborators, suspense: collaboratorsSuspense } =
 
 await Promise.all([suspense(), statusSuspense(), collaboratorsSuspense()]);
 
+provide(WORKSPACE_DATA_KEY, {
+  workspace,
+  columns,
+  collaborators,
+  /* labels */
+});
+
+const route = useRoute();
+const router = useRouter();
+const { user } = useUserSession();
+
+const viewTask = useRouteQuery("view-task") as Ref<string | null>;
+
+const isSettingsMounted = computed(() =>
+  route.matched.some((route) => route.name === "workspace-settings"),
+);
+
 const typedError = computed(
   () =>
     (error.value as FetchError | undefined)?.data as
@@ -32,6 +43,7 @@ const typedError = computed(
       | undefined,
 );
 
+// FIXME: this should be handled in the AvatarsList component
 const collaboratorsSorted = computed(
   () =>
     collaborators.value?.toSorted((a, b) =>
@@ -40,7 +52,6 @@ const collaboratorsSorted = computed(
 );
 
 const is404 = computed(() => typedError.value?.statusCode === 404);
-
 const title = computed(() => workspace.value?.name ?? "Workspace");
 
 useHead({
@@ -52,17 +63,31 @@ const showManageCollaborators = ref(false);
 const onTaskClosed = () => {
   router.push({ query: { ...route.query, "view-task": undefined } });
 };
+
+// TODO: this pattern we created is very useful, we should extract it to a hook
+const settingsSSR = ref(true);
+watch(
+  isSettingsMounted,
+  () => {
+    if (isSettingsMounted.value === false) {
+      settingsSSR.value = false;
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 </script>
 
 <template>
-  <AppLayout>
+  <AppLayout class="dark:bg-muted/40">
     <template #left-items>
       <AppBreadcrumbs
         :entries="[
           { title: 'Home', link: '/app' },
           {
             title: workspace?.name ?? 'Workspace',
-            link: `/app/workspace/${route.params.id}`,
+            link: `/app/workspace/${id}`,
           },
         ]"
       />
@@ -84,9 +109,7 @@ const onTaskClosed = () => {
         </PopoverContent>
       </Popover>
     </template>
-    <div
-      class="flex flex-col flex-grow px-8 gap-8 dark:bg-muted/40 overflow-hidden"
-    >
+    <div class="flex flex-col flex-grow px-8 gap-8 overflow-hidden">
       <template v-if="workspace">
         <div class="flex flex-row gap-4 items-center">
           <h1 class="text-3xl font-extrabold">{{ workspace.name }}</h1>
@@ -96,6 +119,16 @@ const onTaskClosed = () => {
             aria-label="List of workspace collaborators"
             @manage-collaborators="showManageCollaborators = true"
           />
+          <EasyTooltip
+            v-if="workspace.ownerId === user?.id"
+            tooltip="Workspace Settings"
+          >
+            <Button size="sm" variant="outline" as-child>
+              <NuxtLink :to="`/app/workspace/${id}/settings`" class="ml-auto">
+                <Icon name="lucide:ellipsis" />
+              </NuxtLink>
+            </Button>
+          </EasyTooltip>
         </div>
         <TransitionGroup
           name="list"
@@ -127,11 +160,14 @@ const onTaskClosed = () => {
         </div>
       </template>
     </div>
+    <Sheet
+      :open="isSettingsMounted"
+      @update:open="() => router.push(`/app/workspace/${id}`)"
+    >
+      <SheetContent :ssr="settingsSSR" as="aside" class="sm:max-w-lg">
+        <NuxtPage />
+      </SheetContent>
+    </Sheet>
   </AppLayout>
   <TaskView v-if="viewTask" :taskId="viewTask" @close="onTaskClosed" />
-  <EditCollaborators
-    v-if="workspace && collaborators"
-    v-bind="{ workspace, collaborators }"
-    v-model="showManageCollaborators"
-  />
 </template>

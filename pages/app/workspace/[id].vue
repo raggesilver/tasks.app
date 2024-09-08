@@ -10,7 +10,7 @@ definePageMeta({
   layout: false,
 });
 
-const id = useRouteParams("id") as Ref<string>;
+const id = useRouteParamSafe("id") as Ref<string>;
 
 const { data: workspace, error, suspense } = useWorkspace(id);
 const { data: columns, suspense: statusSuspense } = useStatusColumns(id);

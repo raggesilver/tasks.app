@@ -1,5 +1,9 @@
 import type { UpdateTaskInput } from "~/lib/validation";
-import { type Task, type TaskWithAssignees } from "~/server/db/schema";
+import {
+  type Task,
+  type TaskWithAssignees,
+  type TaskWithEverything,
+} from "~/server/db/schema";
 
 export const useTask = (taskId: MaybeRefOrGetter<string>) => {
   const client = useQueryClient();
@@ -14,7 +18,7 @@ export const useTask = (taskId: MaybeRefOrGetter<string>) => {
               ...task,
               createdAt: new Date(task.createdAt),
               updatedAt: new Date(task.updatedAt),
-            }) as TaskWithAssignees,
+            }) as TaskWithEverything,
         ),
     },
     client,

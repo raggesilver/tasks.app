@@ -191,6 +191,7 @@ whenever(metaE, () => (isEditing.value = true));
           </DialogClose>
         </DialogHeader>
 
+        <ManageTaskLabels :task="task" />
         <div class="flex flex-row-reversep-1 mr-auto gap-2">
           <UserAvatar
             v-for="(assignee, i) in task.assignees"

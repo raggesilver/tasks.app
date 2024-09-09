@@ -49,17 +49,11 @@ const labelMap = computed(() => {
           v-if="task.labels.length > 0"
           class="flex flex-row gap-1 items-center justify-start flex-wrap"
         >
-          <Badge
+          <AppLabel
             v-for="label of task.labels"
             :key="`${label.labelId}-${label.taskId}`"
-            class="text-xs py-[1px] px-1"
-            variant="outline"
-            :style="`background-color: ${labelMap[label.labelId].color}80; border-color: ${labelMap[label.labelId].color};`"
-          >
-            <span class="font-normal text-foreground">{{
-              labelMap[label.labelId].name
-            }}</span>
-          </Badge>
+            :label="labelMap[label.labelId]"
+          />
         </div>
         <CardTitle class="font-normal">{{ task.title }}</CardTitle>
       </CardHeader>

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import heroOne from "~/assets/images/app-screenshot.webp?url";
 import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
 
 const links = {

@@ -15,11 +15,11 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0(vue@3.5.3(typescript@5.5.4))
       '@tanstack/vue-query':
-        specifier: ^5.54.2
-        version: 5.54.2(vue@3.5.3(typescript@5.5.4))
+        specifier: ^5.55.2
+        version: 5.55.2(vue@3.5.3(typescript@5.5.4))
       '@tanstack/vue-query-devtools':
-        specifier: ^5.54.2
-        version: 5.54.2(@tanstack/vue-query@5.54.2(vue@3.5.3(typescript@5.5.4)))(vue@3.5.3(typescript@5.5.4))
+        specifier: ^5.55.2
+        version: 5.55.2(@tanstack/vue-query@5.55.2(vue@3.5.3(typescript@5.5.4)))(vue@3.5.3(typescript@5.5.4))
       '@vee-validate/zod':
         specifier: ^4.13.2
         version: 4.13.2(vue@3.5.3(typescript@5.5.4))
@@ -39,8 +39,8 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1(drizzle-orm@0.33.0(postgres@3.4.4))(zod@3.23.8)
       nuxt-auth-utils:
-        specifier: ^0.3.6
-        version: 0.3.6(magicast@0.3.5)(rollup@4.21.2)(webpack-sources@3.2.3)
+        specifier: ^0.3.7
+        version: 0.3.7(magicast@0.3.5)(rollup@4.21.2)(webpack-sources@3.2.3)
       postgres:
         specifier: ^3.4.4
         version: 3.4.4
@@ -80,7 +80,7 @@ importers:
         version: 1.14.0
       '@hebilicious/vue-query-nuxt':
         specifier: ^0.3.0
-        version: 0.3.0(@tanstack/vue-query@5.54.2(vue@3.5.3(typescript@5.5.4)))(nuxt@3.13.1(@parcel/watcher@2.4.1)(@types/node@22.5.4)(drizzle-orm@0.33.0(postgres@3.4.4))(ioredis@5.4.1)(magicast@0.3.5)(rollup@4.21.2)(terser@5.31.6)(typescript@5.5.4)(vite@5.4.3(@types/node@22.5.4)(terser@5.31.6))(vue-tsc@2.1.6(typescript@5.5.4))(webpack-sources@3.2.3))(rollup@4.21.2)(webpack-sources@3.2.3)
+        version: 0.3.0(@tanstack/vue-query@5.55.2(vue@3.5.3(typescript@5.5.4)))(nuxt@3.13.1(@parcel/watcher@2.4.1)(@types/node@22.5.4)(drizzle-orm@0.33.0(postgres@3.4.4))(ioredis@5.4.1)(magicast@0.3.5)(rollup@4.21.2)(terser@5.31.6)(typescript@5.5.4)(vite@5.4.3(@types/node@22.5.4)(terser@5.31.6))(vue-tsc@2.1.6(typescript@5.5.4))(webpack-sources@3.2.3))(rollup@4.21.2)(webpack-sources@3.2.3)
       '@iconify-json/lucide':
         specifier: ^1.2.2
         version: 1.2.2
@@ -1464,23 +1464,23 @@ packages:
     resolution: {integrity: sha512-Wo1iKt2b9OT7d+YGhvEPD3DXvPv2etTusIMhMUoG7fbhmxcXCtIjJDEygy91Y2JFlwGyjqiBPRozme7UD8hoqg==}
     engines: {node: '>=12'}
 
-  '@tanstack/query-core@5.54.1':
-    resolution: {integrity: sha512-hKS+WRpT5zBFip21pB6Jx1C0hranWQrbv5EJ7qPoiV5MYI3C8rTCqWC9DdBseiPT1JgQWh8Y55YthuYZNiw3Xw==}
+  '@tanstack/query-core@5.55.2':
+    resolution: {integrity: sha512-WfuUx06sw/V3R2tRRQf4KZj0g4Q5EHrTdwJmCUovMFuHWVzDvLd5U+B7d5Pk8ni5w5SGpUuzGuQv3nN8xo1QbQ==}
 
-  '@tanstack/query-devtools@5.54.0':
-    resolution: {integrity: sha512-B8Sa6mh7/4m2fyk2/YnUXeOZ1/us7G/C/i1It8YcCbieXc8vf1AdSYjR+mZIoJeKOKLqA741hZqfj8d4F1NCVg==}
+  '@tanstack/query-devtools@5.55.1':
+    resolution: {integrity: sha512-2g0TWQGlkyHs9maHIU5A7lRunG4Rj3Y5lOEenE+fydE4zk7GqRs7rKJBp7F74iqRo/cA9V6t1YYQWqd6YRBmcQ==}
 
   '@tanstack/virtual-core@3.10.7':
     resolution: {integrity: sha512-ND5dfsU0n9F4gROzwNNDJmg6y8n9pI8YWxtgbfJ5UcNn7Hx+MxEXtXcQ189tS7sh8pmCObgz2qSiyRKTZxT4dg==}
 
-  '@tanstack/vue-query-devtools@5.54.2':
-    resolution: {integrity: sha512-cdyvarCJOZJIbsWNdRvOSRpHn/2hVxsdt3xWec7SnbaQ3CGLGMpPZkWSDMZXeuREGxHvLHWWU4ufoV1i2Q9FiA==}
+  '@tanstack/vue-query-devtools@5.55.2':
+    resolution: {integrity: sha512-99mTo+FxSdy0pukcqaSwheyVi8ZEkQ0PePWR/S2OpBDp9fvfTpL9y2Qm6FMagalnLzlKXECzrwjzLI2F2qkwPQ==}
     peerDependencies:
-      '@tanstack/vue-query': ^5.54.2
+      '@tanstack/vue-query': ^5.55.2
       vue: ^3.3.0
 
-  '@tanstack/vue-query@5.54.2':
-    resolution: {integrity: sha512-GYIYee9WkUbPDD28t1kdNNtLCioiIva0MhKCvODGWoEML5MNONCX4/i4y2GGFi8i9nSbcA8MpvD+nt/tdZ+yJw==}
+  '@tanstack/vue-query@5.55.2':
+    resolution: {integrity: sha512-DTxDW9usLRJ4qX3btHYRNdxnIBCjf5QCADD1ZZOyH3/dNocyfQxMSTlPTzkmPxHjFQgiVrudcjgfnD/QPGp8eQ==}
     peerDependencies:
       '@vue/composition-api': ^1.1.2
       vue: ^2.6.0 || ^3.3.0
@@ -3597,8 +3597,8 @@ packages:
     engines: {node: ^16.10.0 || >=18.0.0}
     hasBin: true
 
-  nuxt-auth-utils@0.3.6:
-    resolution: {integrity: sha512-lNo0gM6saYZPe451qcK/Pbp2ky07E6gctydKYas9UcbmYVDV5utsQQhlivyhesxEXzYoymVV+62OCWIP+miH3w==}
+  nuxt-auth-utils@0.3.7:
+    resolution: {integrity: sha512-vD4wJJ9eDA0nn0Q9bXN83avUv7e4lTKHboq6Hrp916MxaazQx6AXmZ6M2lYvH46RTERiqq5TsVZa9+Lc6ZnMqA==}
 
   nuxt@3.13.1:
     resolution: {integrity: sha512-En0vVrCJWu54ptShUlrqOGzXTcjhX+RnHShwdcpNqL9kmE9FWqeDYnPTgt2gJWrYSvVbmjJcVfEugNo9XpNmHA==}
@@ -5598,10 +5598,10 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@hebilicious/vue-query-nuxt@0.3.0(@tanstack/vue-query@5.54.2(vue@3.5.3(typescript@5.5.4)))(nuxt@3.13.1(@parcel/watcher@2.4.1)(@types/node@22.5.4)(drizzle-orm@0.33.0(postgres@3.4.4))(ioredis@5.4.1)(magicast@0.3.5)(rollup@4.21.2)(terser@5.31.6)(typescript@5.5.4)(vite@5.4.3(@types/node@22.5.4)(terser@5.31.6))(vue-tsc@2.1.6(typescript@5.5.4))(webpack-sources@3.2.3))(rollup@4.21.2)(webpack-sources@3.2.3)':
+  '@hebilicious/vue-query-nuxt@0.3.0(@tanstack/vue-query@5.55.2(vue@3.5.3(typescript@5.5.4)))(nuxt@3.13.1(@parcel/watcher@2.4.1)(@types/node@22.5.4)(drizzle-orm@0.33.0(postgres@3.4.4))(ioredis@5.4.1)(magicast@0.3.5)(rollup@4.21.2)(terser@5.31.6)(typescript@5.5.4)(vite@5.4.3(@types/node@22.5.4)(terser@5.31.6))(vue-tsc@2.1.6(typescript@5.5.4))(webpack-sources@3.2.3))(rollup@4.21.2)(webpack-sources@3.2.3)':
     dependencies:
       '@nuxt/kit': 3.13.1(magicast@0.3.5)(rollup@4.21.2)(webpack-sources@3.2.3)
-      '@tanstack/vue-query': 5.54.2(vue@3.5.3(typescript@5.5.4))
+      '@tanstack/vue-query': 5.55.2(vue@3.5.3(typescript@5.5.4))
       defu: 6.1.4
       esbuild: 0.19.12
       magicast: 0.3.5
@@ -6320,22 +6320,22 @@ snapshots:
     dependencies:
       remove-accents: 0.5.0
 
-  '@tanstack/query-core@5.54.1': {}
+  '@tanstack/query-core@5.55.2': {}
 
-  '@tanstack/query-devtools@5.54.0': {}
+  '@tanstack/query-devtools@5.55.1': {}
 
   '@tanstack/virtual-core@3.10.7': {}
 
-  '@tanstack/vue-query-devtools@5.54.2(@tanstack/vue-query@5.54.2(vue@3.5.3(typescript@5.5.4)))(vue@3.5.3(typescript@5.5.4))':
+  '@tanstack/vue-query-devtools@5.55.2(@tanstack/vue-query@5.55.2(vue@3.5.3(typescript@5.5.4)))(vue@3.5.3(typescript@5.5.4))':
     dependencies:
-      '@tanstack/query-devtools': 5.54.0
-      '@tanstack/vue-query': 5.54.2(vue@3.5.3(typescript@5.5.4))
+      '@tanstack/query-devtools': 5.55.1
+      '@tanstack/vue-query': 5.55.2(vue@3.5.3(typescript@5.5.4))
       vue: 3.5.3(typescript@5.5.4)
 
-  '@tanstack/vue-query@5.54.2(vue@3.5.3(typescript@5.5.4))':
+  '@tanstack/vue-query@5.55.2(vue@3.5.3(typescript@5.5.4))':
     dependencies:
       '@tanstack/match-sorter-utils': 8.19.4
-      '@tanstack/query-core': 5.54.1
+      '@tanstack/query-core': 5.55.2
       '@vue/devtools-api': 6.6.3
       vue: 3.5.3(typescript@5.5.4)
       vue-demi: 0.14.10(vue@3.5.3(typescript@5.5.4))
@@ -9005,7 +9005,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  nuxt-auth-utils@0.3.6(magicast@0.3.5)(rollup@4.21.2)(webpack-sources@3.2.3):
+  nuxt-auth-utils@0.3.7(magicast@0.3.5)(rollup@4.21.2)(webpack-sources@3.2.3):
     dependencies:
       '@nuxt/kit': 3.13.1(magicast@0.3.5)(rollup@4.21.2)(webpack-sources@3.2.3)
       defu: 6.1.4

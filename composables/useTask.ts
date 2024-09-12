@@ -1,20 +1,60 @@
+import type { QueryClient } from "@tanstack/vue-query";
 import type { UpdateTaskInput } from "~/lib/validation";
-import { type Task, type TaskWithAssignees } from "~/server/db/schema";
+import {
+  type Task,
+  type TaskWithAssignees,
+  type TaskWithEverything,
+} from "~/server/db/schema";
+
+const normalizeTask = <T extends { createdAt: string; updatedAt: string }>(
+  task: T,
+): T & { createdAt: Date; updatedAt: Date } => ({
+  ...task,
+  createdAt: new Date(task.createdAt),
+  updatedAt: new Date(task.updatedAt),
+});
+
+const setTaskData = (
+  client: QueryClient,
+  task: TaskWithEverything,
+  action = "update-both" as "task" | "status" | "update-both" | "add",
+) => {
+  if (action === "task" || action === "update-both" || action === "add") {
+    client.setQueryData<TaskWithEverything>(["task", task.id], task);
+  }
+
+  if (action === "status" || action === "update-both") {
+    client.setQueryData<TaskWithEverything[]>(
+      ["status-column-tasks", task.statusColumnId],
+      (oldTasks: TaskWithEverything[] | undefined) => {
+        if (!oldTasks) {
+          return [task];
+        }
+        return oldTasks.map((oldTask) =>
+          oldTask.id === task.id ? task : oldTask,
+        );
+      },
+    );
+  }
+
+  if (action === "add") {
+    client.setQueryData<TaskWithEverything[]>(
+      ["status-column-tasks", task.statusColumnId],
+      (oldTasks: TaskWithEverything[] | undefined) =>
+        oldTasks ? [...oldTasks, task] : [task],
+    );
+  }
+};
 
 export const useTask = (taskId: MaybeRefOrGetter<string>) => {
   const client = useQueryClient();
 
-  const { data, ...rest } = useQuery(
+  const { data, ...rest } = useQuery<TaskWithEverything>(
     {
       queryKey: ["task", taskId],
       queryFn: () =>
-        useRequestFetch()(`/api/task/${toValue(taskId)}`).then(
-          (task) =>
-            ({
-              ...task,
-              createdAt: new Date(task.createdAt),
-              updatedAt: new Date(task.updatedAt),
-            }) as TaskWithAssignees,
+        useRequestFetch()(`/api/task/${toValue(taskId)}`).then((task) =>
+          normalizeTask(task),
         ),
     },
     client,
@@ -33,11 +73,7 @@ export const useTask = (taskId: MaybeRefOrGetter<string>) => {
         method: "PATCH",
         body: data,
       }).then((updatedTask) => {
-        const normalized = {
-          ...updatedTask,
-          createdAt: new Date(updatedTask.createdAt),
-          updatedAt: new Date(updatedTask.updatedAt),
-        };
+        const normalized = normalizeTask(updatedTask);
 
         // We do not insert or update the task in the status-column-tasks query
         // here as we'd need to implement too much logic to find the old/new
@@ -150,6 +186,99 @@ export const useTaskRemoveAssigneeMutation = () => {
             queryKey: ["status-column-tasks", statusColumnId],
           });
         }
+      },
+    },
+    client,
+  );
+};
+
+export const useTaskAddLabelMutation = () => {
+  const client = useQueryClient();
+
+  return useMutation(
+    {
+      mutationFn: ({ taskId, labelId }: { taskId: string; labelId: string }) =>
+        useRequestFetch()(`/api/task/${taskId}/label`, {
+          method: "POST",
+          body: {
+            labelId,
+          },
+        }),
+      onSuccess: (_, { taskId, labelId }) => {
+        let statusColumnId: string | undefined;
+        client.setQueryData(
+          ["task", taskId],
+          (task: TaskWithEverything | undefined) => {
+            if (!task?.labels) return task;
+
+            statusColumnId = task.statusColumnId;
+
+            return {
+              ...task,
+              labels: [...task.labels, { labelId, taskId }],
+            };
+          },
+        );
+
+        if (statusColumnId) {
+          client.setQueryData(
+            ["status-column-tasks", statusColumnId],
+            (tasks: TaskWithEverything[] | undefined) =>
+              tasks?.map((task) =>
+                task.id === taskId
+                  ? {
+                      ...task,
+                      labels: [...task.labels, { labelId, taskId }],
+                    }
+                  : task,
+              ),
+          );
+        }
+      },
+    },
+    client,
+  );
+};
+
+export const useTaskRemoveLabelMutation = () => {
+  const client = useQueryClient();
+
+  return useMutation(
+    {
+      mutationFn: ({ taskId, labelId }: { taskId: string; labelId: string }) =>
+        useRequestFetch()(`/api/task/${taskId}/label/${labelId}`, {
+          method: "DELETE",
+        }),
+      onSuccess: (_, { taskId, labelId }) => {
+        let statusColumnId: string | undefined;
+        client.setQueryData(
+          ["task", taskId],
+          (task: TaskWithEverything | undefined) => {
+            if (!task?.labels) return task;
+
+            statusColumnId = task.statusColumnId;
+
+            return {
+              ...task,
+              labels: task.labels.filter((label) => label.labelId !== labelId),
+            };
+          },
+        );
+
+        client.setQueryData(
+          ["status-column-tasks", statusColumnId],
+          (tasks: TaskWithEverything[] | undefined) =>
+            tasks?.map((task) =>
+              task.id === taskId
+                ? {
+                    ...task,
+                    labels: task.labels.filter(
+                      (label) => label.labelId !== labelId,
+                    ),
+                  }
+                : task,
+            ),
+        );
       },
     },
     client,

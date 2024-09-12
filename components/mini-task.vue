@@ -1,10 +1,14 @@
 <script lang="ts" setup>
-import type { Task, TaskWithAssignees } from "~/server/db/schema";
+import { WORKSPACE_DATA_KEY } from "~/lib/injection-keys";
+import type { Task, TaskWithEverything, Label } from "~/server/db/schema";
+import { Badge } from "~/components/ui/badge";
 
 const props = defineProps<{
-  task: TaskWithAssignees;
+  task: TaskWithEverything;
   onDragStart?: (event: DragEvent, task: Task) => void;
 }>();
+
+const { labels } = inject(WORKSPACE_DATA_KEY)!;
 
 const isDragging = ref(false);
 
@@ -20,6 +24,15 @@ const onDragEnd = () => {
 const hasFooterContent = computed(() => {
   return props.task.assignees.length > 0;
 });
+
+const labelMap = computed(() => {
+  return (
+    labels.value?.reduce<Record<string, Label>>((acc, label) => {
+      acc[label.id] = label;
+      return acc;
+    }, {}) ?? {}
+  );
+});
 </script>
 
 <template>
@@ -30,8 +43,18 @@ const hasFooterContent = computed(() => {
     @dragstart="onDragStart"
     @dragend="onDragEnd"
   >
-    <NuxtLink :to="`?view-task=${task.id}`">
+    <NuxtLink :to="{ query: { 'view-task': task.id } }">
       <CardHeader class="p-4">
+        <div
+          v-if="task.labels.length > 0"
+          class="flex flex-row gap-1 items-center justify-start flex-wrap"
+        >
+          <AppLabel
+            v-for="label of task.labels"
+            :key="`${label.labelId}-${label.taskId}`"
+            :label="labelMap[label.labelId]"
+          />
+        </div>
         <CardTitle class="font-normal">{{ task.title }}</CardTitle>
       </CardHeader>
       <CardFooter v-if="hasFooterContent" class="p-2 pt-0">

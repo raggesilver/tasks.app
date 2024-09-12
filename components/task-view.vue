@@ -27,7 +27,10 @@ const isEditing = ref(false);
 const route = useRoute();
 const workspaceId = computed(() => route.params.id.toString());
 
-const result = await suspense();
+const { data: workspace, suspense: workspaceSuspense } =
+  useWorkspace(workspaceId);
+
+const [result] = await Promise.all([suspense(), workspaceSuspense()]);
 
 // If we fail to load the task, present an error and close the task view. Vue
 // Query's retry logic will attempt to load the task multiple times before
@@ -51,8 +54,12 @@ const form = useForm({
 
 const formError = ref<string | null>(null);
 
+const title = computed(
+  () => `${task.value?.title} on ${workspace.value?.name}`,
+);
+
 useHead({
-  title: task.value?.title,
+  title,
 });
 
 watch(isOpen, (value) => {
@@ -191,6 +198,7 @@ whenever(metaE, () => (isEditing.value = true));
           </DialogClose>
         </DialogHeader>
 
+        <ManageTaskLabels :task="task" />
         <div class="flex flex-row-reversep-1 mr-auto gap-2">
           <UserAvatar
             v-for="(assignee, i) in task.assignees"

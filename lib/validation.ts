@@ -59,6 +59,20 @@ export const addAssigneeSchema = z.object({
   userId: z.string().uuid(),
 });
 
+export const createWorkspaceLabelSchema = z.object({
+  name: z.string().min(3).max(255),
+  color: z.string(),
+  workspaceId: z.string().uuid(),
+});
+
+export const updateWorkspaceLabelSchema = createWorkspaceLabelSchema
+  .omit({ workspaceId: true })
+  .partial();
+
+export const addTaskLabelSchema = z.object({
+  labelId: z.string().uuid(),
+});
+
 export type CreateWorkspaceInput = z.infer<typeof createWorkspaceSchema>;
 export type UpdateWorkspaceInput = z.infer<typeof updateWorkspaceSchema>;
 
@@ -77,3 +91,13 @@ export type DeactivateInvitationInput = z.infer<
 >;
 
 export type AddAssigneeInput = z.infer<typeof addAssigneeSchema>;
+
+export type CreateWorkspaceLabelInput = z.infer<
+  typeof createWorkspaceLabelSchema
+>;
+
+export type UpdateWorkspaceLabelInput = z.infer<
+  typeof updateWorkspaceLabelSchema
+>;
+
+export type AddTaskLabelInput = z.infer<typeof addTaskLabelSchema>;

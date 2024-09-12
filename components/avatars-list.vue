@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { DotsHorizontalIcon } from "@radix-icons/vue";
 import {
   Tooltip,
   TooltipContent,
@@ -7,24 +6,14 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import type { User } from "~/server/db/schema";
+import { getInitials } from "~/lib/utils";
 
 defineProps<{
   users: User[];
   isOwner: boolean;
 }>();
 
-const emit = defineEmits<{
-  manageCollaborators: [];
-}>();
-
 const { user } = useUserSession();
-
-const getFullNameInitials = (fullName: string) =>
-  fullName
-    .split(" ")
-    .map((name) => name[0])
-    .join("")
-    .slice(0, 2);
 </script>
 
 <template>
@@ -40,7 +29,7 @@ const getFullNameInitials = (fullName: string) =>
                 :alt="`${collaborator.fullName}'s profile picture`"
               />
               <AvatarFallback>{{
-                getFullNameInitials(collaborator.fullName)
+                getInitials(collaborator.fullName)
               }}</AvatarFallback>
             </Avatar>
           </TooltipTrigger>
@@ -50,22 +39,6 @@ const getFullNameInitials = (fullName: string) =>
               }}{{ collaborator.id === user?.id ? " (you)" : "" }}
             </p>
           </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </li>
-    <li v-if="isOwner" class="flex">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button
-              variant="outline"
-              size="icon"
-              @click="() => emit('manageCollaborators')"
-            >
-              <DotsHorizontalIcon />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Manage collaborators</TooltipContent>
         </Tooltip>
       </TooltipProvider>
     </li>

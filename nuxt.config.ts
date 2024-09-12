@@ -1,9 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  devtools: { enabled: true, componentInspector: true },
+  devtools: { enabled: true, componentInspector: false },
 
   devServer: {
     https: true,
+  },
+
+  experimental: {
+    buildCache: true,
   },
 
   nitro: {
@@ -16,7 +20,7 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ["@unocss/reset/tailwind-compat.css", "~/assets/css/main.css"],
+  css: ["@unocss/reset/tailwind.css", "~/assets/css/main.css"],
 
   modules: [
     "shadcn-nuxt",
@@ -44,4 +48,3 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2024-07-09",
 });
-

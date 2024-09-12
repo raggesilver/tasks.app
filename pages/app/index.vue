@@ -27,6 +27,9 @@ await suspense();
           </nuxt-link>
         </CardContent>
       </Card>
+      <Card class="flex flex-col items-center justify-center p-4 border-dashed">
+        <CreateWorkspace />
+      </Card>
     </div>
   </div>
 </template>

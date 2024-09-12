@@ -5,7 +5,7 @@ import { useForm } from "vee-validate";
 import { toast } from "vue-sonner";
 import { z } from "zod";
 import { createTaskSchema } from "~/lib/validation";
-import type { Task } from "~/server/db/schema";
+import type { Task, TaskWithEverything } from "~/server/db/schema";
 import { Textarea } from "../ui/textarea";
 
 const props = defineProps<{
@@ -26,7 +26,7 @@ const form = useForm({
 
 const queryClient = useQueryClient();
 
-const createTask = (data: SchemaType): Promise<Task> => {
+const createTask = (data: SchemaType): Promise<TaskWithEverything> => {
   // @ts-ignore TypeScript complains about excessive stack depth comparing types
   return $fetch(
     `/api/column/${props.workspaceId}/${props.statusColumnId}/add-task`,
@@ -37,15 +37,16 @@ const createTask = (data: SchemaType): Promise<Task> => {
   );
 };
 
+// FIXME: move this to a composition function
 const { mutateAsync } = useMutation({
   mutationFn: createTask,
   onSuccess: (data) => {
-    const normalized: Task = {
+    const normalized = {
       ...data,
       createdAt: new Date(data.createdAt),
       updatedAt: new Date(data.updatedAt),
     };
-    queryClient.setQueryData<Task[]>(
+    queryClient.setQueryData<TaskWithEverything[]>(
       ["status-column-tasks", props.statusColumnId],
       (old) => {
         if (!old) return [normalized];

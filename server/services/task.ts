@@ -8,17 +8,18 @@ import {
   tasks,
   TaskWithEverything,
   type NewTask,
-  type TaskWithAssignees,
 } from "../db/schema";
 import { DuplicateError, NotFoundError } from "../lib/errors";
 
-export const createTask = async (data: NewTask): Promise<TaskWithAssignees> => {
+export const createTask = async (
+  data: NewTask,
+): Promise<TaskWithEverything> => {
   return db
     .insert(tasks)
     .values(data)
     .returning()
     .execute()
-    .then((task) => ({ ...task[0], assignees: [] }));
+    .then((task) => ({ ...task[0], assignees: [], labels: [] }));
 };
 
 export const getTaskById = async (

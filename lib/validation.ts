@@ -69,6 +69,10 @@ export const updateWorkspaceLabelSchema = createWorkspaceLabelSchema
   .omit({ workspaceId: true })
   .partial();
 
+export const addTaskLabelSchema = z.object({
+  labelId: z.string().uuid(),
+});
+
 export type CreateWorkspaceInput = z.infer<typeof createWorkspaceSchema>;
 export type UpdateWorkspaceInput = z.infer<typeof updateWorkspaceSchema>;
 
@@ -95,3 +99,5 @@ export type CreateWorkspaceLabelInput = z.infer<
 export type UpdateWorkspaceLabelInput = z.infer<
   typeof updateWorkspaceLabelSchema
 >;
+
+export type AddTaskLabelInput = z.infer<typeof addTaskLabelSchema>;

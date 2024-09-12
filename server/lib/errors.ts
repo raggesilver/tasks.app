@@ -1,3 +1,5 @@
+import type { PostgresError } from "postgres";
+
 export class DuplicateError extends Error {
   /**
    * The field that caused the duplicate error.
@@ -17,3 +19,12 @@ export class NotFoundError extends Error {
     this.name = "NotFoundError";
   }
 }
+
+export enum PgErrorCode {
+  FOREIGN_KEY_VIOLATION = "23503",
+  UNIQUE_VIOLATION = "23505",
+}
+
+export const isPostgresError = (e: unknown): e is PostgresError => {
+  return e instanceof Error && "code" in e;
+};

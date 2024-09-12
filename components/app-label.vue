@@ -9,6 +9,7 @@ defineProps<{
 
 <template>
   <Badge
+    v-if="label"
     class="text-xs py-[1px] px-1 select-none"
     variant="outline"
     :style="`background-color: ${label.color}80; border-color: ${label.color};`"

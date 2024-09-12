@@ -10,6 +10,15 @@ export default defineNuxtConfig({
     buildCache: true,
   },
 
+  runtimeConfig: {
+    public: {
+      sentry: {
+        dsn: "",
+        environment: "development",
+      },
+    },
+  },
+
   nitro: {
     prerender: {
       crawlLinks: true,

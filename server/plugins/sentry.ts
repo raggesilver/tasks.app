@@ -1,9 +1,4 @@
-import {
-  captureException,
-  close,
-  getAutoPerformanceIntegrations,
-  init,
-} from "@sentry/node";
+import * as Sentry from "@sentry/node";
 import { H3Error } from "h3";
 
 export default defineNitroPlugin((nitro) => {
@@ -16,16 +11,16 @@ export default defineNitroPlugin((nitro) => {
     return;
   }
 
-  init({
+  Sentry.init({
     dsn: sentry.dsn,
     environment: sentry.environment,
-    integrations: [...getAutoPerformanceIntegrations()],
-    tracesSampleRate: import.meta.dev ? 0.2 : 1.0,
-    profilesSampleRate: 1,
+    integrations: [...Sentry.getAutoPerformanceIntegrations()],
+    tracesSampleRate: import.meta.dev ? 0 : 0.6,
+    profilesSampleRate: import.meta.dev ? 0 : 1,
   });
 
   nitro.hooks.hook("request", (event) => {
-    event.context.$sentry = { captureException };
+    event.context.$sentry = Sentry;
   });
 
   nitro.hooks.hook("error", (error) => {
@@ -34,10 +29,10 @@ export default defineNitroPlugin((nitro) => {
         return;
       }
     }
-    captureException(error);
+    Sentry.captureException(error);
   });
 
   nitro.hooks.hookOnce("close", async () => {
-    await close(5000);
+    await Sentry.close(5000);
   });
 });

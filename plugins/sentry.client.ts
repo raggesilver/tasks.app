@@ -1,4 +1,4 @@
-import { browserTracingIntegration, init } from "@sentry/vue";
+import * as Sentry from "@sentry/vue";
 
 export default defineNuxtPlugin((nuxt) => {
   const router = useRouter();
@@ -10,18 +10,18 @@ export default defineNuxtPlugin((nuxt) => {
     return;
   }
 
-  init({
+  Sentry.init({
     app: nuxt.vueApp,
     dsn: sentry.dsn,
     environment: sentry.environment,
     integrations: [
-      browserTracingIntegration({ router }),
-      // replayIntegration({ maskAllText: false, blockAllMedia: false }),
+      Sentry.browserTracingIntegration({ router }),
+      Sentry.replayIntegration({ maskAllText: false, blockAllMedia: false }),
     ],
-    tracesSampleRate: import.meta.env.DEV ? 0.2 : 1.0,
+    tracesSampleRate: import.meta.env.DEV ? 0 : 0.6,
     tracePropagationTargets: ["localhost", "tasksapp.fly.dev"],
 
-    // replaysSessionSampleRate: 0,
-    // replaysOnErrorSampleRate: 1,
+    replaysSessionSampleRate: 0,
+    replaysOnErrorSampleRate: import.meta.env.DEV ? 0 : 1,
   });
 });

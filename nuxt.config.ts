@@ -16,6 +16,10 @@ export default defineNuxtConfig({
         dsn: "",
         environment: "development",
       },
+      posthogPublicKey: "",
+      // This needs to be overridden to our current host so that nitro can
+      // proxy the requests to PostHog
+      posthogHost: "https://us.i.posthog.com",
     },
   },
 
@@ -27,6 +31,11 @@ export default defineNuxtConfig({
       retryDelay: 0,
       concurrency: 4,
     },
+  },
+
+  routeRules: {
+    "/ingest/static/**": { proxy: "https://us-assets.i.posthog.com/static/**" },
+    "/ingest/**": { proxy: "https://us.i.posthog.com/**" },
   },
 
   css: ["@unocss/reset/tailwind.css", "~/assets/css/main.css"],

@@ -22,6 +22,16 @@ export default defineNuxtPlugin(() => {
     });
   });
 
+  onMounted(() => {
+    window.addEventListener("beforeunload", () => {
+      posthog.capture(
+        "$pageleave",
+        { current_url: window.location.href },
+        { send_instantly: true },
+      );
+    });
+  });
+
   return {
     provide: {
       posthog: () => posthogClient,

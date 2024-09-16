@@ -1,9 +1,8 @@
-import type { QueryClient } from "@tanstack/vue-query";
 import type { UpdateTaskInput } from "~/lib/validation";
-import {
-  type Task,
-  type TaskWithAssignees,
-  type TaskWithEverything,
+import type {
+  Task,
+  TaskWithAssignees,
+  TaskWithEverything,
 } from "~/server/db/schema";
 
 const normalizeTask = <T extends { createdAt: string; updatedAt: string }>(
@@ -14,37 +13,37 @@ const normalizeTask = <T extends { createdAt: string; updatedAt: string }>(
   updatedAt: new Date(task.updatedAt),
 });
 
-const setTaskData = (
-  client: QueryClient,
-  task: TaskWithEverything,
-  action = "update-both" as "task" | "status" | "update-both" | "add",
-) => {
-  if (action === "task" || action === "update-both" || action === "add") {
-    client.setQueryData<TaskWithEverything>(["task", task.id], task);
-  }
-
-  if (action === "status" || action === "update-both") {
-    client.setQueryData<TaskWithEverything[]>(
-      ["status-column-tasks", task.statusColumnId],
-      (oldTasks: TaskWithEverything[] | undefined) => {
-        if (!oldTasks) {
-          return [task];
-        }
-        return oldTasks.map((oldTask) =>
-          oldTask.id === task.id ? task : oldTask,
-        );
-      },
-    );
-  }
-
-  if (action === "add") {
-    client.setQueryData<TaskWithEverything[]>(
-      ["status-column-tasks", task.statusColumnId],
-      (oldTasks: TaskWithEverything[] | undefined) =>
-        oldTasks ? [...oldTasks, task] : [task],
-    );
-  }
-};
+// const setTaskData = (
+//   client: QueryClient,
+//   task: TaskWithEverything,
+//   action = "update-both" as "task" | "status" | "update-both" | "add",
+// ) => {
+//   if (action === "task" || action === "update-both" || action === "add") {
+//     client.setQueryData<TaskWithEverything>(["task", task.id], task);
+//   }
+//
+//   if (action === "status" || action === "update-both") {
+//     client.setQueryData<TaskWithEverything[]>(
+//       ["status-column-tasks", task.statusColumnId],
+//       (oldTasks: TaskWithEverything[] | undefined) => {
+//         if (!oldTasks) {
+//           return [task];
+//         }
+//         return oldTasks.map((oldTask) =>
+//           oldTask.id === task.id ? task : oldTask,
+//         );
+//       },
+//     );
+//   }
+//
+//   if (action === "add") {
+//     client.setQueryData<TaskWithEverything[]>(
+//       ["status-column-tasks", task.statusColumnId],
+//       (oldTasks: TaskWithEverything[] | undefined) =>
+//         oldTasks ? [...oldTasks, task] : [task],
+//     );
+//   }
+// };
 
 export const useTask = (taskId: MaybeRefOrGetter<string>) => {
   const client = useQueryClient();

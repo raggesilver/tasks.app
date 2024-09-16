@@ -38,7 +38,7 @@ const onSubmit = form.handleSubmit(async (values) => {
   router.push({ query: {} });
 });
 
-const deleteLabel = async (label: Label) => {
+const deleteLabel = async (_label: Label) => {
   // TODO: Implement delete label
 };
 </script>
@@ -65,9 +65,9 @@ const deleteLabel = async (label: Label) => {
         Create a new label
       </NuxtLink>
       <div
-        class="flex flex-row gap-2 items-center cursor-pointer hover:bg-foreground/5 p-2 rounded-md [&:hover>button]:block"
         v-for="label of labels"
         :key="label.id"
+        class="flex flex-row gap-2 items-center cursor-pointer hover:bg-foreground/5 p-2 rounded-md [&:hover>button]:block"
       >
         <div
           class="w-4 h-4 rounded-full"
@@ -93,11 +93,11 @@ const deleteLabel = async (label: Label) => {
       <SheetDescription>Add a new label for this workspace.</SheetDescription>
     </SheetHeader>
 
-    <form @submit="onSubmit" class="space-y-2">
+    <form class="space-y-2" @submit="onSubmit">
       <FormField v-slot="{ componentField }" name="workspaceId">
         <FormItem>
           <FormControl>
-            <input type="hidden" v-bind="componentField" />
+            <input type="hidden" v-bind="componentField" >
           </FormControl>
         </FormItem>
       </FormField>

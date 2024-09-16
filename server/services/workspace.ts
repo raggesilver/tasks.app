@@ -1,6 +1,6 @@
 import { and, eq, or, sql } from "drizzle-orm";
 import { union } from "drizzle-orm/pg-core";
-import { UpdateWorkspaceInput } from "~/lib/validation";
+import type { UpdateWorkspaceInput } from "~/lib/validation";
 import { db } from "../db/db";
 import {
   collaborators,

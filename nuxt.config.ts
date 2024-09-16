@@ -50,6 +50,7 @@ export default defineNuxtConfig({
     "@nuxt/content",
     "@nuxt/image",
     "@pinia/nuxt",
+    "@nuxt/eslint",
   ],
 
   vueQuery: {

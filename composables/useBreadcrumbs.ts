@@ -1,6 +1,4 @@
 export const useBreadcrumbs = defineStore("breadcrumbs-store", () => {
-  const route = useRoute();
-
   const basicBreadcrumbs = [
     {
       title: "Home",

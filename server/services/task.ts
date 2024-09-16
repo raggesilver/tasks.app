@@ -1,15 +1,15 @@
 import { and, eq, sql } from "drizzle-orm";
-import { type UpdateTaskInput } from "~/lib/validation";
+import type { UpdateTaskInput } from "~/lib/validation";
 import { db } from "../db/db";
 import {
-  Assignee,
   assignees,
   taskLabels,
   tasks,
-  TaskWithEverything,
+  type Assignee,
   type NewTask,
+  type TaskWithEverything,
 } from "../db/schema";
-import { DuplicateError, NotFoundError } from "../lib/errors";
+import { DuplicateError, isPostgresError, NotFoundError } from "../lib/errors";
 
 export const createTask = async (
   data: NewTask,
@@ -102,12 +102,14 @@ export const addAssigneeToTask = async (
       .returning()
       .execute()
       .then((assignee) => assignee[0]);
-  } catch (e: any) {
+  } catch (e) {
     // Check if constraint violation error (Task does not exist).
-    if (e.code === "23503") {
-      throw new NotFoundError("Task not found");
-    } else if (e.code === "23505") {
-      throw new DuplicateError("userId", "User is already assigned to task");
+    if (isPostgresError(e)) {
+      if (e.code === "23503") {
+        throw new NotFoundError("Task not found");
+      } else if (e.code === "23505") {
+        throw new DuplicateError("userId", "User is already assigned to task");
+      }
     }
     throw e;
   }

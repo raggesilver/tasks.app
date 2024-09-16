@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import assert from "node:assert";
 import { z } from "zod";
-import { SearchUsersInput } from "~/lib/validation";
+import type { SearchUsersInput } from "~/lib/validation";
 import { oauth, users, type User } from "~/server/db/schema";
 import { db } from "../db/db";
 
@@ -54,8 +54,8 @@ type GoogleProfile = {
 };
 
 type ProviderCallbackMap = {
-  google(arg: GoogleProfile): any;
-  github(arg: GitHubProfile): any;
+  google(arg: GoogleProfile): string;
+  github(arg: GitHubProfile): string;
 };
 
 const switchOnProfile = <P extends Providers = Providers>(
@@ -63,6 +63,7 @@ const switchOnProfile = <P extends Providers = Providers>(
   profile: GoogleProfile | GitHubProfile,
   m: ProviderCallbackMap,
 ) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return m[provider](profile as any);
 };
 

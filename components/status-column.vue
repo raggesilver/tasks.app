@@ -239,13 +239,13 @@ const doDeleteColumn = async () => {
     class="w-xs max-h-full flex flex-col bg-muted dark:bg-background drag border-3 border-dashed dark:[&_*]:border-muted/50 status-column"
     :class="cn(classesForDragOverType, { collapsed })"
     :draggable="canDragColumn"
+    v-bind="$attrs"
     @drop="onDrop"
     @dragover.prevent="onDragOver"
     @dragenter.prevent
     @dragleave="onDragLeave"
     @dragend="onDragLeave"
     @dragstart="onColumnDragStart"
-    v-bind="$attrs"
   >
     <CardHeader class="px-2 pt-2 card-header">
       <div class="flex flex-row gap-1 items-center card-title">
@@ -289,8 +289,8 @@ const doDeleteColumn = async () => {
               Column Actions
             </DropdownMenuLabel>
             <DropdownMenuItem
-              @click="showEditModal = true"
               class="grid grid-cols-subgrid col-span-full"
+              @click="showEditModal = true"
             >
               <Icon name="lucide:pencil" /> Edit
             </DropdownMenuItem>
@@ -325,11 +325,11 @@ const doDeleteColumn = async () => {
           :key="task.id"
           :task
           draggable="true"
-          :onDragStart="onDragStart"
+          :on-drag-start="onDragStart"
         />
       </ol>
       <!-- List of tasks -->
-      <EditColumn :column v-model:is-open="showEditModal" />
+      <EditColumn v-model:is-open="showEditModal" :column />
       <CreateTask
         v-bind="{ workspaceId: column.workspaceId, statusColumnId: column.id }"
         v-model:is-open="showCreateTaskModal"

@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   try {
     await addLabelToTask(id, data.labelId);
     return sendNoContent(event, 204);
-  } catch (e: any) {
+  } catch (e) {
     if (isPostgresError(e)) {
       // Check if foreign key constraint violation error (Task or label does not exist).
       if (e.code === PgErrorCode.FOREIGN_KEY_VIOLATION) {

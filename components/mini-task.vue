@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { WORKSPACE_DATA_KEY } from "~/lib/injection-keys";
 import type { Task, TaskWithEverything, Label } from "~/server/db/schema";
-import { Badge } from "~/components/ui/badge";
 
 const props = defineProps<{
   task: TaskWithEverything;
@@ -67,7 +66,7 @@ const labelMap = computed(() => {
           <UserAvatar
             v-for="assignee in task.assignees"
             :key="assignee.userId"
-            :userId="assignee.userId"
+            :user-id="assignee.userId"
             class="w-6 h-6"
           />
         </div>

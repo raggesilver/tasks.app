@@ -72,7 +72,7 @@ const onRemoveCollaborator = (collaborator: User) => {
         <TableHeader>
           <TableRow>
             <TableHead>User</TableHead>
-            <TableHead></TableHead>
+            <TableHead/>
           </TableRow>
         </TableHeader>
         <TableBody>

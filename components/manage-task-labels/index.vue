@@ -46,9 +46,9 @@ const toggleLabel = async (labelId: string) => {
 <template>
   <div class="flex flex-row gap-3 items-center flex-wrap">
     <div
-      class="relative [&:hover>button]:flex"
       v-for="label of task.labels"
       :key="`${label.labelId}-${label.taskId}`"
+      class="relative [&:hover>button]:flex"
     >
       <AppLabel :label="labelMap[label.labelId]" class="h-8 px-3" />
       <EasyTooltip tooltip="Remove label">

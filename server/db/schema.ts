@@ -159,7 +159,7 @@ export const tasks = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  (table) => ({
+  () => ({
     // Tasks are ordered by created_at for now.
     // uniqueIndex: uniqueIndex().on(table.workspaceId, table.statusColumnId, table.order),
   }),

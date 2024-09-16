@@ -219,7 +219,7 @@ const getUserInitials = (name: string) =>
           <div
             class="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3"
           >
-            <div class="grid gap-1" v-for="i of 6" :key="i">
+            <div v-for="i of 6" :key="i" class="grid gap-1">
               <h3 class="text-lg font-bold">
                 {{ index.features[i - 1].title }}
               </h3>
@@ -249,7 +249,7 @@ const getUserInitials = (name: string) =>
           <div
             class="mx-auto grid max-w-5xl grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3"
           >
-            <Card class="flex flex-col justify-between" v-for="i of 3" :key="i">
+            <Card v-for="i of 3" :key="i" class="flex flex-col justify-between">
               <CardHeader class="flex flex-row items-center space-x-2">
                 <Avatar>
                   <!-- <AvatarImage src="/avatars/03.png" /> -->

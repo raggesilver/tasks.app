@@ -1,5 +1,5 @@
 import type { UpdateTaskInput } from "~/lib/validation";
-import { type Task, type TaskWithAssignees } from "~/server/db/schema";
+import type { Task, TaskWithAssignees } from "~/server/db/schema";
 
 export const useTasks = (
   workspaceId: MaybeRefOrGetter<string>,

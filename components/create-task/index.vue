@@ -22,7 +22,7 @@ const title = "Create Task";
         <DialogHeader>
           <DialogTitle>{{ title }}</DialogTitle>
         </DialogHeader>
-        <Form @dismiss="isOpen = false" :workspaceId :statusColumnId />
+        <Form :workspace-id :status-column-id @dismiss="isOpen = false" />
       </DialogContent>
     </Dialog>
     <!-- And an iOS-like bottom sheet on mobile -->
@@ -31,7 +31,7 @@ const title = "Create Task";
         <DrawerHeader class="text-left">
           <DrawerTitle>{{ title }}</DrawerTitle>
         </DrawerHeader>
-        <Form @dismiss="isOpen = false" :workspaceId :statusColumnId />
+        <Form :workspace-id :status-column-id @dismiss="isOpen = false" />
         <DrawerFooter class="pt-2">
           <DrawerClose as-child>
             <Button variant="outline">Cancel</Button>

@@ -4,11 +4,9 @@ import {
   Command,
   CommandInput,
   CommandItem,
-  CommandGroup,
   CommandEmpty,
   CommandList,
 } from "~/components/ui/command";
-import { getInitials } from "~/lib/utils";
 import PopoverTrigger from "../ui/popover/PopoverTrigger.vue";
 import PopoverContent from "../ui/popover/PopoverContent.vue";
 

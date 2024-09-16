@@ -41,9 +41,9 @@ const description = "Create a new workspace to organize your tasks.";
 
   <Button
     variant="outline"
-    @click="isOpen = true"
     size="sm"
     class="flex items-center gap-2"
+    @click="isOpen = true"
   >
     Create <Icon name="lucide:plus" />
   </Button>

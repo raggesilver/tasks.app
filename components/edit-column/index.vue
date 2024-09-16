@@ -22,7 +22,7 @@ const title = "Update Column";
         <DialogHeader>
           <DialogTitle>{{ title }}</DialogTitle>
         </DialogHeader>
-        <Form @dismiss="isOpen = false" :column />
+        <Form :column @dismiss="isOpen = false" />
       </DialogContent>
     </Dialog>
     <!-- And an iOS-like bottom sheet on mobile -->
@@ -31,7 +31,7 @@ const title = "Update Column";
         <DrawerHeader class="text-left">
           <DrawerTitle>{{ title }}</DrawerTitle>
         </DrawerHeader>
-        <Form @dismiss="isOpen = false" :column />
+        <Form :column @dismiss="isOpen = false" />
         <DrawerFooter class="pt-2">
           <DrawerClose as-child>
             <Button variant="outline" class="w-full">Cancel</Button>

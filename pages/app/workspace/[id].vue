@@ -99,7 +99,7 @@ watch(
         ]"
       />
     </template>
-    <template #right-items v-if="workspace">
+    <template v-if="workspace" #right-items>
       <Popover>
         <PopoverTrigger as-child>
           <Button
@@ -122,7 +122,7 @@ watch(
           <h1 class="text-3xl font-extrabold">{{ workspace.name }}</h1>
           <AvatarsList
             :users="collaboratorsSorted"
-            :isOwner="workspace.ownerId === user?.id"
+            :is-owner="workspace.ownerId === user?.id"
             aria-label="List of workspace collaborators"
             @manage-collaborators="showManageCollaborators = true"
           />
@@ -138,10 +138,10 @@ watch(
           </EasyTooltip>
         </div>
         <TransitionGroup
+          ref="boardRef"
           name="list"
           tag="ol"
           class="flex flex-row flex-grow gap-8 items-start max-h-full -mx-8 px-8 pb-8 overflow-x-auto overflow-y-hidden"
-          ref="boardRef"
         >
           <StatusColumn
             v-for="column in columns"
@@ -151,14 +151,14 @@ watch(
             as="li"
           />
           <li
-            class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"
             key="create-column"
+            class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"
           >
             <CreateColumn />
           </li>
         </TransitionGroup>
       </template>
-      <template v-else-if="is404" class="">
+      <template v-else-if="is404">
         <div class="flex-1 flex flex-col items-center justify-center">
           <h1 class="text-3xl font-extrabold">Workspace not found</h1>
           <Button variant="link" as-child>
@@ -175,6 +175,6 @@ watch(
         <NuxtPage />
       </SheetContent>
     </Sheet>
+    <TaskView v-if="viewTask" :task-id="viewTask" @close="onTaskClosed" />
   </AppLayout>
-  <TaskView v-if="viewTask" :taskId="viewTask" @close="onTaskClosed" />
 </template>

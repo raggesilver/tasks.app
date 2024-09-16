@@ -3,8 +3,9 @@ import { toTypedSchema } from "@vee-validate/zod";
 import type { FetchError } from "ofetch";
 import { useForm } from "vee-validate";
 import { toast } from "vue-sonner";
-import { z } from "zod";
+import type { z } from "zod";
 import { createWorkspaceSchema } from "~/lib/validation";
+import type { Workspace } from "~/server/db/schema";
 
 const emit = defineEmits(["dismiss"]);
 
@@ -24,16 +25,20 @@ const { mutateAsync } = useMutation({
     }),
   onSuccess: (data) => {
     queryClient.setQueryData(["workspace", data.id], data);
-    queryClient.setQueryData(
-      ["workspaces"],
-      (workspaces: any[] | undefined) => {
-        if (!workspaces) return;
-        return [
-          ...workspaces.filter((workspace) => workspace.id !== data.id),
-          data,
-        ];
-      },
-    );
+    queryClient.setQueryData<Workspace[]>(["workspaces"], (workspaces) => {
+      const normalized = {
+        ...data,
+        createdAt: new Date(data.createdAt),
+        updatedAt: new Date(data.updatedAt),
+      };
+
+      return workspaces
+        ? [
+            ...workspaces.filter((workspace) => workspace.id !== data.id),
+            normalized,
+          ]
+        : [normalized];
+    });
   },
 });
 
@@ -63,7 +68,7 @@ const onSubmit = form.handleSubmit((values) => {
 </script>
 
 <template>
-  <form @submit="onSubmit" class="p-4 pb-2 sm:p-0">
+  <form class="p-4 pb-2 sm:p-0" @submit="onSubmit">
     <FormField v-slot="{ componentField }" name="name">
       <FormItem>
         <FormLabel>Name</FormLabel>

@@ -5,7 +5,7 @@ import type {
 } from "~/lib/validation";
 import { db } from "../db/db";
 import { statusColumns, type StatusColumn } from "../db/schema";
-import { DuplicateError } from "../lib/errors";
+import { DuplicateError, isPostgresError } from "../lib/errors";
 
 // This service does not perform RBAC checks on users/workspaces before
 // executing queries. We leave this to the resolver layer.
@@ -39,8 +39,8 @@ export const createStatusColumn = async ({
       .returning()
       .execute()
       .then((rows) => rows[0]);
-  } catch (e: any) {
-    if (e.code === "23505") {
+  } catch (e) {
+    if (isPostgresError(e) && e.code === "23505") {
       throw new DuplicateError("name");
     }
     throw e;

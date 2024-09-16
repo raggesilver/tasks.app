@@ -111,7 +111,7 @@ whenever(metaE, () => (isEditing.value = true));
   <Dialog v-if="task && !isDeleting" v-model:open="isOpen">
     <DialogContent :no-close-button="!isEditing">
       <!-- Extract this form into its own component -->
-      <form v-if="isEditing" @submit="editTask" class="flex flex-col gap-4">
+      <form v-if="isEditing" class="flex flex-col gap-4" @submit="editTask">
         <DialogTitle class="text-xl font-bold">Edit Task</DialogTitle>
         <DialogDescription class="sr-only">
           Use this form to edit the task.
@@ -183,8 +183,8 @@ whenever(metaE, () => (isEditing.value = true));
               </DropdownMenuItem>
               <DropdownMenuItem
                 class="text-red-500 grid grid-cols-subgrid col-span-full"
-                @click="doDeleteTask"
                 :disabled="isDeleting"
+                @click="doDeleteTask"
               >
                 <Icon name="lucide:trash" /> Delete Task
                 <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
@@ -203,7 +203,7 @@ whenever(metaE, () => (isEditing.value = true));
           <UserAvatar
             v-for="(assignee, i) in task.assignees"
             :key="assignee.userId"
-            :userId="assignee.userId"
+            :user-id="assignee.userId"
             class="w-8 h-8 border avatar"
             :class="i === 0 ? '' : '-ml-5 transition-all'"
           />
@@ -236,12 +236,12 @@ whenever(metaE, () => (isEditing.value = true));
                 <li v-if="task.lastUpdatedById">
                   Last updated at
                   {{ new Date(task.updatedAt).toLocaleString() }} by
-                  <UserNameLabel :userId="task.lastUpdatedById" />
+                  <UserNameLabel :user-id="task.lastUpdatedById" />
                 </li>
                 <li>
                   Created at {{ new Date(task.createdAt).toLocaleString() }}
                   <template v-if="task.createdById">
-                    by <UserNameLabel :userId="task.createdById" />
+                    by <UserNameLabel :user-id="task.createdById" />
                   </template>
                 </li>
               </ol>

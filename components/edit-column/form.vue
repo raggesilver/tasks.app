@@ -3,7 +3,7 @@ import { toTypedSchema } from "@vee-validate/zod";
 import type { FetchError } from "ofetch";
 import { useForm } from "vee-validate";
 import { toast } from "vue-sonner";
-import { z } from "zod";
+import type { z } from "zod";
 import { updateStatusColumnSchema } from "~/lib/validation";
 import type { StatusColumn } from "~/server/db/schema";
 
@@ -91,7 +91,7 @@ const onSubmit = form.handleSubmit((values) => {
 </script>
 
 <template>
-  <form @submit="onSubmit" class="p-4 pb-2 sm:p-0">
+  <form class="p-4 pb-2 sm:p-0" @submit="onSubmit">
     <FormField v-slot="{ componentField }" name="name">
       <FormItem>
         <FormLabel>Name</FormLabel>

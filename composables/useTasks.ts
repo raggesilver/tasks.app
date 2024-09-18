@@ -1,5 +1,18 @@
+import { queryOptions } from "@tanstack/vue-query";
 import type { UpdateTaskInput } from "~/lib/validation";
-import type { Task, TaskWithAssignees } from "~/server/db/schema";
+import type { Task, TaskWithEverything } from "~/server/db/schema";
+
+export const getTaskOptions = (taskId: MaybeRefOrGetter<string>) =>
+  queryOptions<TaskWithEverything>({
+    queryKey: ["task", taskId],
+  });
+
+export const getStatusColumnTasksOptions = (
+  statusColumnId: MaybeRefOrGetter<string>,
+) =>
+  queryOptions<TaskWithEverything[]>({
+    queryKey: ["status-column-tasks", statusColumnId],
+  });
 
 export const useTasks = (
   workspaceId: MaybeRefOrGetter<string>,
@@ -9,24 +22,24 @@ export const useTasks = (
 
   const { data, ...rest } = useQuery(
     {
-      queryKey: ["status-column-tasks", statusColumnId],
+      queryKey: getStatusColumnTasksOptions(statusColumnId).queryKey,
       queryFn: () =>
         useRequestFetch()(
           `/api/column/${workspaceId}/${statusColumnId}/get-tasks`,
-        )
-          .then((res) =>
-            res.map<TaskWithAssignees>((task) => ({
+        ).then((res) =>
+          res.map((task) => {
+            const normalized = {
               ...task,
               createdAt: new Date(task.createdAt),
               updatedAt: new Date(task.updatedAt),
-            })),
-          )
-          .then((tasks) => {
-            tasks.forEach((task) =>
-              client.setQueryData<TaskWithAssignees>(["task", task.id], task),
+            };
+            client.setQueryData(
+              getTaskOptions(normalized.id).queryKey,
+              normalized,
             );
-            return tasks;
+            return normalized;
           }),
+        ),
     },
     client,
   );
@@ -50,8 +63,8 @@ export const useTasks = (
           updatedAt: new Date(updatedTask.updatedAt),
         };
 
-        client.setQueryData<TaskWithAssignees[]>(
-          ["status-column-tasks", updatedTask.statusColumnId],
+        client.setQueryData(
+          getStatusColumnTasksOptions(updatedTask.statusColumnId).queryKey,
           (tasks) => {
             if (!tasks) return;
 
@@ -62,6 +75,10 @@ export const useTasks = (
             } else {
               Object.assign(copy[index], normalized);
             }
+            // We might be able to simplify this by just moving the updated
+            // task to the first position of the array. This is because it
+            // is extremely likely that it will be the most recently updated
+            // task. This would also remove the need to sort the array.
             copy.sort(
               (a, b) =>
                 new Date(b.updatedAt ?? b.createdAt).getTime() -
@@ -72,19 +89,15 @@ export const useTasks = (
           },
         );
 
-        client.setQueryData<TaskWithAssignees>(
-          ["task", updatedTask.id],
+        client.setQueryData(
+          getTaskOptions(updatedTask.id).queryKey,
           normalized,
         );
 
         if (task.statusColumnId !== updatedTask.statusColumnId) {
-          client.setQueryData<Task[]>(
-            ["status-column-tasks", task.statusColumnId],
-            (tasks) => {
-              if (!tasks) return;
-
-              return tasks.filter((t) => t.id !== task.id);
-            },
+          client.setQueryData(
+            getStatusColumnTasksOptions(task.statusColumnId).queryKey,
+            (tasks) => tasks?.filter((t) => t.id !== task.id),
           );
         }
 

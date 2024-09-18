@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/vue-query";
 import type { SerializeObject } from "nitropack";
 import type { CreateWorkspaceLabelInput } from "~/lib/validation";
-import type { Label } from "~/server/db/schema";
+import type { Label, TaskWithEverything } from "~/server/db/schema";
 
 const setLabelData = (
   client: QueryClient,
@@ -33,6 +33,60 @@ const setLabelData = (
         oldLabels ? [...oldLabels, label] : [label],
     );
   }
+};
+
+const removeLabelData = (
+  client: QueryClient,
+  labelId: string,
+  workspaceId: string,
+) => {
+  client.removeQueries({ queryKey: ["label", labelId] });
+
+  client.setQueryData<Label[]>(["workspace-labels", workspaceId], (oldLabels) =>
+    oldLabels?.filter((label) => label.id !== labelId),
+  );
+
+  const tasksToUpdate: string[] = [];
+
+  client.setQueriesData<TaskWithEverything>(
+    {
+      queryKey: ["task"],
+    },
+    (task) => {
+      return task
+        ? {
+            ...task,
+            labels: task.labels.filter((label) => {
+              const foundLabel = label.labelId === labelId;
+
+              if (foundLabel) {
+                tasksToUpdate.push(task.id);
+              }
+
+              return !foundLabel;
+            }),
+          }
+        : task;
+    },
+  );
+
+  client.setQueriesData<TaskWithEverything[]>(
+    {
+      queryKey: ["status-column-tasks"],
+    },
+    (tasks) => {
+      return tasks?.map((task) => {
+        if (tasksToUpdate.includes(task.id)) {
+          return {
+            ...task,
+            labels: task.labels.filter((label) => label.labelId !== labelId),
+          };
+        }
+
+        return task;
+      });
+    },
+  );
 };
 
 const normalizeLabel = (label: SerializeObject<Label>) => {
@@ -129,6 +183,27 @@ export const useUpdateLabel = () => {
         setLabelData(client, normalizedLabel);
 
         return normalizedLabel;
+      }),
+  });
+
+  return { ...mutation, client };
+};
+
+export const useDeleteLabel = () => {
+  const client = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      labelId,
+      workspaceId,
+    }: {
+      labelId: string;
+      workspaceId: string;
+    }) =>
+      useRequestFetch()(`/api/label/${labelId}`, {
+        method: "DELETE",
+      }).then(() => {
+        removeLabelData(client, labelId, workspaceId);
       }),
   });
 

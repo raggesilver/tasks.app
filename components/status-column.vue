@@ -259,8 +259,14 @@ const doDeleteColumn = async () => {
         />
         <CardTitle class="flex-grow title">
           {{ column.name }}
+          <span
+            v-if="collapsed"
+            class="mt-2 font-medium text-muted-foreground text-sm"
+          >
+            {{ tasks.length }} tasks
+          </span>
         </CardTitle>
-        <EasyTooltip tooltip="Collapse Column">
+        <EasyTooltip :tooltip="collapsed ? 'Expand Column' : 'Collapse Column'">
           <Button
             variant="outline"
             class="w-6 h-6 p-0 collapse-toggle"
@@ -349,7 +355,7 @@ const doDeleteColumn = async () => {
 
 <style>
 .status-column.collapsed {
-  @apply w-12 min-h-[50vh];
+  @apply w-12;
 
   & .card-header {
     @apply p-2;

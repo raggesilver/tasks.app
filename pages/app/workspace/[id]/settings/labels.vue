@@ -163,10 +163,6 @@ const deleteLabel = async (_label: Label) => {
         </FormItem>
       </FormField>
 
-      <p v-if="form.errors">
-        {{ form.errors }}
-      </p>
-
       <Button type="submit" class="w-full sm:w-auto !mt-6">Create Label</Button>
     </form>
   </div>

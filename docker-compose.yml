@@ -1,35 +1,53 @@
-# You should know that Docker Compose works with services.
-# 1 service = 1 container.
-# For example, a service, a server, a client, a database...
-# We use the keyword 'services' to start to create services.
 services:
-  # The name of our service is "database"
-  # but you can use the name of your choice.
-  # Note: This may change the commands you are going to use a little bit.
   database:
-    # Official Postgres image from DockerHub (we use the last version)
     image: "postgres:16-alpine"
-
-    # By default, a Postgres database is running on the 5432 port.
-    # If we want to access the database from our computer (outside the container),
-    # we must share the port with our computer's port.
-    # The syntax is [port we want on our machine]:[port we want to retrieve in the container]
-    # Note: You are free to change your computer's port,
-    # but take into consideration that it will change the way
-    # you are connecting to your database.
     ports:
       - 5432:5432
-
     environment:
-      POSTGRES_USER: user # The PostgreSQL user (useful to connect to the database)
-      POSTGRES_PASSWORD: password # The PostgreSQL password (useful to connect to the database)
-      POSTGRES_DB: postgres # The PostgreSQL default database (automatically created at first launch)
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
     user: 1000:1000
-    # The `volumes` tag allows us to share a folder with our container
-    # Its syntax is as follows: [folder path on our machine]:[folder path to retrieve in the container]
     volumes:
-      # In this example, we share the folder `db-data` in our root repository, with the default PostgreSQL data path
-      # It means that every time the repository is modifying the data inside
-      # of `/var/lib/postgresql/data/`, automatically the change will appear in `db-data`
-      # You don't need to create the `db-data` folder. Docker Compose will do it for you
       - ./db-data/:/var/lib/postgresql/data/
+    # health check postgres ready
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+  # This proxy allows us to hit 443 on the host and have it route to port
+  # 3000 on the host. This is useful since GitHub OAuth refuses to work as
+  # intended on localhost, so we changed the URL to https://tasksapp.local,
+  # which we set up in /etc/hosts to point to localhost.
+  proxy:
+    image: nginx:alpine
+    ports:
+      - 443:443
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./cert:/etc/nginx/certs
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - dev
+  # app:
+  #   build:
+  #     dockerfile: Dockerfile.dev
+  #     context: .
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - .:/app
+  #     - /app/node_modules # prevent node_modules from being overridden
+  #   environment:
+  #     - NODE_ENV=development
+  #     - DATABASE_URL=postgres://user:password@database:5432/postgres
+  #   depends_on:
+  #     database:
+  #       condition: service_healthy
+
+networks:
+  dev:
+    driver: bridge

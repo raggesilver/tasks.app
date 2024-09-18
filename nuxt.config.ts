@@ -2,10 +2,6 @@
 export default defineNuxtConfig({
   devtools: { enabled: true, componentInspector: false },
 
-  devServer: {
-    https: true,
-  },
-
   experimental: {
     buildCache: true,
   },
@@ -28,8 +24,21 @@ export default defineNuxtConfig({
       crawlLinks: true,
       routes: ["/", "/sign-in", "/legal/privacy-policy", "/legal/tos"],
       ignore: ["/app", "/auth"],
-      retryDelay: 0,
-      concurrency: 4,
+    },
+  },
+
+  vite: {
+    optimizeDeps: {
+      include: [
+        "class-variance-authority",
+        "@radix-icons/vue",
+        "clsx",
+        "tailwind-merge",
+        "@tanstack/vue-query",
+        "vaul-vue",
+        "@vee-validate/zod",
+        "zod",
+      ],
     },
   },
 

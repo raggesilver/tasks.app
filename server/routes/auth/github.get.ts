@@ -4,11 +4,6 @@ import { getOrCreateUser } from "~/server/services/user";
 export default oauthGitHubEventHandler({
   config: {
     emailRequired: true,
-    ...(import.meta.dev && {
-      authorizationParams: {
-        redirect_uri: `https://localhost:3000/auth/github`,
-      },
-    }),
   },
   async onSuccess(event, { user: profile }) {
     const user = await getOrCreateUser("github", profile);

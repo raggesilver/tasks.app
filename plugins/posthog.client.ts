@@ -22,7 +22,7 @@ export default defineNuxtPlugin(() => {
     });
   });
 
-  onMounted(() => {
+  if (window !== undefined) {
     window.addEventListener("beforeunload", () => {
       posthog.capture(
         "$pageleave",
@@ -30,7 +30,11 @@ export default defineNuxtPlugin(() => {
         { send_instantly: true },
       );
     });
-  });
+  } else {
+    console.warn(
+      "Skipping beforeunload event listener because window is not defined",
+    );
+  }
 
   return {
     provide: {

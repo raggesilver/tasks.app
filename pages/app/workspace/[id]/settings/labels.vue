@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { WORKSPACE_DATA_KEY } from "~/lib/injection-keys";
-import {
-  FormItem,
-  FormField,
-  FormLabel,
-  FormControl,
-} from "~/components/ui/form";
-import { useForm } from "vee-validate";
-import { createWorkspaceLabelSchema } from "~/lib/validation";
-import { toTypedSchema } from "@vee-validate/zod";
 import { Cross2Icon, PlusIcon } from "@radix-icons/vue";
-import type { Label } from "~/server/db/schema";
+import { toTypedSchema } from "@vee-validate/zod";
+import { useForm } from "vee-validate";
+import { toast } from "vue-sonner";
 import EasyTooltip from "~/components/easy-tooltip.vue";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "~/components/ui/form";
+import { WORKSPACE_DATA_KEY } from "~/lib/injection-keys";
+import { createWorkspaceLabelSchema } from "~/lib/validation";
+import type { Label } from "~/server/db/schema";
 
 const { workspace, labels } = inject(WORKSPACE_DATA_KEY)!;
 
@@ -28,18 +29,36 @@ const form = useForm({
     name: "",
     color: "#00FF00",
   },
+  keepValuesOnUnmount: true,
 });
 
 const { mutateAsync } = useCreateLabel();
+const { mutateAsync: deleteLabelMutation } = useDeleteLabel();
 
-const onSubmit = form.handleSubmit(async (values) => {
+const onSubmit = form.handleSubmit(async (values, { resetForm }) => {
   await mutateAsync(values);
-  form.resetForm();
-  router.push({ query: {} });
+
+  resetForm({
+    values: {
+      workspaceId: workspace.value?.id ?? "",
+      name: "",
+      color: "#00FF00",
+    },
+  });
+
+  router.replace({ query: {} });
 });
 
 const deleteLabel = async (_label: Label) => {
-  // TODO: Implement delete label
+  try {
+    await deleteLabelMutation({
+      labelId: _label.id,
+      workspaceId: _label.workspaceId,
+    });
+    toast.success("Label deleted successfully.");
+  } catch {
+    toast.error("Failed to delete label.");
+  }
 };
 </script>
 
@@ -97,7 +116,7 @@ const deleteLabel = async (_label: Label) => {
       <FormField v-slot="{ componentField }" name="workspaceId">
         <FormItem>
           <FormControl>
-            <input type="hidden" v-bind="componentField" >
+            <input type="hidden" v-bind="componentField" />
           </FormControl>
         </FormItem>
       </FormField>
@@ -121,6 +140,10 @@ const deleteLabel = async (_label: Label) => {
           <FormMessage />
         </FormItem>
       </FormField>
+
+      <p v-if="form.errors">
+        {{ form.errors }}
+      </p>
 
       <Button type="submit" class="w-full sm:w-auto !mt-6">Create Label</Button>
     </form>

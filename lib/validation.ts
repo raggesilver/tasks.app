@@ -101,3 +101,6 @@ export type UpdateWorkspaceLabelInput = z.infer<
 >;
 
 export type AddTaskLabelInput = z.infer<typeof addTaskLabelSchema>;
+
+export const validateId = <T extends string>(id: T) =>
+  z.object({ [id]: z.string().uuid() });

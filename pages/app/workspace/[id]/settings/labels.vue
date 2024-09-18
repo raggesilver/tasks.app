@@ -93,16 +93,38 @@ const deleteLabel = async (_label: Label) => {
           :style="{ backgroundColor: label.color }"
         />
         <span>{{ label.name }}</span>
-        <EasyTooltip tooltip="Delete label">
-          <Button
-            size="icon"
-            variant="ghost"
-            class="hidden p-0 w-auto h-auto ml-auto"
-            @click="() => deleteLabel(label)"
-          >
-            <Cross2Icon class="w-4 h-4" />
-          </Button>
-        </EasyTooltip>
+        <AlertDialog>
+          <EasyTooltip tooltip="Delete label">
+            <AlertDialogTrigger as-child>
+              <Button
+                size="icon"
+                variant="ghost"
+                class="hidden p-1 w-auto h-auto ml-auto"
+              >
+                <Cross2Icon class="w-4 h-4" />
+              </Button>
+            </AlertDialogTrigger>
+          </EasyTooltip>
+
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the
+                label and remove it from all tasks.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                @click="() => deleteLabel(label)"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   </div>

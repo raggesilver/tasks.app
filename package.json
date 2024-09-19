@@ -26,7 +26,7 @@
     "drizzle-zod": "^0.5.1",
     "nuxt-auth-utils": "^0.3.8",
     "postgres": "^3.4.4",
-    "posthog-js": "^1.161.5",
+    "posthog-js": "^1.161.6",
     "radix-vue": "^1.9.5",
     "shadcn-nuxt": "^0.10.4",
     "slug": "^9.1.0",

@@ -2,6 +2,10 @@
 export default defineNuxtConfig({
   devtools: { enabled: true, componentInspector: false },
 
+  devServer: {
+    https: true,
+  },
+
   experimental: {
     buildCache: true,
   },

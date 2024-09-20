@@ -1,9 +1,12 @@
-import { AUTHORIZED_REDIRECT } from "~/lib/constants";
+import { AUTHORIZED_REDIRECT, UNAUTHORIZED_REDIRECT } from "~/lib/constants";
 import { getOrCreateUser } from "~/server/services/user";
 
 export default oauthGitHubEventHandler({
   config: {
     emailRequired: true,
+    ...(import.meta.dev && {
+      redirectURL: "https://localhost:3000/auth/github",
+    }),
   },
   async onSuccess(event, { user: profile }) {
     const user = await getOrCreateUser("github", profile);
@@ -14,7 +17,8 @@ export default oauthGitHubEventHandler({
   },
   // Optional, will return a json error and 401 status code by default
   onError(event, error) {
-    console.error("GitHub OAuth error:", error, event);
-    return sendRedirect(event, "/");
+    console.error("GitHub OAuth error:", error);
+    const search = new URLSearchParams({ error: error.message });
+    return sendRedirect(event, `${UNAUTHORIZED_REDIRECT}?${search}`);
   },
 });

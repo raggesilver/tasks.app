@@ -7,8 +7,8 @@ export default defineNuxtPlugin(() => {
     api_host: runtimeConfig.public.posthogHost || "https://us.i.posthog.com",
     person_profiles: "identified_only",
     capture_pageview: false, // we add manual pageview capturing below
-    loaded: (posthog) => {
-      if (import.meta.dev) posthog.debug();
+    loaded: () => {
+      // if (import.meta.dev) posthog.debug();
     },
   });
 

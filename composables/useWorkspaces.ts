@@ -12,7 +12,7 @@ export const getWorkspaceOptions = (id: MaybeRefOrGetter<string>) =>
     queryKey: ["workspace", id],
   });
 
-const normalizeWorkspace = (
+export const normalizeWorkspace = (
   workspace: SerializeObject<Workspace>,
 ): Workspace => ({
   ...workspace,

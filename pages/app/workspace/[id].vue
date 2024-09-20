@@ -18,12 +18,14 @@ const { data: collaborators, suspense: collaboratorsSuspense } =
   useWorkspaceCollaborators(id);
 const { data: labels, suspense: labelsSuspense } = useWorkspaceLabels(id);
 
-await Promise.all([
-  suspense(),
-  statusSuspense(),
-  collaboratorsSuspense(),
-  labelsSuspense(),
-]);
+if (import.meta.env.SSR && !import.meta.env.DEV) {
+  await Promise.all([
+    suspense(),
+    statusSuspense(),
+    collaboratorsSuspense(),
+    labelsSuspense(),
+  ]);
+}
 
 provide(WORKSPACE_DATA_KEY, {
   workspace,
@@ -99,7 +101,7 @@ watch(
         ]"
       />
     </template>
-    <template v-if="workspace" #right-items>
+    <template #right-items>
       <Popover>
         <PopoverTrigger as-child>
           <Button
@@ -107,12 +109,13 @@ watch(
             variant="outline"
             class="flex items-center gap-2"
             title="Share workspace"
+            :disabled="!workspace"
           >
             Share <Icon name="lucide:share" />
           </Button>
         </PopoverTrigger>
         <PopoverContent align="end" class="w-full sm:w-[435px]">
-          <ShareWorkspace :workspace />
+          <ShareWorkspace v-if="workspace" :workspace />
         </PopoverContent>
       </Popover>
     </template>
@@ -120,12 +123,7 @@ watch(
       <template v-if="workspace">
         <div class="flex flex-row gap-4 items-center">
           <h1 class="text-3xl font-extrabold">{{ workspace.name }}</h1>
-          <AvatarsList
-            :users="collaboratorsSorted"
-            :is-owner="workspace.ownerId === user?.id"
-            aria-label="List of workspace collaborators"
-            @manage-collaborators="showManageCollaborators = true"
-          />
+          <WorkspaceCollaboratorList :workspace-id="workspace.id" />
           <EasyTooltip
             v-if="workspace.ownerId === user?.id"
             tooltip="Workspace Settings"
@@ -175,6 +173,6 @@ watch(
         <NuxtPage />
       </SheetContent>
     </Sheet>
-    <TaskView v-if="viewTask" :task-id="viewTask" @close="onTaskClosed" />
+    <LazyTaskView v-if="viewTask" :task-id="viewTask" @close="onTaskClosed" />
   </AppLayout>
 </template>

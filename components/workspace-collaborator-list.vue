@@ -3,13 +3,25 @@ const props = withDefaults(
   defineProps<{
     workspaceId: string;
     /**
-     * Whether to show the owner first in the list of collaborators.
+     * Whether to show the owner first in the list of collaborators. Nothing
+     * will change if the owner is not a collaborator.
+     *
      * @default true
      */
     ownerFirst?: boolean;
+    /**
+     * If provided, the list will render at most `limit` collaborators. If
+     * there are more than `limit` collaborators, the `limit`-th element on the
+     * list will be a placeholder for the number of remaining collaborators.
+     *
+     * If this number is less than 1, the list will render all collaborators.
+     *
+     */
+    limit?: number;
   }>(),
   {
     ownerFirst: true,
+    limit: 5,
   },
 );
 
@@ -22,31 +34,37 @@ if (import.meta.env.SSR) {
 }
 
 const { user } = useUserSession();
-const collaboratorsPotato = computed(() =>
-  props.ownerFirst
-    ? (data.value?.toSorted((a, b) =>
-        a.id === user.value?.id ? 1 : b.id === user.value?.id ? 1 : 0,
-      ) ?? [])
-    : (data.value ?? []),
+
+const shouldLimit = computed(
+  () => data.value && props.limit > 1 && data.value.length > props.limit,
 );
 
 const collaborators = computed(() => {
-  return collaboratorsPotato.value
-    ? [
-        collaboratorsPotato.value[0],
-        collaboratorsPotato.value[0],
-        collaboratorsPotato.value[0],
-        collaboratorsPotato.value[0],
-        collaboratorsPotato.value[1],
-      ]
-    : [];
+  if (!data.value) return [];
+  if (!props.ownerFirst) return data.value;
+
+  const owner = data.value.find(
+    (collaborator) => collaborator.id === user.value?.id,
+  );
+
+  const withoutOwner = data.value.filter(
+    (collaborator) => collaborator.id !== user.value?.id,
+  );
+
+  const index = shouldLimit.value ? props.limit - 2 : withoutOwner.length;
+
+  withoutOwner.splice(index, 0, owner!);
+
+  return withoutOwner;
 });
 
-const collapsedCollaborators = computed(() =>
-  collaborators.value
-    .slice(3)
-    .map((collaborator) => collaborator.fullName)
-    .join("\n"),
+const collapsedCollaboratorsText = computed(() =>
+  shouldLimit.value
+    ? collaborators.value
+        .slice(props.limit - 1)
+        .map((collaborator) => collaborator.fullName)
+        .join("\n")
+    : "",
 );
 </script>
 
@@ -58,20 +76,19 @@ const collapsedCollaborators = computed(() =>
       </li>
     </template>
     <template v-else>
-      <li v-if="collaborators.length > 4" class="flex">
-        <EasyTooltip :tooltip="collapsedCollaborators">
+      <li v-if="shouldLimit" class="flex">
+        <EasyTooltip :tooltip="collapsedCollaboratorsText">
           <Avatar class="border border-foreground">
             <AvatarFallback class="select-none cursor-default">
-              {{ collaborators.length - 3 }}+
+              {{ collaborators.length - limit + 1 }}+
             </AvatarFallback>
           </Avatar>
         </EasyTooltip>
       </li>
       <li
-        v-for="collaborator of collaborators.slice(
-          0,
-          collaborators.length > 4 ? 2 : 3,
-        )"
+        v-for="collaborator of shouldLimit
+          ? collaborators.slice(0, limit - 1)
+          : collaborators"
         :key="collaborator.id"
         class="flex"
       >
@@ -79,9 +96,6 @@ const collapsedCollaborators = computed(() =>
           :user="collaborator"
           class="avatar border border-foreground"
         />
-      </li>
-      <li v-if="collaborators.length > 3" class="flex">
-        <UniversalUserAvatar :user class="avatar border border-foreground" />
       </li>
     </template>
   </ul>

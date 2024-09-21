@@ -18,7 +18,7 @@ const { data: collaborators, suspense: collaboratorsSuspense } =
   useWorkspaceCollaborators(id);
 const { data: labels, suspense: labelsSuspense } = useWorkspaceLabels(id);
 
-if (import.meta.env.SSR && !import.meta.env.DEV) {
+if (import.meta.env.SSR) {
   await Promise.all([
     suspense(),
     statusSuspense(),
@@ -32,7 +32,6 @@ provide(WORKSPACE_DATA_KEY, {
   columns,
   collaborators,
   labels,
-  /* labels */
 });
 
 const route = useRoute();
@@ -52,22 +51,12 @@ const typedError = computed(
       | undefined,
 );
 
-// FIXME: this should be handled in the AvatarsList component
-const collaboratorsSorted = computed(
-  () =>
-    collaborators.value?.toSorted((a, b) =>
-      a.id === user.value?.id ? -1 : b.id === user.value?.id ? 1 : 0,
-    ) ?? [],
-);
-
 const is404 = computed(() => typedError.value?.statusCode === 404);
 const title = computed(() => workspace.value?.name ?? "Workspace");
 
 useHead({
   title,
 });
-
-const showManageCollaborators = ref(false);
 
 const onTaskClosed = () => {
   router.push({ query: { ...route.query, "view-task": undefined } });
@@ -118,22 +107,22 @@ watch(
           <ShareWorkspace v-if="workspace" :workspace />
         </PopoverContent>
       </Popover>
+      <EasyTooltip
+        v-if="workspace?.ownerId === user?.id"
+        tooltip="Workspace Settings"
+      >
+        <Button size="sm" variant="outline" class="w-8 p-0" as-child>
+          <NuxtLink :to="`/app/workspace/${id}/settings`">
+            <Icon name="lucide:ellipsis" />
+          </NuxtLink>
+        </Button>
+      </EasyTooltip>
     </template>
     <div class="flex flex-col flex-grow px-8 gap-8 overflow-hidden">
       <template v-if="workspace">
         <div class="flex flex-row gap-4 items-center">
           <h1 class="text-3xl font-extrabold">{{ workspace.name }}</h1>
           <WorkspaceCollaboratorList :workspace-id="workspace.id" />
-          <EasyTooltip
-            v-if="workspace.ownerId === user?.id"
-            tooltip="Workspace Settings"
-          >
-            <Button size="sm" variant="outline" as-child>
-              <NuxtLink :to="`/app/workspace/${id}/settings`" class="ml-auto">
-                <Icon name="lucide:ellipsis" />
-              </NuxtLink>
-            </Button>
-          </EasyTooltip>
         </div>
         <TransitionGroup
           ref="boardRef"

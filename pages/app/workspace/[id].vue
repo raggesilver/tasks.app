@@ -12,14 +12,25 @@ definePageMeta({
 
 const id = useRouteParamSafe("id") as Ref<string>;
 
-const { data: workspace, error, suspense } = useWorkspace(id);
+const {
+  data: workspace,
+  error,
+  suspense,
+  isPending: isWorkspacePending,
+} = useWorkspace(id);
+
 const {
   data: columns,
   suspense: statusSuspense,
   isPending: isStatusColumnPending,
 } = useStatusColumns(id);
+
+// FIXME: this is only being used via injection. I want to move away from this
+// pattern and use a more explicit approach.
 const { data: collaborators, suspense: collaboratorsSuspense } =
   useWorkspaceCollaborators(id);
+// FIXME: this is only being used via injection. I want to move away from this
+// pattern and use a more explicit approach.
 const { data: labels, suspense: labelsSuspense } = useWorkspaceLabels(id);
 
 if (import.meta.env.SSR) {
@@ -108,7 +119,7 @@ watch(
           </Button>
         </PopoverTrigger>
         <PopoverContent align="end" class="w-full sm:w-[435px]">
-          <ShareWorkspace v-if="workspace" :workspace />
+          <LazyShareWorkspace v-if="workspace" :workspace />
         </PopoverContent>
       </Popover>
       <EasyTooltip
@@ -123,10 +134,24 @@ watch(
       </EasyTooltip>
     </template>
     <div class="flex flex-col flex-grow px-8 gap-8 overflow-hidden">
-      <template v-if="workspace">
+      <template v-if="is404">
+        <div class="flex-1 flex flex-col items-center justify-center">
+          <h1 class="text-3xl font-extrabold">Workspace not found</h1>
+          <Button variant="link" as-child>
+            <NuxtLink to="/app">Go back</NuxtLink>
+          </Button>
+        </div>
+      </template>
+      <template v-else>
         <div class="flex flex-row gap-4 items-center">
-          <h1 class="text-3xl font-extrabold">{{ workspace.name }}</h1>
-          <WorkspaceCollaboratorList :workspace-id="workspace.id" />
+          <h1 class="text-3xl font-extrabold flex items-center gap-2">
+            <LazySkeleton
+              v-if="isWorkspacePending"
+              class="h-[1em] w-xs inline-block"
+            />
+            <span v-else>{{ workspace?.name }}</span>
+          </h1>
+          <WorkspaceCollaboratorList :workspace-id="id" />
         </div>
         <template v-if="isStatusColumnPending || !columns">
           <ol
@@ -164,14 +189,6 @@ watch(
             <CreateColumn />
           </li>
         </ol>
-      </template>
-      <template v-else-if="is404">
-        <div class="flex-1 flex flex-col items-center justify-center">
-          <h1 class="text-3xl font-extrabold">Workspace not found</h1>
-          <Button variant="link" as-child>
-            <NuxtLink to="/app">Go back</NuxtLink>
-          </Button>
-        </div>
       </template>
     </div>
     <Sheet

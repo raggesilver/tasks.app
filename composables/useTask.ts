@@ -1,129 +1,80 @@
+import { queryOptions } from "@tanstack/vue-query";
+import { normalizeDates } from "~/lib/utils";
 import type { UpdateTaskInput } from "~/lib/validation";
-import type {
-  Task,
-  TaskWithAssignees,
-  TaskWithEverything,
-} from "~/server/db/schema";
+import type { Assignee, Task, TaskWithEverything } from "~/server/db/schema";
 
-const normalizeTask = <T extends { createdAt: string; updatedAt: string }>(
-  task: T,
-): T & { createdAt: Date; updatedAt: Date } => ({
-  ...task,
-  createdAt: new Date(task.createdAt),
-  updatedAt: new Date(task.updatedAt),
-});
+export const getTaskOptions = (id: MaybeRefOrGetter<string>) =>
+  queryOptions<TaskWithEverything>({
+    queryKey: ["task", id],
+  });
 
-// const setTaskData = (
-//   client: QueryClient,
-//   task: TaskWithEverything,
-//   action = "update-both" as "task" | "status" | "update-both" | "add",
-// ) => {
-//   if (action === "task" || action === "update-both" || action === "add") {
-//     client.setQueryData<TaskWithEverything>(["task", task.id], task);
-//   }
-//
-//   if (action === "status" || action === "update-both") {
-//     client.setQueryData<TaskWithEverything[]>(
-//       ["status-column-tasks", task.statusColumnId],
-//       (oldTasks: TaskWithEverything[] | undefined) => {
-//         if (!oldTasks) {
-//           return [task];
-//         }
-//         return oldTasks.map((oldTask) =>
-//           oldTask.id === task.id ? task : oldTask,
-//         );
-//       },
-//     );
-//   }
-//
-//   if (action === "add") {
-//     client.setQueryData<TaskWithEverything[]>(
-//       ["status-column-tasks", task.statusColumnId],
-//       (oldTasks: TaskWithEverything[] | undefined) =>
-//         oldTasks ? [...oldTasks, task] : [task],
-//     );
-//   }
-// };
-
-export const useTask = (taskId: MaybeRefOrGetter<string>) => {
+export const useTask = (
+  taskId: MaybeRefOrGetter<string>,
+  options: { enabled?: MaybeRefOrGetter<boolean> } = {},
+) => {
   const client = useQueryClient();
 
-  const { data, ...rest } = useQuery<TaskWithEverything>(
+  return useQuery(
     {
-      queryKey: ["task", taskId],
+      queryKey: getTaskOptions(taskId).queryKey,
       queryFn: () =>
         useRequestFetch()(`/api/task/${toValue(taskId)}`).then((task) =>
-          normalizeTask(task),
+          normalizeDates<TaskWithEverything>(task),
         ),
+      ...options,
     },
     client,
   );
+};
 
-  const { mutateAsync: mutate, error: mutationError } = useMutation({
-    mutationFn: ({
-      task,
-      data,
-    }: {
-      task: Task;
-      data: UpdateTaskInput;
-    }): Promise<Task> =>
-      // @ts-ignore
+export const useTaskMutation = () => {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ task, data }: { task: Task; data: UpdateTaskInput }) =>
       useRequestFetch()(`/api/task/${task.id}`, {
         method: "PATCH",
         body: data,
       }).then((updatedTask) => {
-        const normalized = normalizeTask(updatedTask);
+        const normalized = normalizeDates<TaskWithEverything>(updatedTask);
 
         // We do not insert or update the task in the status-column-tasks query
         // here as we'd need to implement too much logic to find the old/new
         // status column, update, and sort the tasks.
 
         if (task.statusColumnId !== updatedTask.statusColumnId) {
-          client.invalidateQueries({
-            queryKey: ["status-column-tasks", task.statusColumnId],
-          });
+          client.invalidateQueries(
+            getStatusColumnTasksOptions(task.statusColumnId),
+          );
         }
 
-        client.invalidateQueries({
-          queryKey: ["status-column-tasks", updatedTask.statusColumnId],
-        });
+        client.invalidateQueries(
+          getStatusColumnTasksOptions(updatedTask.statusColumnId),
+        );
 
-        client.setQueryData(["task", task.id], normalized);
+        client.setQueryData(getTaskOptions(task.id).queryKey, normalized);
 
         return normalized;
       }),
   });
+};
 
-  const {
-    mutateAsync: deleteTask,
-    error: deletionError,
-    isPending: isDeleting,
-  } = useMutation({
+export const useDeleteTaskMutation = () => {
+  const client = useQueryClient();
+
+  return useMutation({
     mutationFn: (task: Task) =>
-      // @ts-ignore
-      useRequestFetch()(`/api/task/${task.id}`, { method: "DELETE" }),
+      useRequestFetch()<null>(`/api/task/${task.id}`, { method: "DELETE" }),
     onSuccess: (_, task: Task) => {
       // Remove individual task query
-      client.removeQueries({
-        queryKey: ["task", task.id],
-      });
+      client.removeQueries(getTaskOptions(task.id));
       // Remove task from it's status column
       client.setQueryData(
-        ["status-column-tasks", task.statusColumnId],
-        (tasks: Task[]) => tasks?.filter((t) => t.id !== task.id),
+        getStatusColumnTasksOptions(task.statusColumnId).queryKey,
+        (tasks) => tasks?.filter((t) => t.id !== task.id),
       );
     },
   });
-
-  return {
-    data,
-    mutate,
-    mutationError,
-    deleteTask,
-    deletionError,
-    isDeleting,
-    ...rest,
-  };
 };
 
 export const useTaskAddAssigneeMutation = () => {
@@ -132,7 +83,7 @@ export const useTaskAddAssigneeMutation = () => {
   return useMutation(
     {
       mutationFn: ({ taskId, userId }: { taskId: string; userId: string }) =>
-        useRequestFetch()(`/api/task/${taskId}/assignee`, {
+        useRequestFetch()<Assignee | null>(`/api/task/${taskId}/assignee`, {
           method: "POST",
           body: {
             userId,
@@ -141,19 +92,14 @@ export const useTaskAddAssigneeMutation = () => {
       onSuccess: (response, { taskId }) => {
         if (!response) return;
 
-        const statusColumnId = client.getQueryData<TaskWithAssignees>([
-          "task",
-          taskId,
-        ])?.statusColumnId;
+        const statusColumnId = client.getQueryData(
+          getTaskOptions(taskId).queryKey,
+        )?.statusColumnId;
 
-        client.invalidateQueries({
-          queryKey: ["task", taskId],
-        });
+        client.invalidateQueries(getTaskOptions(taskId));
 
         if (statusColumnId) {
-          client.invalidateQueries({
-            queryKey: ["status-column-tasks", statusColumnId],
-          });
+          client.invalidateQueries(getStatusColumnTasksOptions(statusColumnId));
         }
       },
     },
@@ -167,23 +113,18 @@ export const useTaskRemoveAssigneeMutation = () => {
   return useMutation(
     {
       mutationFn: ({ taskId, userId }: { taskId: string; userId: string }) =>
-        useRequestFetch()(`/api/task/${taskId}/assignee/${userId}`, {
+        useRequestFetch()<null>(`/api/task/${taskId}/assignee/${userId}`, {
           method: "DELETE",
         }),
       onSuccess: (_, { taskId }) => {
-        const statusColumnId = client.getQueryData<TaskWithAssignees>([
-          "task",
-          taskId,
-        ])?.statusColumnId;
+        const statusColumnId = client.getQueryData(
+          getTaskOptions(taskId).queryKey,
+        )?.statusColumnId;
 
-        client.invalidateQueries({
-          queryKey: ["task", taskId],
-        });
+        client.invalidateQueries(getTaskOptions(taskId));
 
         if (statusColumnId) {
-          client.invalidateQueries({
-            queryKey: ["status-column-tasks", statusColumnId],
-          });
+          client.invalidateQueries(getStatusColumnTasksOptions(statusColumnId));
         }
       },
     },
@@ -197,7 +138,7 @@ export const useTaskAddLabelMutation = () => {
   return useMutation(
     {
       mutationFn: ({ taskId, labelId }: { taskId: string; labelId: string }) =>
-        useRequestFetch()(`/api/task/${taskId}/label`, {
+        useRequestFetch()<null>(`/api/task/${taskId}/label`, {
           method: "POST",
           body: {
             labelId,
@@ -205,24 +146,21 @@ export const useTaskAddLabelMutation = () => {
         }),
       onSuccess: (_, { taskId, labelId }) => {
         let statusColumnId: string | undefined;
-        client.setQueryData(
-          ["task", taskId],
-          (task: TaskWithEverything | undefined) => {
-            if (!task?.labels) return task;
+        client.setQueryData(getTaskOptions(taskId).queryKey, (task) => {
+          if (!task?.labels) return task;
 
-            statusColumnId = task.statusColumnId;
+          statusColumnId = task.statusColumnId;
 
-            return {
-              ...task,
-              labels: [...task.labels, { labelId, taskId }],
-            };
-          },
-        );
+          return {
+            ...task,
+            labels: [...task.labels, { labelId, taskId }],
+          };
+        });
 
         if (statusColumnId) {
           client.setQueryData(
-            ["status-column-tasks", statusColumnId],
-            (tasks: TaskWithEverything[] | undefined) =>
+            getStatusColumnTasksOptions(statusColumnId).queryKey,
+            (tasks) =>
               tasks?.map((task) =>
                 task.id === taskId
                   ? {
@@ -245,28 +183,27 @@ export const useTaskRemoveLabelMutation = () => {
   return useMutation(
     {
       mutationFn: ({ taskId, labelId }: { taskId: string; labelId: string }) =>
-        useRequestFetch()(`/api/task/${taskId}/label/${labelId}`, {
+        useRequestFetch()<null>(`/api/task/${taskId}/label/${labelId}`, {
           method: "DELETE",
         }),
       onSuccess: (_, { taskId, labelId }) => {
         let statusColumnId: string | undefined;
+        client.setQueryData(getTaskOptions(taskId).queryKey, (task) => {
+          if (!task?.labels) return task;
+
+          statusColumnId = task.statusColumnId;
+
+          return {
+            ...task,
+            labels: task.labels.filter((label) => label.labelId !== labelId),
+          };
+        });
+
+        if (!statusColumnId) return;
+
         client.setQueryData(
-          ["task", taskId],
-          (task: TaskWithEverything | undefined) => {
-            if (!task?.labels) return task;
-
-            statusColumnId = task.statusColumnId;
-
-            return {
-              ...task,
-              labels: task.labels.filter((label) => label.labelId !== labelId),
-            };
-          },
-        );
-
-        client.setQueryData(
-          ["status-column-tasks", statusColumnId],
-          (tasks: TaskWithEverything[] | undefined) =>
+          getStatusColumnTasksOptions(statusColumnId).queryKey,
+          (tasks) =>
             tasks?.map((task) =>
               task.id === taskId
                 ? {

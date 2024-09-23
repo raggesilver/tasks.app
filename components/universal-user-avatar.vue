@@ -33,7 +33,7 @@ if (import.meta.env.SSR && props.userId) {
 const isReallyPending = computed(() => isPending.value && !props.user);
 
 const resolvedUser = computed<User | null | undefined>(() =>
-  "user" in props ? props.user : data.value,
+  props.userId ? data.value : props.user,
 );
 
 const initials = computed(() =>

@@ -282,11 +282,12 @@ useMagicKeys({
         </DialogHeader>
 
         <ManageTaskLabels :task="task" />
-        <div class="flex flex-row-reversep-1 mr-auto gap-2">
+        <div class="flex flex-row-reversep-1 mr-auto gap-1">
           <UniversalUserAvatar
             v-for="assignee of task.assignees"
             :key="assignee.userId"
             :user-id="assignee.userId"
+            class="w-8 h-8 [&:not(:first-child)]:-ml-4 border border-border transition-all"
           />
           <ManageTaskAssignees :task-id="task.id" :workspace-id="workspaceId">
             <Button variant="outline" class="w-8 h-8 p-0 rounded-full shrink-0">

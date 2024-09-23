@@ -14,7 +14,7 @@ export function getInitials(name: string) {
     .join("");
 }
 
-type ObjectWithDates = { createdAt: Date; updatedAt: Date };
+type ObjectWithDates = { createdAt: Date; updatedAt?: Date };
 
 export function normalizeDates<T extends ObjectWithDates>(
   input: SerializeObject<T>,
@@ -27,7 +27,7 @@ export function normalizeDates<T extends ObjectWithDates>(input: T | T[]) {
   const normalize = (input: T) => ({
     ...input,
     createdAt: new Date(input.createdAt),
-    updatedAt: new Date(input.updatedAt),
+    ...(input.updatedAt && { updatedAt: new Date(input.updatedAt) }),
   });
 
   return Array.isArray(input) ? input.map(normalize) : normalize(input);

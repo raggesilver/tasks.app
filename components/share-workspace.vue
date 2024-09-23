@@ -8,8 +8,15 @@ const props = defineProps<{
 
 const { user } = useUserSession();
 
-const { activeInvitationLink, isPending, createInvitationLink } =
-  useWorkspaceInvitationLink(props.workspace.id);
+const { data: activeInvitationLink, isPending: _isPending } = useWorkspaceInvitationLink(
+  () => props.workspace.id,
+);
+
+const { mutateAsync: createInvitationLink } =
+  useCreateWorkspaceInvitationLinkMutation(() => props.workspace.id);
+
+// Prevent flashing loading spinner
+const isPending = debouncedRef(_isPending, 500);
 
 const isOwner = computed(() => props.workspace.ownerId === user.value?.id);
 

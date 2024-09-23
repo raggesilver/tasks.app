@@ -25,7 +25,7 @@ const props = withDefaults(
   },
 );
 
-const { data, isLoading, suspense } = useWorkspaceCollaborators(
+const { data, isPending, suspense } = useWorkspaceCollaborators(
   props.workspaceId,
 );
 
@@ -70,7 +70,7 @@ const collapsedCollaboratorsText = computed(() =>
 
 <template>
   <ul class="flex flex-row-reverse collaborators-avatars wrapper">
-    <template v-if="isLoading">
+    <template v-if="isPending">
       <li v-for="i in 3" :key="i" class="flex">
         <UniversalUserAvatar :user="null" class="avatar" />
       </li>

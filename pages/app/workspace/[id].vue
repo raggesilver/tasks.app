@@ -13,7 +13,11 @@ definePageMeta({
 const id = useRouteParamSafe("id") as Ref<string>;
 
 const { data: workspace, error, suspense } = useWorkspace(id);
-const { data: columns, suspense: statusSuspense } = useStatusColumns(id);
+const {
+  data: columns,
+  suspense: statusSuspense,
+  isPending: isStatusColumnPending,
+} = useStatusColumns(id);
 const { data: collaborators, suspense: collaboratorsSuspense } =
   useWorkspaceCollaborators(id);
 const { data: labels, suspense: labelsSuspense } = useWorkspaceLabels(id);
@@ -124,10 +128,26 @@ watch(
           <h1 class="text-3xl font-extrabold">{{ workspace.name }}</h1>
           <WorkspaceCollaboratorList :workspace-id="workspace.id" />
         </div>
-        <TransitionGroup
-          ref="boardRef"
-          name="list"
-          tag="ol"
+        <template v-if="isStatusColumnPending || !columns">
+          <ol
+            class="flex flex-row flex-grow gap-8 items-start max-h-full -mx-8 px-8 pb-8 overflow-x-auto overflow-y-hidden"
+          >
+            <Skeleton
+              v-for="i in 3"
+              :key="i"
+              class="shrink-0 w-xs h-full bg-muted dark:bg-background"
+              as="li"
+            />
+            <li
+              key="create-column"
+              class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"
+            >
+              <CreateColumn />
+            </li>
+          </ol>
+        </template>
+        <ol
+          v-else
           class="flex flex-row flex-grow gap-8 items-start max-h-full -mx-8 px-8 pb-8 overflow-x-auto overflow-y-hidden"
         >
           <StatusColumn
@@ -143,7 +163,7 @@ watch(
           >
             <CreateColumn />
           </li>
-        </TransitionGroup>
+        </ol>
       </template>
       <template v-else-if="is404">
         <div class="flex-1 flex flex-col items-center justify-center">

@@ -2,8 +2,6 @@
 import { Toaster } from "@/components/ui/sonner";
 import { ConfigProvider } from "radix-vue";
 
-const useIdFunction = () => useId();
-
 useHead({
   titleTemplate: (title) => (title ? `${title} | Tasks.app` : "Tasks.app"),
 });
@@ -11,7 +9,7 @@ useHead({
 
 <template>
   <div class="bg-background" vaul-drawer-wrapper>
-    <ConfigProvider :use-id="useIdFunction">
+    <ConfigProvider v-bind="{ useId }">
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>

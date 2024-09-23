@@ -5,10 +5,10 @@ definePageMeta({
   layout: "app",
 });
 
-const { data, isLoading, suspense } = useWorkspaces();
+const { data, isPending, suspense } = useWorkspaces();
 
 // Block rendering until the data is fetched only in SSR. In the client, the
-// `isLoading` flag will be used to show a skeleton loader.
+// `isPending` flag will be used to show a skeleton loader.
 if (import.meta.env.SSR) {
   await suspense();
 }
@@ -20,7 +20,7 @@ if (import.meta.env.SSR) {
     <div
       class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
     >
-      <template v-if="isLoading">
+      <template v-if="isPending">
         <Skeleton v-for="i in 3" :key="i" class="min-h-[100px] rounded-lg" />
       </template>
       <template v-else>

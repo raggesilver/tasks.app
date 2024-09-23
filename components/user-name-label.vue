@@ -5,7 +5,7 @@ const props = defineProps<{
   userId: string;
 }>();
 
-const { data, isLoading } = useQuery({
+const { data, isPending } = useQuery({
   queryKey: ["public-user", props.userId],
   queryFn: (): Promise<User | null> =>
     // @ts-ignore
@@ -14,7 +14,7 @@ const { data, isLoading } = useQuery({
 </script>
 
 <template>
-  <template v-if="isLoading">
+  <template v-if="isPending">
     <Skeleton
       class="h-[1em] w-12 inline-block"
       style="vertical-align: middle"

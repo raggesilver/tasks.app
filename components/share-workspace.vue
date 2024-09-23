@@ -8,7 +8,7 @@ const props = defineProps<{
 
 const { user } = useUserSession();
 
-const { activeInvitationLink, isLoading, createInvitationLink } =
+const { activeInvitationLink, isPending, createInvitationLink } =
   useWorkspaceInvitationLink(props.workspace.id);
 
 const isOwner = computed(() => props.workspace.ownerId === user.value?.id);
@@ -40,7 +40,7 @@ const copyLink = async () => {
 
 <template>
   <!-- Loading -->
-  <div v-if="isLoading" class="flex items-center justify-center py-8">
+  <div v-if="isPending" class="flex items-center justify-center py-8">
     <Icon name="lucide:loader-circle" class="animate-spin" />
   </div>
   <!-- User is owner -->

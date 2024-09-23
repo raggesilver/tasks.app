@@ -12,7 +12,12 @@ const {
   data: tasks,
   suspense,
   mutate,
+  isPending,
 } = useTasks(props.column.workspaceId, props.column.id);
+
+if (import.meta.env.SSR) {
+  await suspense();
+}
 
 const { mutateAsync: mutateStatusColumn } = useStatusColumnMutation({
   onSuccess: () => {
@@ -32,8 +37,6 @@ const { mutateAsync: deleteColumn, isPending: isDeleting } =
       toast.error("Failed to delete column");
     },
   });
-
-await suspense();
 
 const showEditModal = ref(false);
 const showCreateTaskModal = ref(false);
@@ -263,7 +266,11 @@ const doDeleteColumn = async () => {
             v-if="collapsed"
             class="mt-2 font-medium text-muted-foreground text-sm"
           >
-            {{ tasks.length }} tasks
+            <LazySkeleton
+              v-if="isPending"
+              class="inline-block w-[1em] h-[3em]"
+            />
+            <span v-else-if="tasks">{{ tasks!.length }} tasks</span>
           </span>
         </CardTitle>
         <EasyTooltip :tooltip="collapsed ? 'Expand Column' : 'Collapse Column'">
@@ -334,6 +341,7 @@ const doDeleteColumn = async () => {
           :on-drag-start="onDragStart"
         />
       </ol>
+      <LazySkeleton v-else class="w-full h-8" />
       <!-- List of tasks -->
       <EditColumn v-model:is-open="showEditModal" :column />
       <CreateTask

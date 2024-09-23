@@ -3,6 +3,7 @@ import {
   presetTypography,
   presetWind,
   transformerDirectives,
+  transformerVariantGroup,
 } from "unocss";
 import presetAnimations from "unocss-preset-animations";
 
@@ -19,7 +20,7 @@ export default defineConfig({
     presetAnimations(),
     presetTypography(),
   ],
-  transformers: [transformerDirectives()],
+  transformers: [transformerDirectives(), transformerVariantGroup()],
   theme: {
     container: {
       center: true,

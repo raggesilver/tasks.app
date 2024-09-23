@@ -1,32 +1,35 @@
+import { queryOptions } from "@tanstack/vue-query";
+import { normalizeDates } from "~/lib/utils";
 import type { StatusColumn } from "~/server/db/schema";
+
+export const getStatusColumnOptions = (
+  statusColumnId: MaybeRefOrGetter<string>,
+) =>
+  queryOptions<StatusColumn>({
+    queryKey: ["status-column", statusColumnId],
+  });
+
+export const getWorkspaceColumnsOptions = (
+  workspaceId: MaybeRefOrGetter<string>,
+) =>
+  queryOptions<StatusColumn[]>({
+    queryKey: ["workspace-columns", workspaceId],
+  });
 
 export const useStatusColumns = (workspaceId: MaybeRefOrGetter<string>) => {
   const client = useQueryClient();
-  const { ...rest } = useQuery(
+
+  return useQuery(
     {
-      queryKey: ["workspace-columns", workspaceId],
+      queryKey: getWorkspaceColumnsOptions(workspaceId).queryKey,
       queryFn: () =>
-        // We need to use `useRequestFetch` instead of `fetch` because of a bug
-        // in Nuxt that doesn't include cookies in SSR requests.
-        //
-        // https://github.com/Atinux/nuxt-auth-utils/issues/97#issuecomment-2150442690
-        //https://github.com/nuxt/nuxt/issues/24813
         useRequestFetch()(`/api/column/${toValue(workspaceId)}`).then(
           (columns) => {
-            const normalized = columns.map((column) => {
-              const ret: StatusColumn = {
-                ...column,
-                // Date objects are not deserialized properly, so we need to
-                // convert them back to Date objects.
-                createdAt: new Date(column.createdAt),
-                updatedAt: new Date(column.updatedAt),
-              };
+            const normalized = normalizeDates<StatusColumn>(columns);
 
-              // Cache each workspace in the query client so that navigating to
-              // the workspace page doesn't need to fetch the workspace again.
-              client.setQueryData<StatusColumn>(["status-column", ret.id], ret);
-              return ret;
-            });
+            for (const col of normalized) {
+              client.setQueryData(getStatusColumnOptions(col.id).queryKey, col);
+            }
 
             return normalized;
           },
@@ -34,11 +37,6 @@ export const useStatusColumns = (workspaceId: MaybeRefOrGetter<string>) => {
     },
     client,
   );
-
-  return {
-    client,
-    ...rest,
-  };
 };
 
 export const useStatusColumnMutation = (
@@ -48,7 +46,7 @@ export const useStatusColumnMutation = (
   } = {},
 ) => {
   const client = useQueryClient();
-  const { mutateAsync } = useMutation(
+  return useMutation(
     {
       mutationFn: ({
         col,
@@ -56,31 +54,28 @@ export const useStatusColumnMutation = (
       }: {
         col: StatusColumn;
         newOrder: number;
-      }): Promise<StatusColumn | null> => {
-        // @ts-ignore
-        return $fetch(`/api/column/${col.workspaceId}/${col.id}`, {
-          method: "PATCH",
-          body: { order: newOrder },
-        });
-      },
-      onSuccess: async (column: StatusColumn | null) => {
-        if (!column) return;
-
+      }) =>
+        useRequestFetch()<StatusColumn>(
+          `/api/column/${col.workspaceId}/${col.id}`,
+          {
+            method: "PATCH",
+            body: { order: newOrder },
+          },
+        ),
+      onSuccess: async (column) => {
         // TODO: we are not doing optimistic updates here since it would require
         // reimplementing the update logic in the client. We should consider
         // returning all columns from the server.
 
         // TODO: We should invalidate individual column queries here as well
 
-        //await client.setQueryData(["status-column", column.id], column);
+        // await client.setQueryData(["status-column", column.id], column);
 
-        await client.invalidateQueries({
-          queryKey: ["workspace-columns", column.workspaceId],
-        });
+        await client.invalidateQueries(
+          getWorkspaceColumnsOptions(column.workspaceId),
+        );
 
-        await client.invalidateQueries({
-          queryKey: ["workspace", column.workspaceId],
-        });
+        await client.invalidateQueries(getWorkspaceOptions(column.workspaceId));
 
         options.onSuccess?.(column);
       },
@@ -90,8 +85,6 @@ export const useStatusColumnMutation = (
     },
     client,
   );
-
-  return { mutateAsync };
 };
 
 export const useDeleteStatusColumn = (
@@ -108,19 +101,17 @@ export const useDeleteStatusColumn = (
   return useMutation(
     {
       mutationFn: async (column: StatusColumn) =>
-        await useRequestFetch()(
+        await useRequestFetch()<null>(
           `/api/column/${column.workspaceId}/${column.id}`,
           { method: "DELETE" },
-        ).then((response) => response as null),
+        ),
       onSuccess: async (_, column) => {
         // We need to invalidate all columns as their order might have changed.
-        await client.invalidateQueries({
-          queryKey: ["workspace-columns", column.workspaceId],
-        });
+        await client.invalidateQueries(
+          getWorkspaceColumnsOptions(column.workspaceId),
+        );
 
-        client.removeQueries({
-          queryKey: ["status-column", column.id],
-        });
+        client.removeQueries(getStatusColumnOptions(column.id));
 
         options.onSuccess?.(column);
       },

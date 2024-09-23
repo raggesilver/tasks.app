@@ -1,7 +1,19 @@
-import type { QueryClient } from "@tanstack/vue-query";
-import type { SerializeObject } from "nitropack";
+import { queryOptions, type QueryClient } from "@tanstack/vue-query";
+import { normalizeDates } from "~/lib/utils";
 import type { CreateWorkspaceLabelInput } from "~/lib/validation";
 import type { Label, TaskWithEverything } from "~/server/db/schema";
+
+export const getLabelOptions = (labelId: MaybeRefOrGetter<string>) =>
+  queryOptions<Label>({
+    queryKey: ["label", labelId],
+  });
+
+export const getWorkspaceLabelsOptions = (
+  workspaceId: MaybeRefOrGetter<string>,
+) =>
+  queryOptions<Label[]>({
+    queryKey: ["workspace-labels", workspaceId],
+  });
 
 const setLabelData = (
   client: QueryClient,
@@ -9,28 +21,21 @@ const setLabelData = (
   action = "update-both" as "label" | "workspace" | "update-both" | "add",
 ) => {
   if (action === "label" || action === "update-both" || action === "add") {
-    client.setQueryData<Label>(["label", label.id], label);
+    client.setQueryData(getLabelOptions(label.id).queryKey, label);
   }
 
   if (action === "workspace" || action === "update-both") {
-    client.setQueryData<Label[]>(
-      ["workspace-labels", label.workspaceId],
-      (oldLabels: Label[] | undefined) => {
-        if (!oldLabels) {
-          return [label];
-        }
-        return oldLabels.map((oldLabel) =>
-          oldLabel.id === label.id ? label : oldLabel,
-        );
-      },
+    client.setQueryData(
+      getWorkspaceLabelsOptions(label.workspaceId).queryKey,
+      (oldLabels) =>
+        oldLabels?.map((old) => (old.id === label.id ? label : old)),
     );
   }
 
   if (action === "add") {
-    client.setQueryData<Label[]>(
-      ["workspace-labels", label.workspaceId],
-      (oldLabels: Label[] | undefined) =>
-        oldLabels ? [...oldLabels, label] : [label],
+    client.setQueryData(
+      getWorkspaceLabelsOptions(label.workspaceId).queryKey,
+      (oldLabels) => (oldLabels ? [...oldLabels, label] : [label]),
     );
   }
 };
@@ -40,10 +45,11 @@ const removeLabelData = (
   labelId: string,
   workspaceId: string,
 ) => {
-  client.removeQueries({ queryKey: ["label", labelId] });
+  client.removeQueries(getLabelOptions(labelId));
 
-  client.setQueryData<Label[]>(["workspace-labels", workspaceId], (oldLabels) =>
-    oldLabels?.filter((label) => label.id !== labelId),
+  client.setQueryData(
+    getWorkspaceLabelsOptions(workspaceId).queryKey,
+    (oldLabels) => oldLabels?.filter((label) => label.id !== labelId),
   );
 
   const tasksToUpdate: string[] = [];
@@ -89,27 +95,19 @@ const removeLabelData = (
   );
 };
 
-const normalizeLabel = (label: SerializeObject<Label>) => {
-  return {
-    ...label,
-    createdAt: new Date(label.createdAt),
-    updatedAt: new Date(label.updatedAt),
-  };
-};
-
 export const useWorkspaceLabels = (workspaceId: MaybeRefOrGetter<string>) => {
   const client = useQueryClient();
 
-  const { ...rest } = useQuery<Label[]>(
+  return useQuery(
     {
-      queryKey: ["workspace-labels", workspaceId],
+      queryKey: getWorkspaceLabelsOptions(workspaceId).queryKey,
       queryFn: async () =>
         useRequestFetch()(`/api/label`, {
           query: {
             workspaceId: toValue(workspaceId),
           },
         }).then((labels) => {
-          const normalizedLabels = labels.map(normalizeLabel);
+          const normalizedLabels = labels.map<Label>(normalizeDates);
           normalizedLabels.forEach((label) =>
             setLabelData(client, label, "label"),
           );
@@ -118,19 +116,17 @@ export const useWorkspaceLabels = (workspaceId: MaybeRefOrGetter<string>) => {
     },
     client,
   );
-
-  return { ...rest, client };
 };
 
 export const useWorkspaceLabel = (labelId: MaybeRefOrGetter<string>) => {
   const client = useQueryClient();
 
-  const { ...rest } = useQuery<Label>(
+  return useQuery<Label>(
     {
-      queryKey: ["label", labelId],
+      queryKey: getLabelOptions(labelId).queryKey,
       queryFn: async () =>
         useRequestFetch()(`/api/label/${toValue(labelId)}`).then((label) => {
-          const normalizedLabel = normalizeLabel(label);
+          const normalizedLabel = normalizeDates<Label>(label);
 
           setLabelData(client, normalizedLabel, "label");
 
@@ -139,34 +135,30 @@ export const useWorkspaceLabel = (labelId: MaybeRefOrGetter<string>) => {
     },
     client,
   );
-
-  return { ...rest, client };
 };
 
 export const useCreateLabel = () => {
   const client = useQueryClient();
 
-  const mutation = useMutation({
+  return useMutation({
     mutationFn: async (data: CreateWorkspaceLabelInput) =>
       useRequestFetch()("/api/label", {
         method: "POST",
         body: data,
       }).then((label) => {
-        const normalizedLabel = normalizeLabel(label);
+        const normalizedLabel = normalizeDates<Label>(label);
 
         setLabelData(client, normalizedLabel, "add");
 
         return normalizedLabel;
       }),
   });
-
-  return { ...mutation, client };
 };
 
 export const useUpdateLabel = () => {
   const client = useQueryClient();
 
-  const mutation = useMutation({
+  return useMutation({
     mutationFn: async ({
       data,
       labelId,
@@ -178,21 +170,19 @@ export const useUpdateLabel = () => {
         method: "PATCH",
         body: data,
       }).then((label) => {
-        const normalizedLabel = normalizeLabel(label);
+        const normalizedLabel = normalizeDates<Label>(label);
 
         setLabelData(client, normalizedLabel);
 
         return normalizedLabel;
       }),
   });
-
-  return { ...mutation, client };
 };
 
 export const useDeleteLabel = () => {
   const client = useQueryClient();
 
-  const mutation = useMutation({
+  return useMutation({
     mutationFn: async ({
       labelId,
       workspaceId,
@@ -206,6 +196,4 @@ export const useDeleteLabel = () => {
         removeLabelData(client, labelId, workspaceId);
       }),
   });
-
-  return { ...mutation, client };
 };

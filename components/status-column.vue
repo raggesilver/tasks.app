@@ -11,9 +11,9 @@ const props = defineProps<{
 const {
   data: tasks,
   suspense,
-  mutate,
   isPending,
 } = useTasks(props.column.workspaceId, props.column.id);
+const { mutateAsync: mutateTask } = useTaskMutation();
 
 if (import.meta.env.SSR) {
   await suspense();
@@ -121,7 +121,7 @@ const handleTaskDrop = async (event: DragEvent) => {
     return;
   }
 
-  await mutate({
+  await mutateTask({
     task,
     data: { statusColumnId: props.column.id },
   })

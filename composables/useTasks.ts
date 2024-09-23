@@ -1,11 +1,8 @@
-import { queryOptions } from "@tanstack/vue-query";
+import { queryOptions, useMutation } from "@tanstack/vue-query";
+import { normalizeDates } from "~/lib/utils";
 import type { UpdateTaskInput } from "~/lib/validation";
 import type { Task, TaskWithEverything } from "~/server/db/schema";
-
-export const getTaskOptions = (taskId: MaybeRefOrGetter<string>) =>
-  queryOptions<TaskWithEverything>({
-    queryKey: ["task", taskId],
-  });
+import { getTaskOptions } from "./useTask";
 
 export const getStatusColumnTasksOptions = (
   statusColumnId: MaybeRefOrGetter<string>,
@@ -20,7 +17,7 @@ export const useTasks = (
 ) => {
   const client = useQueryClient();
 
-  const { data, ...rest } = useQuery(
+  return useQuery(
     {
       queryKey: getStatusColumnTasksOptions(statusColumnId).queryKey,
       queryFn: () =>
@@ -28,40 +25,31 @@ export const useTasks = (
           `/api/column/${workspaceId}/${statusColumnId}/get-tasks`,
         ).then((res) =>
           res.map((task) => {
-            const normalized = {
-              ...task,
-              createdAt: new Date(task.createdAt),
-              updatedAt: new Date(task.updatedAt),
-            };
+            const normalized = normalizeDates(task);
+
             client.setQueryData(
               getTaskOptions(normalized.id).queryKey,
               normalized,
             );
+
             return normalized;
           }),
         ),
     },
     client,
   );
+};
 
-  const { mutateAsync: mutate, error: mutationError } = useMutation({
-    mutationFn: ({
-      task,
-      data,
-    }: {
-      task: Task;
-      data: UpdateTaskInput;
-    }): Promise<Task> =>
-      // @ts-ignore
+export const useTaskMutation = () => {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ task, data }: { task: Task; data: UpdateTaskInput }) =>
       useRequestFetch()(`/api/task/${task.id}`, {
         method: "PATCH",
         body: data,
       }).then((updatedTask) => {
-        const normalized = {
-          ...updatedTask,
-          createdAt: new Date(updatedTask.createdAt),
-          updatedAt: new Date(updatedTask.updatedAt),
-        };
+        const normalized = normalizeDates<TaskWithEverything>(updatedTask);
 
         client.setQueryData(
           getStatusColumnTasksOptions(updatedTask.statusColumnId).queryKey,
@@ -75,10 +63,6 @@ export const useTasks = (
             } else {
               Object.assign(copy[index], normalized);
             }
-            // We might be able to simplify this by just moving the updated
-            // task to the first position of the array. This is because it
-            // is extremely likely that it will be the most recently updated
-            // task. This would also remove the need to sort the array.
             copy.sort(
               (a, b) =>
                 new Date(b.updatedAt ?? b.createdAt).getTime() -
@@ -104,11 +88,4 @@ export const useTasks = (
         return normalized;
       }),
   });
-
-  return {
-    data,
-    mutate,
-    mutationError,
-    ...rest,
-  };
 };

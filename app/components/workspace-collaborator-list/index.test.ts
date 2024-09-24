@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { testid, testUsers } from "~/__tests__/utils";
 import * as _exports from "~/composables/useWorkspaceCollaborators";
 import type { PublicUser } from "~/lib/validation";
-import Component from "../../../components/workspace-collaborator-list/index.vue";
+import Component from "./index.vue";
 
 mockNuxtImport("useUserSession", () => {
   return () => ({

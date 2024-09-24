@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Toaster } from "@/components/ui/sonner";
-import { ConfigProvider } from "radix-vue";
 import { VueQueryDevtools } from "@tanstack/vue-query-devtools";
 import { FetchError } from "ofetch";
 
@@ -31,11 +30,9 @@ useHead({
 
 <template>
   <div class="bg-background" vaul-drawer-wrapper>
-    <ConfigProvider v-bind="{ useId }">
-      <NuxtLayout>
-        <NuxtPage />
-      </NuxtLayout>
-    </ConfigProvider>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
 
     <VueQueryDevtools />
     <Toaster rich-colors close-button class="z-100" />

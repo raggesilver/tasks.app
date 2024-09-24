@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import type { User } from "~/server/db/schema";
 import {
   Command,
+  CommandEmpty,
   CommandInput,
   CommandItem,
-  CommandEmpty,
   CommandList,
 } from "~/components/ui/command";
-import PopoverTrigger from "../ui/popover/PopoverTrigger.vue";
+import type { PublicUser } from "~/lib/validation";
+import type { User } from "~/server/db/schema";
 import PopoverContent from "../ui/popover/PopoverContent.vue";
+import PopoverTrigger from "../ui/popover/PopoverTrigger.vue";
 
 const props = defineProps<{
   taskId: string;
@@ -44,7 +45,9 @@ const users = computed(() => {
   );
 });
 
-const toggleUser = async (user: User & { isAssigned: boolean }) => {
+const toggleUser = async (
+  user: (User | PublicUser) & { isAssigned: boolean },
+) => {
   if (toggleStatuses[user.id]) {
     return;
   }

@@ -8,11 +8,12 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { getInitials } from "~/lib/utils";
+import type { PublicUser } from "~/lib/validation";
 import type { User, Workspace } from "~/server/db/schema";
 
 const props = defineProps<{
   workspace: Workspace;
-  collaborators: User[];
+  collaborators: (User | PublicUser)[];
 }>();
 
 const { user: self } = useUserSession();
@@ -28,7 +29,7 @@ const nonSelfCollaborators = computed(() =>
 const { mutateAsync, status: mutationStatus } =
   useRemoveWorkspaceCollaborator();
 
-const onRemoveCollaborator = (collaborator: User) => {
+const onRemoveCollaborator = (collaborator: User | PublicUser) => {
   // Remove collaborator from workspace
   if (mutationStatus.value === "pending") {
     return;
@@ -72,7 +73,7 @@ const onRemoveCollaborator = (collaborator: User) => {
         <TableHeader>
           <TableRow>
             <TableHead>User</TableHead>
-            <TableHead/>
+            <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>

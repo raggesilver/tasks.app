@@ -12,25 +12,41 @@ definePageMeta({
 
 const id = useRouteParamSafe("id") as Ref<string>;
 
-const { data: workspace, error, suspense } = useWorkspace(id);
-const { data: columns, suspense: statusSuspense } = useStatusColumns(id);
+const {
+  data: workspace,
+  error,
+  suspense,
+  isPending: isWorkspacePending,
+} = useWorkspace(id);
+
+const {
+  data: columns,
+  suspense: statusSuspense,
+  isPending: isStatusColumnPending,
+} = useStatusColumns(id);
+
+// FIXME: this is only being used via injection. I want to move away from this
+// pattern and use a more explicit approach.
 const { data: collaborators, suspense: collaboratorsSuspense } =
   useWorkspaceCollaborators(id);
+// FIXME: this is only being used via injection. I want to move away from this
+// pattern and use a more explicit approach.
 const { data: labels, suspense: labelsSuspense } = useWorkspaceLabels(id);
 
-await Promise.all([
-  suspense(),
-  statusSuspense(),
-  collaboratorsSuspense(),
-  labelsSuspense(),
-]);
+if (import.meta.env.SSR) {
+  await Promise.all([
+    suspense(),
+    statusSuspense(),
+    collaboratorsSuspense(),
+    labelsSuspense(),
+  ]);
+}
 
 provide(WORKSPACE_DATA_KEY, {
   workspace,
   columns,
   collaborators,
   labels,
-  /* labels */
 });
 
 const route = useRoute();
@@ -50,22 +66,12 @@ const typedError = computed(
       | undefined,
 );
 
-// FIXME: this should be handled in the AvatarsList component
-const collaboratorsSorted = computed(
-  () =>
-    collaborators.value?.toSorted((a, b) =>
-      a.id === user.value?.id ? -1 : b.id === user.value?.id ? 1 : 0,
-    ) ?? [],
-);
-
 const is404 = computed(() => typedError.value?.statusCode === 404);
 const title = computed(() => workspace.value?.name ?? "Workspace");
 
 useHead({
   title,
 });
-
-const showManageCollaborators = ref(false);
 
 const onTaskClosed = () => {
   router.push({ query: { ...route.query, "view-task": undefined } });
@@ -99,7 +105,7 @@ watch(
         ]"
       />
     </template>
-    <template v-if="workspace" #right-items>
+    <template #right-items>
       <Popover>
         <PopoverTrigger as-child>
           <Button
@@ -107,40 +113,66 @@ watch(
             variant="outline"
             class="flex items-center gap-2"
             title="Share workspace"
+            :disabled="!workspace"
           >
             Share <Icon name="lucide:share" />
           </Button>
         </PopoverTrigger>
         <PopoverContent align="end" class="w-full sm:w-[435px]">
-          <ShareWorkspace :workspace />
+          <LazyShareWorkspace v-if="workspace" :workspace />
         </PopoverContent>
       </Popover>
+      <EasyTooltip
+        v-if="workspace?.ownerId === user?.id"
+        tooltip="Workspace Settings"
+      >
+        <Button size="sm" variant="outline" class="w-8 p-0" as-child>
+          <NuxtLink :to="`/app/workspace/${id}/settings`">
+            <Icon name="lucide:ellipsis" />
+          </NuxtLink>
+        </Button>
+      </EasyTooltip>
     </template>
     <div class="flex flex-col flex-grow px-8 gap-8 overflow-hidden">
-      <template v-if="workspace">
-        <div class="flex flex-row gap-4 items-center">
-          <h1 class="text-3xl font-extrabold">{{ workspace.name }}</h1>
-          <AvatarsList
-            :users="collaboratorsSorted"
-            :is-owner="workspace.ownerId === user?.id"
-            aria-label="List of workspace collaborators"
-            @manage-collaborators="showManageCollaborators = true"
-          />
-          <EasyTooltip
-            v-if="workspace.ownerId === user?.id"
-            tooltip="Workspace Settings"
-          >
-            <Button size="sm" variant="outline" as-child>
-              <NuxtLink :to="`/app/workspace/${id}/settings`" class="ml-auto">
-                <Icon name="lucide:ellipsis" />
-              </NuxtLink>
-            </Button>
-          </EasyTooltip>
+      <template v-if="is404">
+        <div class="flex-1 flex flex-col items-center justify-center">
+          <h1 class="text-3xl font-extrabold">Workspace not found</h1>
+          <Button variant="link" as-child>
+            <NuxtLink to="/app">Go back</NuxtLink>
+          </Button>
         </div>
-        <TransitionGroup
-          ref="boardRef"
-          name="list"
-          tag="ol"
+      </template>
+      <template v-else>
+        <div class="flex flex-row gap-4 items-center">
+          <h1 class="text-3xl font-extrabold flex items-center gap-2">
+            <LazySkeleton
+              v-if="isWorkspacePending"
+              class="h-[1em] w-xs inline-block"
+            />
+            <span v-else>{{ workspace?.name }}</span>
+          </h1>
+          <WorkspaceCollaboratorList :workspace-id="id" />
+        </div>
+        <template v-if="isStatusColumnPending || !columns">
+          <ol
+            class="flex flex-row flex-grow gap-8 items-start max-h-full -mx-8 px-8 pb-8 overflow-x-auto overflow-y-hidden"
+          >
+            <Skeleton
+              v-for="i in 3"
+              :key="i"
+              class="shrink-0 w-xs h-full bg-muted dark:bg-background"
+              as="li"
+            />
+            <li
+              key="create-column"
+              class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"
+            >
+              <CreateColumn />
+            </li>
+          </ol>
+        </template>
+        <ol
+          v-else
           class="flex flex-row flex-grow gap-8 items-start max-h-full -mx-8 px-8 pb-8 overflow-x-auto overflow-y-hidden"
         >
           <StatusColumn
@@ -156,15 +188,7 @@ watch(
           >
             <CreateColumn />
           </li>
-        </TransitionGroup>
-      </template>
-      <template v-else-if="is404">
-        <div class="flex-1 flex flex-col items-center justify-center">
-          <h1 class="text-3xl font-extrabold">Workspace not found</h1>
-          <Button variant="link" as-child>
-            <NuxtLink to="/app">Go back</NuxtLink>
-          </Button>
-        </div>
+        </ol>
       </template>
     </div>
     <Sheet
@@ -175,6 +199,6 @@ watch(
         <NuxtPage />
       </SheetContent>
     </Sheet>
-    <TaskView v-if="viewTask" :task-id="viewTask" @close="onTaskClosed" />
+    <LazyTaskView v-if="viewTask" :task-id="viewTask" @close="onTaskClosed" />
   </AppLayout>
 </template>

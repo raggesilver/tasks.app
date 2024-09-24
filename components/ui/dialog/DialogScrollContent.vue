@@ -10,14 +10,18 @@ import {
   useForwardPropsEmits,
 } from "radix-vue";
 import { type HTMLAttributes, computed } from "vue";
+import { Cross2Icon } from "@radix-icons/vue";
 
 const props = defineProps<
-  DialogContentProps & { class?: HTMLAttributes["class"] }
+  DialogContentProps & {
+    class?: HTMLAttributes["class"];
+    noCloseButton?: boolean;
+  }
 >();
 const emits = defineEmits<DialogContentEmits>();
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+  const { class: _, noCloseButton, ...delegated } = props;
 
   return delegated;
 });
@@ -54,6 +58,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
         <slot />
 
         <DialogClose
+          v-if="props.noCloseButton !== true"
           class="absolute top-4 right-4 p-0.5 transition-colors rounded-md hover:bg-secondary"
         >
           <Cross2Icon class="w-4 h-4" />

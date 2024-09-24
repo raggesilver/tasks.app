@@ -10,7 +10,6 @@ import { getInitials } from "~/lib/utils";
 
 defineProps<{
   users: User[];
-  isOwner: boolean;
 }>();
 
 const { user } = useUserSession();

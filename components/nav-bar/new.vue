@@ -13,10 +13,7 @@
       </div>
       <span aria-hidden="true" class="mx-auto" />
       <!-- This div is used as a target for component teleports -->
-      <div
-        id="nav-bar-right-items"
-        class="flex flex-row gap-inherit items-inherit"
-      >
+      <div id="nav-bar-right-items" class="flex flex-row gap-2 items-inherit">
         <slot name="right-items" />
       </div>
       <NavBarUserMenu />

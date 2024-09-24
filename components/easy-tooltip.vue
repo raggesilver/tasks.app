@@ -16,7 +16,7 @@ const props = defineProps<{
       <TooltipTrigger as-child>
         <slot v-bind="$attrs" />
       </TooltipTrigger>
-      <TooltipContent>
+      <TooltipContent class="whitespace-pre-wrap">
         {{ props.tooltip }}
       </TooltipContent>
     </Tooltip>

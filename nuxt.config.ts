@@ -2,6 +2,10 @@
 export default defineNuxtConfig({
   devtools: { enabled: true, componentInspector: false },
 
+  devServer: {
+    https: true,
+  },
+
   experimental: {
     buildCache: true,
   },
@@ -63,9 +67,9 @@ export default defineNuxtConfig({
   ],
 
   vueQuery: {
-    // vueQueryPluginOptions: {
-    //   enableDevtoolsV6Plugin: true,
-    // },
+    vueQueryPluginOptions: {
+      enableDevtoolsV6Plugin: true,
+    },
     queryClientOptions: {
       defaultOptions: {
         queries: {

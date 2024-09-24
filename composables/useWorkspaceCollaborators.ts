@@ -1,4 +1,13 @@
-import type { TaskWithAssignees, User } from "~/server/db/schema";
+import { queryOptions } from "@tanstack/vue-query";
+import type { PublicUser } from "~/lib/validation";
+import type { TaskWithAssignees } from "~/server/db/schema";
+
+export const getWorkspaceCollaboratorsOptions = (
+  workspaceId: MaybeRefOrGetter<string>,
+) =>
+  queryOptions<PublicUser[]>({
+    queryKey: ["workspace-collaborators", workspaceId],
+  });
 
 export const useWorkspaceCollaborators = (
   workspaceId: MaybeRefOrGetter<string>,
@@ -7,11 +16,11 @@ export const useWorkspaceCollaborators = (
 
   return useQuery(
     {
-      queryKey: ["workspace-collaborators", workspaceId],
+      queryKey: getWorkspaceCollaboratorsOptions(workspaceId).queryKey,
       queryFn: () =>
         useRequestFetch()(
           `/api/workspace/${toValue(workspaceId)}/collaborators`,
-        ).then((users) => users as User[]),
+        ),
     },
     client,
   );
@@ -54,8 +63,8 @@ export const useRemoveWorkspaceCollaborator = () => {
         ).then(() => ({ workspaceId, userId })),
       onSuccess: ({ workspaceId, userId }) => {
         client.setQueryData(
-          ["workspace-collaborators", workspaceId],
-          (users: User[]) => users?.filter((user) => user.id !== userId) ?? [],
+          getWorkspaceCollaboratorsOptions(workspaceId).queryKey,
+          (users) => users?.filter((user) => user.id !== userId),
         );
 
         // Collaborators who have been removed from a workspace are
@@ -66,6 +75,10 @@ export const useRemoveWorkspaceCollaborator = () => {
           (task) => updateInCacheTask(task, workspaceId, userId),
         );
 
+
+        // FIXME: we need the ability to get status column tasks options without
+        // a specified status column id. This will allow us to update the cache
+        // for all status columns in a type-safe way.
         client.setQueriesData<TaskWithAssignees[]>(
           { queryKey: ["status-column-tasks"] },
           (tasks) =>

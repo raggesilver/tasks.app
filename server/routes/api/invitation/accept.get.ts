@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { getInvitationByToken } from "~/server/services/invitation";
-import { addCollaboratorById } from "~/server/services/workspace";
+import { getInvitationByToken } from "~~/server/services/invitation";
+import { addCollaboratorById } from "~~/server/services/workspace";
 
 const schema = z.object({
   token: z.string(),

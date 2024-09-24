@@ -1,4 +1,4 @@
-import { getTaskById } from "~/server/services/task";
+import { getTaskById } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

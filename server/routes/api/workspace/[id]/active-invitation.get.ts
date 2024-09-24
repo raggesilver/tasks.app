@@ -1,4 +1,4 @@
-import { getActiveInvitationForWorkspace } from "~/server/services/invitation";
+import { getActiveInvitationForWorkspace } from "~~/server/services/invitation";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

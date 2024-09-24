@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { removeLabelFromTask } from "~/server/services/task";
+import { removeLabelFromTask } from "~~/server/services/task";
 
 const paramsSchema = z.object({
   id: z.string().uuid(),

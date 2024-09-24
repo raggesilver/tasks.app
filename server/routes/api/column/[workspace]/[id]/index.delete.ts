@@ -1,4 +1,4 @@
-import { deleteStatusColumn } from "~/server/services/columns";
+import { deleteStatusColumn } from "~~/server/services/columns";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

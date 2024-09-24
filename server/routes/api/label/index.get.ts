@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getLabelsForWorkspace } from "~/server/services/label";
+import { getLabelsForWorkspace } from "~~/server/services/label";
 
 const schema = z.object({
   workspaceId: z.string().uuid(),

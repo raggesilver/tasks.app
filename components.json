@@ -5,7 +5,7 @@
   "tsConfigPath": ".nuxt/tsconfig.json",
   "tailwind": {
     "config": "tailwind.config.js",
-    "css": "assets/css/main.css",
+    "css": "app/assets/css/main.css",
     "baseColor": "zinc",
     "cssVariables": true
   },

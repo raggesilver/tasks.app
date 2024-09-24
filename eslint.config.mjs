@@ -1,5 +1,5 @@
 // @ts-check
-import withNuxt from './.nuxt/eslint.config.mjs'
+import withNuxt from '.nuxt/eslint.config.mjs'
 
 export default withNuxt(
   {
@@ -14,7 +14,7 @@ export default withNuxt(
     },
   },
   {
-    files: ["components/ui/**/*.vue"],
+    files: ["app/components/ui/**/*.vue"],
     rules: {
       // Eslint doesn't know about vue's multi-script setup, so it thinks
       // we're importing things not at the top of the file.

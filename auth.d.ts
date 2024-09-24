@@ -1,4 +1,4 @@
-import type { User as DbUser } from "~/server/db/schema";
+import type { User as DbUser } from "~~/server/db/schema";
 
 declare module "#auth-utils" {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type

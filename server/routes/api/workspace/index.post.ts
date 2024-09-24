@@ -1,6 +1,6 @@
 import createSlug from "slug";
 import { createWorkspaceSchema } from "~/lib/validation";
-import { createWorkspace } from "~/server/services/workspace";
+import { createWorkspace } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event);

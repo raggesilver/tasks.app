@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getInitials } from "~/lib/utils";
+import type { PublicUser } from "~/lib/validation";
 import type { User } from "~/server/db/schema";
 
 defineOptions({
@@ -11,7 +12,7 @@ const props = defineProps<
       /**
        * The user to display. If `null`, a skeleton will be shown.
        */
-      user: User | null;
+      user: User | PublicUser | null;
       userId?: never;
     }
   | {
@@ -32,7 +33,7 @@ if (import.meta.env.SSR && props.userId) {
 
 const isReallyPending = computed(() => isPending.value && !props.user);
 
-const resolvedUser = computed<User | null | undefined>(() =>
+const resolvedUser = computed<User | PublicUser | null | undefined>(() =>
   props.userId ? data.value : props.user,
 );
 

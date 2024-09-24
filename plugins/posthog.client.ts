@@ -2,7 +2,7 @@ import { defineNuxtPlugin } from "#app";
 import posthog from "posthog-js";
 
 export default defineNuxtPlugin(() => {
-  if (import.meta.dev) {
+  if (import.meta.dev || import.meta.env.MODE === "test") {
     return;
   }
 

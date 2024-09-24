@@ -72,13 +72,20 @@ const collapsedCollaboratorsText = computed(() =>
   <ul class="flex flex-row-reverse collaborators-avatars wrapper">
     <template v-if="isPending">
       <li v-for="i in 3" :key="i" class="flex">
-        <UniversalUserAvatar :user="null" class="avatar" />
+        <UniversalUserAvatar
+          :user="null"
+          class="avatar"
+          :data-testid="`mock-user-avatar-${i}`"
+        />
       </li>
     </template>
     <template v-else>
       <li v-if="shouldLimit" class="flex">
         <EasyTooltip :tooltip="collapsedCollaboratorsText">
-          <Avatar class="border border-foreground">
+          <Avatar
+            class="border border-foreground"
+            data-testid="collapsed-users-avatar"
+          >
             <AvatarFallback class="select-none cursor-default">
               {{ collaborators.length - limit + 1 }}+
             </AvatarFallback>
@@ -95,6 +102,7 @@ const collapsedCollaboratorsText = computed(() =>
         <UniversalUserAvatar
           :user="collaborator"
           class="avatar border border-foreground"
+          :data-testid="`user-avatar-${collaborator.id}`"
         />
       </li>
     </template>

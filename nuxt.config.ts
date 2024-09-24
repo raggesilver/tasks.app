@@ -31,20 +31,20 @@ export default defineNuxtConfig({
     },
   },
 
-  vite: {
-    optimizeDeps: {
-      include: [
-        "class-variance-authority",
-        "@radix-icons/vue",
-        "clsx",
-        "tailwind-merge",
-        "@tanstack/vue-query",
-        "vaul-vue",
-        "@vee-validate/zod",
-        "zod",
-      ],
-    },
-  },
+  // vite: {
+  //   optimizeDeps: {
+  //     include: [
+  //       "class-variance-authority",
+  //       "@radix-icons/vue",
+  //       "clsx",
+  //       "tailwind-merge",
+  //       "@tanstack/vue-query",
+  //       "vaul-vue",
+  //       "@vee-validate/zod",
+  //       "zod",
+  //     ],
+  //   },
+  // },
 
   routeRules: {
     "/ingest/static/**": { proxy: "https://us-assets.i.posthog.com/static/**" },
@@ -64,6 +64,7 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@pinia/nuxt",
     "@nuxt/eslint",
+    "@nuxt/test-utils/module",
   ],
 
   vueQuery: {

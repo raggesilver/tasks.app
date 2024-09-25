@@ -7,12 +7,12 @@ import { createTask } from "~~/server/services/task";
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event);
 
-  const { workspace: workspaceId, column: columnId } =
+  const { workspace: workspaceId, id: columnId } =
     await getValidatedRouterParams(
       event,
       z.object({
         workspace: z.string().uuid(),
-        column: z.string().uuid(),
+        id: z.string().uuid(),
       }).parseAsync,
     );
 

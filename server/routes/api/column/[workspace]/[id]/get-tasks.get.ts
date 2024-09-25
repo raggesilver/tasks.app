@@ -5,12 +5,12 @@ import { getTasksForStatusColumn } from "~~/server/services/task";
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
 
-  const { workspace: workspaceId, statusColumn: statusColumnId } =
+  const { workspace: workspaceId, id: statusColumnId } =
     await getValidatedRouterParams(
       event,
       z.object({
         workspace: z.string().uuid(),
-        statusColumn: z.string().uuid(),
+        id: z.string().uuid(),
       }).parseAsync,
     );
 

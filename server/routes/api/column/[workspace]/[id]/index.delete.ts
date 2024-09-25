@@ -1,12 +1,28 @@
+import { z } from "zod";
+import { isUserAllowedToCreateOrModifyColumns } from "~~/server/services/authorization";
 import { deleteStatusColumn } from "~~/server/services/columns";
 
 export default defineEventHandler(async (event) => {
-  await requireUserSession(event);
+  const { user } = await requireUserSession(event);
 
-  const workspaceId = getRouterParam(event, "workspace")!;
-  const columnId = getRouterParam(event, "id")!;
+  const { workspace: workspaceId, id: columnId } =
+    await getValidatedRouterParams(
+      event,
+      z.object({
+        workspace: z.string().uuid(),
+        id: z.string().uuid(),
+      }).parseAsync,
+    );
 
-  // TODO: check if the user has access to the workspace
+  if (
+    false === (await isUserAllowedToCreateOrModifyColumns(user.id, workspaceId))
+  ) {
+    throw createError({
+      status: 403,
+      message: "You are not authorized to delete columns",
+    });
+  }
+
   const response = await deleteStatusColumn(workspaceId, columnId);
 
   if (!response) {

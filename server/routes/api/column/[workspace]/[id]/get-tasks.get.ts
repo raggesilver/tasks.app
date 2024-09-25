@@ -1,14 +1,25 @@
+import { z } from "zod";
+import { isUserWorkspaceCollaborator } from "~~/server/services/authorization";
 import { getTasksForStatusColumn } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
-  await requireUserSession(event);
+  const { user } = await requireUserSession(event);
 
-  const workspaceId = getRouterParam(event, "workspace")!;
-  const statusColumnId = getRouterParam(event, "id")!;
+  const { workspace: workspaceId, statusColumn: statusColumnId } =
+    await getValidatedRouterParams(
+      event,
+      z.object({
+        workspace: z.string().uuid(),
+        statusColumn: z.string().uuid(),
+      }).parseAsync,
+    );
 
-  // TODO: validate that the user has access to the workspace
+  if (false === (await isUserWorkspaceCollaborator(user.id, workspaceId))) {
+    throw createError({
+      status: 403,
+      message: "You are not authorized to view tasks in this workspace",
+    });
+  }
 
-  const tasks = await getTasksForStatusColumn(workspaceId, statusColumnId);
-
-  return tasks;
+  return getTasksForStatusColumn(workspaceId, statusColumnId);
 });

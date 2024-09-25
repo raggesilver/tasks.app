@@ -143,3 +143,10 @@ export async function isUserAllowedToCreateOrModifyWorkspaceInvitation(
 ): Promise<boolean> {
   return isUserWorkspaceOwner(userId, workspaceId);
 }
+
+export async function isUserAllowedToCreateOrModifyColumns(
+  userId: string,
+  workspaceId: string,
+): Promise<boolean> {
+  return isUserWorkspaceCollaborator(userId, workspaceId);
+}

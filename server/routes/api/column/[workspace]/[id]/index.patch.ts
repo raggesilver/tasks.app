@@ -1,27 +1,44 @@
+import { z } from "zod";
 import { updateStatusColumnSchema } from "~/lib/validation";
 import type { StatusColumn } from "~~/server/db/schema";
+import { isUserAllowedToCreateOrModifyColumns } from "~~/server/services/authorization";
 import { updateStatusColumn } from "~~/server/services/columns";
-import { getWorkspaceById } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event);
+  const { user } = await requireUserSession(event);
 
-  const workspaceId = getRouterParam(event, "workspace")!;
-  const columnId = getRouterParam(event, "id")!;
+  const { workspace: workspaceId, id: columnId } =
+    await getValidatedRouterParams(
+      event,
+      z.object({
+        workspace: z.string().uuid(),
+        id: z.string().uuid(),
+      }).parseAsync,
+    );
 
-  const data = await readValidatedBody(event, updateStatusColumnSchema.parse);
-
-  const workspace = await getWorkspaceById(session.user.id, workspaceId);
-
-  if (!workspace) {
-    throw createError({ status: 404, message: "Workspace not found" });
+  if (
+    false === (await isUserAllowedToCreateOrModifyColumns(user.id, workspaceId))
+  ) {
+    throw createError({
+      status: 403,
+      message: "You are not authorized to update columns",
+    });
   }
 
-  const column = await updateStatusColumn(workspace.id, columnId, data);
+  const data = await readValidatedBody(
+    event,
+    updateStatusColumnSchema.parseAsync,
+  );
+
+  const column: StatusColumn | null = await updateStatusColumn(
+    workspaceId,
+    columnId,
+    data,
+  );
 
   if (!column) {
     throw createError({ status: 404, message: "Column not found" });
   }
 
-  return column as StatusColumn;
+  return column;
 });

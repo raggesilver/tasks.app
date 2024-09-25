@@ -1,18 +1,33 @@
+import { z } from "zod";
 import { createTaskSchema } from "~/lib/validation";
+import type { TaskWithEverything } from "~~/server/db/schema";
+import { isUserWorkspaceCollaborator } from "~~/server/services/authorization";
 import { createTask } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event);
 
-  const workspaceId = getRouterParam(event, "workspace")!;
-  const columnId = getRouterParam(event, "id")!;
+  const { workspace: workspaceId, column: columnId } =
+    await getValidatedRouterParams(
+      event,
+      z.object({
+        workspace: z.string().uuid(),
+        column: z.string().uuid(),
+      }).parseAsync,
+    );
 
-  const data = await readValidatedBody(event, createTaskSchema.parse);
+  const data = await readValidatedBody(event, createTaskSchema.parseAsync);
 
-  // TODO: validate that workspace and column exist
-  // TODO: validate that user has access to workspace
+  if (
+    false === (await isUserWorkspaceCollaborator(session.user.id, workspaceId))
+  ) {
+    throw createError({
+      status: 403,
+      message: "You are not authorized to create tasks in this workspace",
+    });
+  }
 
-  const task = await createTask({
+  const task: TaskWithEverything = await createTask({
     workspaceId,
     statusColumnId: columnId,
     createdById: session.user.id,

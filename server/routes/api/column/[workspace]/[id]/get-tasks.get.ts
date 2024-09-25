@@ -1,4 +1,4 @@
-import { getTasksForStatusColumn } from "~/server/services/task";
+import { getTasksForStatusColumn } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

@@ -1,6 +1,6 @@
 import { createInvitationSchema } from "~/lib/validation";
-import { createInvitation } from "~/server/services/invitation";
-import { getWorkspaceById } from "~/server/services/workspace";
+import { createInvitation } from "~~/server/services/invitation";
+import { getWorkspaceById } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);

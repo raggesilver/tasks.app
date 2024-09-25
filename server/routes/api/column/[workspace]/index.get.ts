@@ -1,5 +1,5 @@
-import { getStatusColumns } from "~/server/services/columns";
-import { getWorkspaceById } from "~/server/services/workspace";
+import { getStatusColumns } from "~~/server/services/columns";
+import { getWorkspaceById } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event);

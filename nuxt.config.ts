@@ -1,6 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  compatibilityDate: "2024-09-24",
   devtools: { enabled: true, componentInspector: false },
+
+  future: {
+    compatibilityVersion: 4,
+  },
 
   devServer: {
     https: true,
@@ -64,7 +69,21 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@pinia/nuxt",
     "@nuxt/eslint",
+    "@nuxt/test-utils/module",
   ],
+
+  content: {
+    sources: {
+      content: {
+        driver: "fs",
+        base: "./app/content",
+      },
+    },
+  },
+
+  shadcn: {
+    componentDir: "./app/components/ui",
+  },
 
   vueQuery: {
     vueQueryPluginOptions: {
@@ -78,5 +97,4 @@ export default defineNuxtConfig({
       },
     },
   },
-  compatibilityDate: "2024-07-09",
 });

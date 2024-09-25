@@ -1,5 +1,5 @@
 import { publicUserSchema } from "~/lib/validation";
-import { getWorkspaceCollaborators } from "~/server/services/workspace";
+import { getWorkspaceCollaborators } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

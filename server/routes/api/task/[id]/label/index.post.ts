@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { addTaskLabelSchema } from "~/lib/validation";
-import { isPostgresError, PgErrorCode } from "~/server/lib/errors";
-import { addLabelToTask } from "~/server/services/task";
+import { isPostgresError, PgErrorCode } from "~~/server/lib/errors";
+import { addLabelToTask } from "~~/server/services/task";
 
 const paramSchema = z.object({ id: z.string().uuid() });
 

@@ -1,5 +1,5 @@
 import { publicUserSchema, searchUsersSchema } from "~/lib/validation";
-import { searchUsers } from "~/server/services/user";
+import { searchUsers } from "~~/server/services/user";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

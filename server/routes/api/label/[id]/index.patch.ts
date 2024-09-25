@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { updateWorkspaceLabelSchema } from "~/lib/validation";
-import { updateLabel } from "~/server/services/label";
+import { updateLabel } from "~~/server/services/label";
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(

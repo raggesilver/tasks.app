@@ -1,5 +1,5 @@
 import { updateTaskSchema } from "~/lib/validation";
-import { updateTask } from "~/server/services/task";
+import { updateTask } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event);

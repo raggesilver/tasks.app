@@ -1,5 +1,5 @@
 import { createWorkspaceLabelSchema } from "~/lib/validation";
-import { createLabel } from "~/server/services/label";
+import { createLabel } from "~~/server/services/label";
 
 export default defineEventHandler(async (event) => {
   const data = await readValidatedBody(event, createWorkspaceLabelSchema.parse);

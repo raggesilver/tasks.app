@@ -1,4 +1,4 @@
-import { getUserById } from "~/server/services/user";
+import { getUserById } from "~~/server/services/user";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

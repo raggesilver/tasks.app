@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // FIXME: ensure user has permission to delete label
   const label = await deleteLabel(labelId);
 
   return sendNoContent(event, label ? 204 : 404);

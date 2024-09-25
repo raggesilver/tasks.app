@@ -1,6 +1,6 @@
 import { createInvitationSchema } from "~/lib/validation";
+import { isUserAllowedToCreateOrModifyWorkspaceInvitation } from "~~/server/services/authorization";
 import { createInvitation } from "~~/server/services/invitation";
-import { getWorkspaceById } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
@@ -10,17 +10,17 @@ export default defineEventHandler(async (event) => {
     createInvitationSchema.parseAsync,
   );
 
-  const workspace = await getWorkspaceById(user.id, data.workspaceId);
-
-  if (!workspace) {
-    throw createError({ status: 404, message: "Workspace not found" });
-  }
-
-  if (workspace.ownerId !== user.id) {
+  if (
+    false ===
+    (await isUserAllowedToCreateOrModifyWorkspaceInvitation(
+      user.id,
+      data.workspaceId,
+    ))
+  ) {
     throw createError({
       status: 403,
       message:
-        "You are not authorized to create invitation links for this workspace",
+        "You are not authorized to create or modify workspace invitation links",
     });
   }
 

@@ -37,6 +37,15 @@ export async function createInvitation(
   });
 }
 
+export async function getInvitationById(
+  invidationId: string,
+): Promise<InvitationLink | null> {
+  return db.query.invitationLinks
+    .findFirst({ where: (table, { eq }) => eq(table.id, invidationId) })
+    .execute()
+    .then((res) => res ?? null);
+}
+
 export async function getActiveInvitationForWorkspace(
   workspaceId: string,
 ): Promise<InvitationLink | null> {

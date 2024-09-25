@@ -10,6 +10,21 @@ import {
 } from "../db/schema";
 
 /**
+ * Check if a user is the owner of a workspace.
+ *
+ * @param userId The user ID.
+ * @param workspaceId The workspace ID.
+ */
+export const isUserWorkspaceOwner = (userId: string, workspaceId: string) =>
+  db
+    .select({ res: sql`1` })
+    .from(workspaces)
+    .where(and(eq(workspaces.ownerId, userId), eq(workspaces.id, workspaceId)))
+    .limit(1)
+    .execute()
+    .then((rows) => rows[0]?.res === 1);
+
+/**
  * Check if a user is a collaborator or owner of a workspace.
  *
  * @param userId The user ID.
@@ -120,4 +135,11 @@ export async function isUserAllowedToModifyLabel(
     .limit(1)
     .execute()
     .then((rows) => rows[0]?.res === 1);
+}
+
+export async function isUserAllowedToCreateOrModifyWorkspaceInvitation(
+  userId: string,
+  workspaceId: string,
+): Promise<boolean> {
+  return isUserWorkspaceOwner(userId, workspaceId);
 }

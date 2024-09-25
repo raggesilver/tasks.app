@@ -1,13 +1,24 @@
-import { updateTaskSchema } from "~/lib/validation";
+import { updateTaskSchema, validateId } from "~/lib/validation";
+import { isUserWorkspaceCollaboratorForTask } from "~~/server/services/authorization";
 import { updateTask } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event);
+  const { user } = await requireUserSession(event);
+  const { id: taskId } = await getValidatedRouterParams(
+    event,
+    validateId("id").parseAsync,
+  );
 
-  const taskId = getRouterParam(event, "id")!;
-  const data = await readValidatedBody(event, updateTaskSchema.parse);
+  if (false === (await isUserWorkspaceCollaboratorForTask(user.id, taskId))) {
+    throw createError({
+      status: 403,
+      message: "You are not authorized to modify this task",
+    });
+  }
 
-  const task = await updateTask(taskId, session.user.id, data);
+  const data = await readValidatedBody(event, updateTaskSchema.parseAsync);
+
+  const task = await updateTask(taskId, user.id, data);
 
   if (!task) {
     throw createError({ status: 404, message: "Task not found" });

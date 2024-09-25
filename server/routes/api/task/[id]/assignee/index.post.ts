@@ -1,15 +1,26 @@
-import { addAssigneeSchema } from "~/lib/validation";
+import { addAssigneeSchema, validateId } from "~/lib/validation";
 import { DuplicateError, NotFoundError } from "~~/server/lib/errors";
+import { isUserWorkspaceCollaboratorForTask } from "~~/server/services/authorization";
 import { addAssigneeToTask } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
-  await requireUserSession(event);
+  const { user } = await requireUserSession(event);
+  const { id: taskId } = await getValidatedRouterParams(
+    event,
+    validateId("id").parseAsync,
+  );
 
-  // TODO: validate that the user is a member of the workspace and has
-  // permission to add assignees
+  if (false === (await isUserWorkspaceCollaboratorForTask(user.id, taskId))) {
+    throw createError({
+      status: 403,
+      message: "You are not authorized to modify this task",
+    });
+  }
 
-  const taskId = getRouterParam(event, "id")!;
-  const { userId } = await readValidatedBody(event, addAssigneeSchema.parse);
+  const { userId } = await readValidatedBody(
+    event,
+    addAssigneeSchema.parseAsync,
+  );
 
   return addAssigneeToTask(taskId, userId).catch((e) => {
     if (e instanceof NotFoundError) {

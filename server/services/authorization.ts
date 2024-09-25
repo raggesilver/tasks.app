@@ -2,6 +2,7 @@ import { and, eq, or, sql } from "drizzle-orm";
 import { db } from "../db/db";
 import {
   collaborators,
+  tasks,
   workspaces,
   type User,
   type Workspace,
@@ -24,6 +25,32 @@ export const isUserWorkspaceCollaborator = (
     .where(
       and(
         eq(collaborators.workspaceId, workspaceId),
+        or(eq(collaborators.userId, userId), eq(workspaces.ownerId, userId)),
+      ),
+    )
+    .limit(1)
+    .execute()
+    .then((rows) => rows[0]?.res === 1);
+
+/**
+ * Check if a user is a collaborator or owner of the workspace that a task
+ * belongs to.
+ *
+ * @param userId The user ID.
+ * @param taskId The task ID.
+ */
+export const isUserWorkspaceCollaboratorForTask = (
+  userId: string,
+  taskId: string,
+) =>
+  db
+    .select({ res: sql`1` })
+    .from(collaborators)
+    .leftJoin(workspaces, eq(workspaces.ownerId, userId))
+    .leftJoin(tasks, eq(tasks.workspaceId, workspaces.id))
+    .where(
+      and(
+        eq(tasks.id, taskId),
         or(eq(collaborators.userId, userId), eq(workspaces.ownerId, userId)),
       ),
     )

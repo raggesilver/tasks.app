@@ -1,17 +1,15 @@
 import { z } from "zod";
 import { isUserWorkspaceCollaboratorForTask } from "~~/server/services/authorization";
-import { removeLabelFromTask } from "~~/server/services/task";
-
-const paramsSchema = z.object({
-  id: z.string().uuid(),
-  labelId: z.string().uuid(),
-});
+import { removeAssigneeFromTask } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
-  const { id: taskId, labelId } = await getValidatedRouterParams(
+  const { id: taskId, assigneeId } = await getValidatedRouterParams(
     event,
-    paramsSchema.parseAsync,
+    z.object({
+      id: z.string().uuid(),
+      assigneeId: z.string().uuid(),
+    }).parseAsync,
   );
 
   if (false === (await isUserWorkspaceCollaboratorForTask(user.id, taskId))) {
@@ -21,7 +19,10 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const result = await removeLabelFromTask(taskId, labelId);
-
-  return sendNoContent(event, result ? 204 : 404);
+  return removeAssigneeFromTask(taskId, assigneeId).then((success) => {
+    if (!success) {
+      return sendNoContent(event, 404);
+    }
+    return sendNoContent(event);
+  });
 });

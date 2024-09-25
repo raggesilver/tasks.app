@@ -2,6 +2,7 @@ import { and, eq, or, sql } from "drizzle-orm";
 import { db } from "../db/db";
 import {
   collaborators,
+  labels,
   tasks,
   workspaces,
   type User,
@@ -58,6 +59,25 @@ export const isUserWorkspaceCollaboratorForTask = (
     .execute()
     .then((rows) => rows[0]?.res === 1);
 
+export const isUserWorkspaceCollaboratorForLabel = (
+  userId: string,
+  labelId: string,
+) =>
+  db
+    .select({ res: sql`1` })
+    .from(collaborators)
+    .leftJoin(workspaces, eq(workspaces.ownerId, userId))
+    .leftJoin(labels, eq(labels.workspaceId, workspaces.id))
+    .where(
+      and(
+        eq(labels.id, labelId),
+        or(eq(collaborators.userId, userId), eq(workspaces.ownerId, userId)),
+      ),
+    )
+    .limit(1)
+    .execute()
+    .then((rows) => rows[0]?.res === 1);
+
 // ...
 
 export async function isUserAllowedToEditWorkspace(
@@ -85,4 +105,19 @@ export async function isUserAllowedToDeleteWorkspace(
   workspace: Workspace,
 ): Promise<boolean> {
   return workspace.ownerId === user.id;
+}
+
+export async function isUserAllowedToModifyLabel(
+  userId: string,
+  labelId: string,
+): Promise<boolean> {
+  // Currently, only workspace owners can modify labels.
+  return db
+    .select({ res: sql`1` })
+    .from(labels)
+    .leftJoin(workspaces, eq(workspaces.id, labels.workspaceId))
+    .where(and(eq(labels.id, labelId), eq(workspaces.ownerId, userId)))
+    .limit(1)
+    .execute()
+    .then((rows) => rows[0]?.res === 1);
 }

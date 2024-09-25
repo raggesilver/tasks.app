@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isUserWorkspaceCollaboratorForLabel } from "~~/server/services/authorization";
 import { getLabelById } from "~~/server/services/label";
 
 const schema = z.object({
@@ -6,7 +7,15 @@ const schema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const { id } = await getValidatedRouterParams(event, schema.parse);
+  const { user } = await requireUserSession(event);
+  const { id } = await getValidatedRouterParams(event, schema.parseAsync);
+
+  if (false === (await isUserWorkspaceCollaboratorForLabel(user.id, id))) {
+    throw createError({
+      status: 403,
+      message: "You are not authorized to view this label",
+    });
+  }
 
   const label = await getLabelById(id);
 

@@ -1,7 +1,7 @@
 import { createStatusColumnSchema } from "~/lib/validation";
-import type { StatusColumn } from "~/server/db/schema";
-import { createStatusColumn } from "~/server/services/columns";
-import { getWorkspaceById } from "~/server/services/workspace";
+import type { StatusColumn } from "~~/server/db/schema";
+import { createStatusColumn } from "~~/server/services/columns";
+import { getWorkspaceById } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event);

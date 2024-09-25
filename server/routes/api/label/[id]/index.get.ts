@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getLabelById } from "~/server/services/label";
+import { getLabelById } from "~~/server/services/label";
 
 const schema = z.object({
   id: z.string().uuid(),

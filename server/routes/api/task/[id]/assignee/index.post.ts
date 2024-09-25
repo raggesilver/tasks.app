@@ -1,6 +1,6 @@
 import { addAssigneeSchema } from "~/lib/validation";
-import { DuplicateError, NotFoundError } from "~/server/lib/errors";
-import { addAssigneeToTask } from "~/server/services/task";
+import { DuplicateError, NotFoundError } from "~~/server/lib/errors";
+import { addAssigneeToTask } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

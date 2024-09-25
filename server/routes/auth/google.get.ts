@@ -1,5 +1,5 @@
 import { AUTHORIZED_REDIRECT, UNAUTHORIZED_REDIRECT } from "~/lib/constants";
-import { getOrCreateUser } from "~/server/services/user";
+import { getOrCreateUser } from "~~/server/services/user";
 
 export default oauthGoogleEventHandler({
   config: {

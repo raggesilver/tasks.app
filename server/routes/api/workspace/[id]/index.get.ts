@@ -1,4 +1,4 @@
-import { getWorkspaceById } from "~/server/services/workspace";
+import { getWorkspaceById } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event);

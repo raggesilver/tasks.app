@@ -1,4 +1,4 @@
-import { addCollaboratorById } from "~/server/services/workspace";
+import { addCollaboratorById } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

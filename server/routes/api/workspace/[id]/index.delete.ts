@@ -1,4 +1,4 @@
-import { deleteWorkspaceById } from "~/server/services/workspace";
+import { deleteWorkspaceById } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

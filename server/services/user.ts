@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import assert from "node:assert";
 import { z } from "zod";
 import type { SearchUsersInput } from "~/lib/validation";
-import { oauth, users, type User } from "~/server/db/schema";
+import { oauth, users, type User } from "~~/server/db/schema";
 import { db } from "../db/db";
 
 type Providers = "google" | "github";

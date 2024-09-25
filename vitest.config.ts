@@ -1,10 +1,12 @@
 import { defineVitestConfig } from "@nuxt/test-utils/config";
+import path from "path";
 
 export default defineVitestConfig({
   test: {
     environment: "happy-dom",
     coverage: {
       reportOnFailure: true,
+      reportsDirectory: path.resolve(__dirname, "coverage"),
       exclude: [
         // Default exclusion list
         "coverage/**",

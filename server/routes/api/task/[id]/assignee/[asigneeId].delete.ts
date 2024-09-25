@@ -1,4 +1,4 @@
-import { removeAssigneeFromTask } from "~/server/services/task";
+import { removeAssigneeFromTask } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

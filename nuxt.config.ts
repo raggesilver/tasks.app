@@ -1,6 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  compatibilityDate: "2024-09-24",
   devtools: { enabled: true, componentInspector: false },
+
+  future: {
+    compatibilityVersion: 4,
+  },
 
   devServer: {
     https: true,
@@ -31,20 +36,20 @@ export default defineNuxtConfig({
     },
   },
 
-  // vite: {
-  //   optimizeDeps: {
-  //     include: [
-  //       "class-variance-authority",
-  //       "@radix-icons/vue",
-  //       "clsx",
-  //       "tailwind-merge",
-  //       "@tanstack/vue-query",
-  //       "vaul-vue",
-  //       "@vee-validate/zod",
-  //       "zod",
-  //     ],
-  //   },
-  // },
+  vite: {
+    optimizeDeps: {
+      include: [
+        "class-variance-authority",
+        "@radix-icons/vue",
+        "clsx",
+        "tailwind-merge",
+        "@tanstack/vue-query",
+        "vaul-vue",
+        "@vee-validate/zod",
+        "zod",
+      ],
+    },
+  },
 
   routeRules: {
     "/ingest/static/**": { proxy: "https://us-assets.i.posthog.com/static/**" },
@@ -67,6 +72,19 @@ export default defineNuxtConfig({
     "@nuxt/test-utils/module",
   ],
 
+  content: {
+    sources: {
+      content: {
+        driver: "fs",
+        base: "./app/content",
+      },
+    },
+  },
+
+  shadcn: {
+    componentDir: "./app/components/ui",
+  },
+
   vueQuery: {
     vueQueryPluginOptions: {
       enableDevtoolsV6Plugin: true,
@@ -79,5 +97,4 @@ export default defineNuxtConfig({
       },
     },
   },
-  compatibilityDate: "2024-07-09",
 });

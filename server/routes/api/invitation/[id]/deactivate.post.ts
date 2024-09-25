@@ -1,6 +1,6 @@
 import { deactivateInvitationSchema } from "~/lib/validation";
-import { deactivateInvitationById } from "~/server/services/invitation";
-import { getWorkspaceById } from "~/server/services/workspace";
+import { deactivateInvitationById } from "~~/server/services/invitation";
+import { getWorkspaceById } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);

@@ -1,5 +1,5 @@
 import { validateId } from "~/lib/validation";
-import { deleteLabel } from "~/server/services/label";
+import { deleteLabel } from "~~/server/services/label";
 
 export default defineEventHandler(async (event) => {
   await requireUserSession(event);

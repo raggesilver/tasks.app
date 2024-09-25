@@ -3,16 +3,11 @@ import { createWorkspaceSchema } from "~/lib/validation";
 import { createWorkspace } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event);
-
-  if (!session.user) {
-    throw createError({ status: 401, message: "Unauthorized" });
-  }
-
+  const { user } = await requireUserSession(event);
   const { name } = await readValidatedBody(event, createWorkspaceSchema.parse);
-  const slug = createSlug(name);
 
-  const workspace = await createWorkspace(session.user.id, { name, slug });
+  const slug = createSlug(name);
+  const workspace = await createWorkspace(user.id, { name, slug });
 
   return workspace;
 });

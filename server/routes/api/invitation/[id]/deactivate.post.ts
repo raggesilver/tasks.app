@@ -1,6 +1,6 @@
 import { deactivateInvitationSchema } from "~/lib/validation";
+import { isUserAllowedToCreateOrModifyWorkspaceInvitation } from "~~/server/services/authorization";
 import { deactivateInvitationById } from "~~/server/services/invitation";
-import { getWorkspaceById } from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
@@ -10,17 +10,16 @@ export default defineEventHandler(async (event) => {
     deactivateInvitationSchema.parseAsync,
   );
 
-  const workspace = await getWorkspaceById(user.id, data.workspaceId);
-
-  if (!workspace) {
-    throw createError({ status: 404, message: "Workspace not found" });
-  }
-
-  if (workspace.ownerId !== user.id) {
+  if (
+    false ===
+    (await isUserAllowedToCreateOrModifyWorkspaceInvitation(
+      user.id,
+      data.workspaceId,
+    ))
+  ) {
     throw createError({
       status: 403,
-      message:
-        "You are not authorized to deactivate invitation links for this workspace",
+      message: "You are not authorized to deactivate this invitation",
     });
   }
 

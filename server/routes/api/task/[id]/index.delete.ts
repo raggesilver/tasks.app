@@ -1,9 +1,20 @@
+import { validateId } from "~/lib/validation";
+import { isUserWorkspaceCollaboratorForTask } from "~~/server/services/authorization";
 import { deleteTask } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
-  await requireUserSession(event);
+  const { user } = await requireUserSession(event);
+  const { id: taskId } = await getValidatedRouterParams(
+    event,
+    validateId("id").parseAsync,
+  );
 
-  const taskId = getRouterParam(event, "id")!;
+  if (false === (await isUserWorkspaceCollaboratorForTask(user.id, taskId))) {
+    throw createError({
+      status: 403,
+      message: "You are not authorized to delete this task",
+    });
+  }
 
   const result = await deleteTask(taskId);
 

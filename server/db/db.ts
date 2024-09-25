@@ -6,3 +6,5 @@ export const db = drizzle(postgres(process.env.DATABASE_URL!), {
   schema,
   logger: import.meta.dev && false,
 });
+
+export type DBTX = Parameters<Parameters<typeof db.transaction>[0]>[0];

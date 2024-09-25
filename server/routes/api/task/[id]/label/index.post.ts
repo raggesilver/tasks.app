@@ -1,16 +1,29 @@
 import { z } from "zod";
 import { addTaskLabelSchema } from "~/lib/validation";
 import { isPostgresError, PgErrorCode } from "~~/server/lib/errors";
+import { isUserWorkspaceCollaboratorForTask } from "~~/server/services/authorization";
 import { addLabelToTask } from "~~/server/services/task";
 
 const paramSchema = z.object({ id: z.string().uuid() });
 
 export default defineEventHandler(async (event) => {
-  const { id } = await getValidatedRouterParams(event, paramSchema.parse);
-  const data = await readValidatedBody(event, addTaskLabelSchema.parse);
+  const { user } = await requireUserSession(event);
+  const { id: taskId } = await getValidatedRouterParams(
+    event,
+    paramSchema.parseAsync,
+  );
+
+  if (false === (await isUserWorkspaceCollaboratorForTask(user.id, taskId))) {
+    throw createError({
+      status: 403,
+      message: "You are not authorized to modify this task",
+    });
+  }
+
+  const data = await readValidatedBody(event, addTaskLabelSchema.parseAsync);
 
   try {
-    await addLabelToTask(id, data.labelId);
+    await addLabelToTask(taskId, data.labelId);
     return sendNoContent(event, 204);
   } catch (e) {
     if (isPostgresError(e)) {

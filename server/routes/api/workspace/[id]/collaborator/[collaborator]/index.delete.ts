@@ -1,10 +1,32 @@
-import { removeCollaboratorById } from "~~/server/services/workspace";
+import { z } from "zod";
+import { isUserAllowedToEditWorkspace } from "~~/server/services/authorization";
+import {
+  _getWorkspaceById,
+  removeCollaboratorById,
+} from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
-  await requireUserSession(event);
+  const { user } = await requireUserSession(event);
+  const { id, collaborator: collaboratorId } = await getValidatedRouterParams(
+    event,
+    z.object({
+      id: z.string().uuid(),
+      collaborator: z.string().uuid(),
+    }).parse,
+  );
 
-  const id = getRouterParam(event, "id")!;
-  const collaboratorId = getRouterParam(event, "collaborator")!;
+  const workspace = await _getWorkspaceById(id);
+
+  if (!workspace) {
+    throw createError({ status: 404, message: "Workspace not found" });
+  }
+
+  if (false === (await isUserAllowedToEditWorkspace(user, workspace))) {
+    throw createError({
+      status: 403,
+      message: "You are not allowed to edit this workspace",
+    });
+  }
 
   const result = await removeCollaboratorById(id, collaboratorId);
 

@@ -1,14 +1,31 @@
-import { publicUserSchema } from "~/lib/validation";
-import { getWorkspaceCollaborators } from "~~/server/services/workspace";
+import { publicUserSchema, validateId } from "~/lib/validation";
+import { isUserWorkspaceCollaborator } from "~~/server/services/authorization";
+import {
+  _getWorkspaceById,
+  getWorkspaceCollaborators,
+} from "~~/server/services/workspace";
 
 export default defineEventHandler(async (event) => {
-  await requireUserSession(event);
+  const { user } = await requireUserSession(event);
+  const { id: workspaceId } = await getValidatedRouterParams(
+    event,
+    validateId("id").parse,
+  );
 
-  const workspaceId = getRouterParam(event, "id")!;
+  const workspace = await _getWorkspaceById(workspaceId);
 
-  // TODO: verify that the user is a collaborator of the workspace
+  if (!workspace) {
+    throw createError({ status: 404, message: "Workspace not found" });
+  }
 
-  return getWorkspaceCollaborators(workspaceId).then((users) =>
-    publicUserSchema.array().parseAsync(users),
+  if (false === (await isUserWorkspaceCollaborator(user.id, workspace.id))) {
+    throw createError({
+      status: 403,
+      message: "You are not allowed to view this workspace",
+    });
+  }
+
+  return getWorkspaceCollaborators(workspaceId).then(
+    publicUserSchema.array().parseAsync,
   );
 });

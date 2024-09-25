@@ -27,6 +27,21 @@ export async function createWorkspace(
   return workspace;
 }
 
+export async function _getWorkspaceById(id: string): Promise<Workspace | null> {
+  const workspace = await db.query.workspaces
+    .findFirst({
+      where: (table, { eq }) => eq(table.id, id),
+    })
+    .execute();
+
+  return workspace ?? null;
+}
+
+// FIXME: this function is mixing authorization and data fetching. We should
+// check if the user has access to the workspace in a separate function.
+/**
+ * @deprecated migrate to {@link _getWorkspaceById}
+ */
 export async function getWorkspaceById(
   userId: string,
   id: string,

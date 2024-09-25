@@ -1,13 +1,23 @@
+import { validateId } from "~/lib/validation";
+import { isUserAllowedToViewWorkspace } from "~~/server/services/authorization";
 import { getActiveInvitationForWorkspace } from "~~/server/services/invitation";
 
 export default defineEventHandler(async (event) => {
-  await requireUserSession(event);
-
-  const workspaceId = getRouterParam(event, "id")!;
+  const { user } = await requireUserSession(event);
+  const { id } = await getValidatedRouterParams(event, validateId("id").parse);
 
   // TODO: we may want to throw a 404 if the workspace does not exist
 
-  // FIXME: verify that the user is a member of this workspace
+  // TODO: we still need to better define the permissions for this endpoint. We
+  // haven't yet decided if we want to allow collaborators to view the active
+  // invitation link.
 
-  return getActiveInvitationForWorkspace(workspaceId);
+  if (false === (await isUserAllowedToViewWorkspace(user, id))) {
+    throw createError({
+      status: 403,
+      message: "You are not allowed to view this workspace",
+    });
+  }
+
+  return getActiveInvitationForWorkspace(id);
 });

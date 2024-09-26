@@ -36,11 +36,11 @@ export const isUserWorkspaceCollaborator = (
 ) =>
   db
     .select({ res: sql`1` })
-    .from(collaborators)
-    .leftJoin(workspaces, eq(workspaces.ownerId, userId))
+    .from(workspaces)
+    .leftJoin(collaborators, eq(collaborators.workspaceId, workspaceId))
     .where(
       and(
-        eq(collaborators.workspaceId, workspaceId),
+        eq(workspaces.id, workspaceId),
         or(eq(collaborators.userId, userId), eq(workspaces.ownerId, userId)),
       ),
     )
@@ -61,9 +61,9 @@ export const isUserWorkspaceCollaboratorForTask = (
 ) =>
   db
     .select({ res: sql`1` })
-    .from(collaborators)
-    .leftJoin(workspaces, eq(workspaces.ownerId, userId))
-    .leftJoin(tasks, eq(tasks.workspaceId, workspaces.id))
+    .from(tasks)
+    .leftJoin(workspaces, eq(workspaces.id, tasks.workspaceId))
+    .leftJoin(collaborators, eq(collaborators.workspaceId, tasks.workspaceId))
     .where(
       and(
         eq(tasks.id, taskId),
@@ -80,9 +80,9 @@ export const isUserWorkspaceCollaboratorForLabel = (
 ) =>
   db
     .select({ res: sql`1` })
-    .from(collaborators)
-    .leftJoin(workspaces, eq(workspaces.ownerId, userId))
-    .leftJoin(labels, eq(labels.workspaceId, workspaces.id))
+    .from(labels)
+    .leftJoin(workspaces, eq(workspaces.id, labels.workspaceId))
+    .leftJoin(collaborators, eq(collaborators.workspaceId, labels.workspaceId))
     .where(
       and(
         eq(labels.id, labelId),

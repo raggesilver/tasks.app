@@ -4,6 +4,7 @@ import { useMagicKeys, whenever } from "@vueuse/core";
 import { FetchError } from "ofetch";
 import { useForm } from "vee-validate";
 import { toast } from "vue-sonner";
+import { MAX_FILE_SIZE } from "~/lib/constants";
 import { updateTaskSchema } from "~/lib/validation";
 
 const props = defineProps<{
@@ -40,6 +41,7 @@ const workspaceId = computed(() => route.params.id.toString());
 const showSubmitShortcut = ref(false);
 
 const { data: workspace } = useWorkspace(workspaceId);
+const { mutateAsync: addAttachment } = useAddTaskAttachmentMutation();
 
 // This component is not mounted on the server. Once we make this dialog
 // server-rendered, we can uncomment the code bellow.
@@ -151,186 +153,235 @@ useMagicKeys({
     }
   },
 });
+
+const onFileDropped = async (files: File[]) => {
+  if (!task.value) {
+    return;
+  }
+
+  for (const file of files) {
+    await addAttachment({
+      taskId: task.value.id,
+      workspaceId: task.value.workspaceId,
+      columnId: task.value.statusColumnId,
+      file,
+    })
+      .then(() => {
+        toast.success(`File ${file.name} uploaded successfully`);
+      })
+      .catch((error: FetchError) => {
+        toast.error(error.message);
+      });
+  }
+};
 </script>
 
 <template>
   <Dialog v-if="enabled" v-model:open="isOpen">
     <DialogScrollContent no-close-button>
-      <template v-if="isTaskPending">
-        <DialogHeader class="flex flex-row gap-2 items-baseline">
-          <DialogTitle>
-            <Skeleton class="w-sm max-w-full h-[1em] block" />
-          </DialogTitle>
-          <DialogClose as-child>
-            <Button variant="outline" class="w-6 h-6 p-0 flex-shrink-0 ml-auto">
-              <Icon name="lucide:x" />
-            </Button>
-          </DialogClose>
-        </DialogHeader>
-        <DialogDescription class="space-y-2 mt-2">
-          <Skeleton class="w-full h-[1em]" />
-          <Skeleton class="w-3/4 h-[1em]" />
-        </DialogDescription>
-      </template>
-      <!-- Extract this form into its own component -->
-      <form
-        v-else-if="isEditing"
-        class="flex flex-col gap-4"
-        @submit="editTask"
+      <FileDropzone
+        :max-file-size="MAX_FILE_SIZE"
+        :enabled="enabled && !isTaskPending && !!task"
+        @file-dropped="onFileDropped"
       >
-        <DialogTitle class="text-xl font-bold">Edit Task</DialogTitle>
-        <DialogDescription class="sr-only">
-          Use this form to edit the task.
-        </DialogDescription>
-        <FormField v-slot="{ componentField }" name="title">
-          <FormItem>
-            <FormLabel>Title</FormLabel>
-            <FormControl>
-              <Input
-                type="text"
-                placeholder="JavaScript 101"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
         <div class="flex flex-col gap-2">
-          <FormField v-slot="{ componentField }" name="description">
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  v-bind="componentField"
-                  @keypress.enter="onTextareaEnter"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-
-          <span
-            v-if="showSubmitShortcut"
-            class="text-muted-foreground text-xs ml-auto"
+          <template v-if="isTaskPending">
+            <DialogHeader class="flex flex-row gap-2 items-baseline">
+              <DialogTitle>
+                <Skeleton class="w-sm max-w-full h-[1em] block" />
+              </DialogTitle>
+              <DialogClose as-child>
+                <Button
+                  variant="outline"
+                  class="w-6 h-6 p-0 flex-shrink-0 ml-auto"
+                >
+                  <Icon name="lucide:x" />
+                </Button>
+              </DialogClose>
+            </DialogHeader>
+            <DialogDescription class="space-y-2 mt-2">
+              <Skeleton class="w-full h-[1em]" />
+              <Skeleton class="w-3/4 h-[1em]" />
+            </DialogDescription>
+          </template>
+          <!-- Extract this form into its own component -->
+          <form
+            v-else-if="isEditing"
+            class="flex flex-col gap-4"
+            @submit="editTask"
           >
-            <kbd class="styled font-sans">Esc</kbd> to cancel,
-            <kbd class="styled font-sans">⌘ Enter</kbd> to save.
-          </span>
-        </div>
+            <DialogTitle class="text-xl font-bold">Edit Task</DialogTitle>
+            <DialogDescription class="sr-only">
+              Use this form to edit the task.
+            </DialogDescription>
+            <FormField v-slot="{ componentField }" name="title">
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="JavaScript 101"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <p
-          v-if="formError"
-          class="mt-4 text-[0.8rem] font-medium text-destructive"
-        >
-          {{ formError }}
-        </p>
-        <div class="grid grid-cols-2 gap-2 ml-auto">
-          <Button
-            type="button"
-            class="w-full sm:w-auto mt-6"
-            variant="outline"
-            @click="isEditing = false"
-          >
-            Discard Changes
-          </Button>
-          <Button type="submit" class="w-full sm:w-auto mt-6">
-            Save Changes
-          </Button>
-        </div>
-      </form>
-      <template v-else-if="task">
-        <DialogHeader class="flex flex-row gap-2 items-baseline">
-          <DialogTitle class="text-xl font-bold flex">
-            <span>{{ task.title }}</span>
-          </DialogTitle>
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button
-                variant="outline"
-                class="w-6 h-6 p-0 ml-auto flex-shrink-0"
+            <div class="flex flex-col gap-2">
+              <FormField v-slot="{ componentField }" name="description">
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      v-bind="componentField"
+                      @keypress.enter="onTextareaEnter"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+
+              <span
+                v-if="showSubmitShortcut"
+                class="text-muted-foreground text-xs ml-auto"
               >
-                <Icon name="lucide:ellipsis" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              class="grid grid-cols-[min-content_auto_min-content] gap-x-2"
+                <kbd class="styled font-sans">Esc</kbd> to cancel,
+                <kbd class="styled font-sans">⌘ Enter</kbd> to save.
+              </span>
+            </div>
+
+            <p
+              v-if="formError"
+              class="mt-4 text-[0.8rem] font-medium text-destructive"
             >
-              <DropdownMenuItem
-                class="grid grid-cols-subgrid col-span-full"
-                @click="isEditing = true"
+              {{ formError }}
+            </p>
+            <div class="grid grid-cols-2 gap-2 ml-auto">
+              <Button
+                type="button"
+                class="w-full sm:w-auto mt-6"
+                variant="outline"
+                @click="isEditing = false"
               >
-                <Icon name="lucide:pencil" /> Edit Task
-                <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                class="text-red-500 grid grid-cols-subgrid col-span-full"
-                :disabled="isDeleting"
-                @click="doDeleteTask"
-              >
-                <Icon name="lucide:trash" /> Delete Task
-                <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DialogClose as-child>
-            <Button variant="outline" class="w-6 h-6 p-0 flex-shrink-0">
-              <Icon name="lucide:x" />
-            </Button>
-          </DialogClose>
-        </DialogHeader>
+                Discard Changes
+              </Button>
+              <Button type="submit" class="w-full sm:w-auto mt-6">
+                Save Changes
+              </Button>
+            </div>
+          </form>
+          <template v-else-if="task">
+            <DialogHeader class="flex flex-row gap-2 items-baseline">
+              <DialogTitle class="text-xl font-bold flex">
+                <span>{{ task.title }}</span>
+              </DialogTitle>
+              <DropdownMenu>
+                <DropdownMenuTrigger as-child>
+                  <Button
+                    variant="outline"
+                    class="w-6 h-6 p-0 ml-auto flex-shrink-0"
+                  >
+                    <Icon name="lucide:ellipsis" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  class="grid grid-cols-[min-content_auto_min-content] gap-x-2"
+                >
+                  <DropdownMenuItem
+                    class="grid grid-cols-subgrid col-span-full"
+                    @click="isEditing = true"
+                  >
+                    <Icon name="lucide:pencil" /> Edit Task
+                    <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    class="text-red-500 grid grid-cols-subgrid col-span-full"
+                    :disabled="isDeleting"
+                    @click="doDeleteTask"
+                  >
+                    <Icon name="lucide:trash" /> Delete Task
+                    <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DialogClose as-child>
+                <Button variant="outline" class="w-6 h-6 p-0 flex-shrink-0">
+                  <Icon name="lucide:x" />
+                </Button>
+              </DialogClose>
+            </DialogHeader>
 
-        <ManageTaskLabels :task="task" />
-        <div class="flex flex-row-reversep-1 mr-auto gap-1">
-          <UniversalUserAvatar
-            v-for="assignee of task.assignees"
-            :key="assignee.userId"
-            :user-id="assignee.userId"
-            class="w-8 h-8 [&:not(:first-child)]:-ml-4 border border-border transition-all"
-          />
-          <ManageTaskAssignees :task-id="task.id" :workspace-id="workspaceId">
-            <Button variant="outline" class="w-8 h-8 p-0 rounded-full shrink-0">
-              <Icon
-                :name="
-                  task?.assignees.length === 0
-                    ? 'lucide:user-plus'
-                    : 'lucide:ellipsis'
-                "
+            <ManageTaskLabels :task="task" />
+            <div class="flex flex-row-reversep-1 mr-auto gap-1">
+              <UniversalUserAvatar
+                v-for="assignee of task.assignees"
+                :key="assignee.userId"
+                :user-id="assignee.userId"
+                class="w-8 h-8 [&:not(:first-child)]:-ml-4 border border-border transition-all"
               />
-            </Button>
-          </ManageTaskAssignees>
+              <ManageTaskAssignees
+                :task-id="task.id"
+                :workspace-id="workspaceId"
+              >
+                <Button
+                  variant="outline"
+                  class="w-8 h-8 p-0 rounded-full shrink-0"
+                >
+                  <Icon
+                    :name="
+                      task?.assignees.length === 0
+                        ? 'lucide:user-plus'
+                        : 'lucide:ellipsis'
+                    "
+                  />
+                </Button>
+              </ManageTaskAssignees>
+            </div>
+
+            <!-- Temporary -->
+            <ul class="list-disc list-inside">
+              <li v-for="attachment of task.attachments" :key="attachment.id">
+                {{ attachment.originalName }}
+              </li>
+            </ul>
+
+            <div class="flex gap-4 py-4">
+              <div class="flex flex-col gap-8 flex-grow-1">
+                <section>
+                  <p class="text-sm text-muted-foreground">Description</p>
+                  <DialogDescription class="text-base text-foreground">
+                    {{ task.description }}
+                  </DialogDescription>
+                </section>
+
+                <section>
+                  <h2 class="font-bold mb-2">Activity</h2>
+
+                  <ol class="text-xs flex flex-col gap-2 text-muted-foreground">
+                    <li v-if="task.lastUpdatedById">
+                      Last updated at
+                      {{ new Date(task.updatedAt).toLocaleString() }} by
+                      <UserNameLabel :user-id="task?.lastUpdatedById" />
+                    </li>
+                    <li>
+                      Created at {{ new Date(task.createdAt).toLocaleString() }}
+                      <template v-if="task.createdById">
+                        by
+                        <UserNameLabel
+                          v-if="task"
+                          :user-id="task.createdById"
+                        />
+                      </template>
+                    </li>
+                  </ol>
+                </section>
+              </div>
+            </div>
+          </template>
         </div>
-
-        <div class="flex gap-4 py-4">
-          <div class="flex flex-col gap-8 flex-grow-1">
-            <section>
-              <p class="text-sm text-muted-foreground">Description</p>
-              <DialogDescription class="text-base text-foreground">
-                {{ task.description }}
-              </DialogDescription>
-            </section>
-
-            <section>
-              <h2 class="font-bold mb-2">Activity</h2>
-
-              <ol class="text-xs flex flex-col gap-2 text-muted-foreground">
-                <li v-if="task.lastUpdatedById">
-                  Last updated at
-                  {{ new Date(task.updatedAt).toLocaleString() }} by
-                  <UserNameLabel :user-id="task?.lastUpdatedById" />
-                </li>
-                <li>
-                  Created at {{ new Date(task.createdAt).toLocaleString() }}
-                  <template v-if="task.createdById">
-                    by <UserNameLabel v-if="task" :user-id="task.createdById" />
-                  </template>
-                </li>
-              </ol>
-            </section>
-          </div>
-        </div>
-      </template>
+      </FileDropzone>
     </DialogScrollContent>
   </Dialog>
 </template>

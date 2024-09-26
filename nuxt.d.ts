@@ -1,5 +1,5 @@
 import type { S3Client } from "@aws-sdk/client-s3";
-import type { Sentry } from "@sentry/node";
+import type Sentry from "@sentry/node";
 
 declare module "#app" {
   interface PageMeta {

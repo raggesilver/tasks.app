@@ -82,15 +82,15 @@ export default defineEventHandler(async (event) => {
       .execute();
 
     const { url } = await storage.getPresignedUploadUrl({
-      fileId: attachment.id,
-      contentLength: parseInt(getHeader(event, "content-length")!),
+      attachment,
     });
 
     const response = await fetch(url, {
       method: "PUT",
       headers: {
-        "Content-Type": "application/octet-stream",
+        "Content-Type": mimeType,
         "Content-Length": contentLength.toString(),
+        "Content-Disposition": `inline; filename="${name}"`,
       },
       body: getRequestWebStream(event),
       // @ts-expect-error For some reason, duplex is not in RequestInit type

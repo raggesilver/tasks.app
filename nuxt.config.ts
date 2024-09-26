@@ -54,6 +54,7 @@ export default defineNuxtConfig({
         "vaul-vue",
         "@vee-validate/zod",
         "zod",
+        "radix-vue",
       ],
     },
   },

@@ -353,16 +353,28 @@ const onFileDropped = async (files: File[]) => {
                 </section>
 
                 <!-- Temporary -->
-                <ul class="list-disc list-inside">
+                <ul class="">
                   <li
                     v-for="attachment of task.attachments"
                     :key="attachment.id"
                   >
-                    {{ attachment.name }}
-                    <span class="text-xs text-muted-foreground"
-                      >{{ attachment.mimeType }},
-                      {{ formatFileSize(attachment.size) }}</span
+                    <a
+                      :href="`/api/attachment/${attachment.id}`"
+                      :download="attachment.name"
                     >
+                      <img
+                        v-if="attachment.mimeType.startsWith('image')"
+                        :src="`/api/attachment/${attachment.id}`"
+                      />
+
+                      <template v-else>
+                        {{ attachment.name }}
+                        <span class="text-xs text-muted-foreground"
+                          >{{ attachment.mimeType }},
+                          {{ formatFileSize(attachment.size) }}</span
+                        >
+                      </template>
+                    </a>
                   </li>
                 </ul>
 

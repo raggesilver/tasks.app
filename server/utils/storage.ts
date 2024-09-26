@@ -1,6 +1,7 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import type { H3Event } from "h3";
+import type { Attachment } from "../db/schema";
 
 export const useStorageS3 = (event: H3Event) => {
   const client = event.context.$s3;
@@ -12,23 +13,28 @@ export const useStorageS3 = (event: H3Event) => {
   const config = useRuntimeConfig();
 
   return {
-    async getPresignedUploadUrl({
-      fileId,
-      contentLength,
-    }: {
-      fileId: string;
-      contentLength: number;
-    }) {
+    async getPresignedUploadUrl({ attachment }: { attachment: Attachment }) {
       return getSignedUrl(
         client,
         new PutObjectCommand({
           Bucket: config.bucketName,
-          Key: fileId,
-          ContentLength: contentLength,
-          ContentType: "application/octet-stream",
+          Key: attachment.id,
+          ContentLength: attachment.size,
+          ContentType: attachment.mimeType,
+          ContentDisposition: `inline; filename="${attachment.name}"`,
         }),
         { expiresIn: 3600 },
-      ).then((url) => ({ url, fileId }));
+      ).then((url) => ({ url }));
+    },
+    async getPresignedDownloadUrl(attachment: Attachment) {
+      return getSignedUrl(
+        client,
+        new GetObjectCommand({
+          Bucket: config.bucketName,
+          Key: attachment.id,
+        }),
+        { expiresIn: 3600 },
+      );
     },
   };
 };

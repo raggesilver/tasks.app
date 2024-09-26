@@ -26,6 +26,13 @@ export default defineNuxtConfig({
       // proxy the requests to PostHog
       posthogHost: "https://us.i.posthog.com",
     },
+    aws: {
+      accessKeyId: "",
+      endpointUrlS3: "",
+      region: "auto",
+      secretAccessKey: "",
+    },
+    bucketName: "",
   },
 
   nitro: {

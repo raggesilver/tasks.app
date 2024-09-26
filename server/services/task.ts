@@ -19,7 +19,12 @@ export const createTask = async (
     .values(data)
     .returning()
     .execute()
-    .then((task) => ({ ...task[0], assignees: [], labels: [] }));
+    .then((task) => ({
+      ...task[0],
+      assignees: [],
+      labels: [],
+      attachments: [],
+    }));
 };
 
 export const getTaskById = async (
@@ -31,6 +36,7 @@ export const getTaskById = async (
       with: {
         assignees: true,
         labels: true,
+        attachments: true,
       },
     })
     .execute()
@@ -51,6 +57,7 @@ export const getTasksForStatusColumn = async (
       with: {
         assignees: true,
         labels: true,
+        attachments: true,
       },
       // Most recently created tasks first
       orderBy: (table, { desc }) =>

@@ -205,7 +205,10 @@ export const attachments = pgTable("attachments", {
   // commentId: uuid("comment_id").references(() => comments.id, {
   //   onDelete: "cascade",
   // }),
-  originalName: varchar("original_name", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  mimeType: varchar("mime_type", { length: 255 }).notNull(),
+  size: integer("size").notNull(),
+  // Later we may want to store alt text for images, duration for videos, etc.
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

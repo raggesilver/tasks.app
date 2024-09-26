@@ -5,6 +5,7 @@ import { FetchError } from "ofetch";
 import { useForm } from "vee-validate";
 import { toast } from "vue-sonner";
 import { MAX_FILE_SIZE } from "~/lib/constants";
+import { formatFileSize } from "~/lib/utils";
 import { updateTaskSchema } from "~/lib/validation";
 
 const props = defineProps<{
@@ -340,21 +341,30 @@ const onFileDropped = async (files: File[]) => {
               </ManageTaskAssignees>
             </div>
 
-            <!-- Temporary -->
-            <ul class="list-disc list-inside">
-              <li v-for="attachment of task.attachments" :key="attachment.id">
-                {{ attachment.originalName }}
-              </li>
-            </ul>
-
             <div class="flex gap-4 py-4">
               <div class="flex flex-col gap-8 flex-grow-1">
                 <section>
                   <p class="text-sm text-muted-foreground">Description</p>
-                  <DialogDescription class="text-base text-foreground">
+                  <DialogDescription
+                    class="text-base text-foreground whitespace-pre-wrap"
+                  >
                     {{ task.description }}
                   </DialogDescription>
                 </section>
+
+                <!-- Temporary -->
+                <ul class="list-disc list-inside">
+                  <li
+                    v-for="attachment of task.attachments"
+                    :key="attachment.id"
+                  >
+                    {{ attachment.name }}
+                    <span class="text-xs text-muted-foreground"
+                      >{{ attachment.mimeType }},
+                      {{ formatFileSize(attachment.size) }}</span
+                    >
+                  </li>
+                </ul>
 
                 <section>
                   <h2 class="font-bold mb-2">Activity</h2>

@@ -16,7 +16,8 @@ export const useAddTaskAttachmentMutation = () => {
         file: File;
       }) => {
         const query = new URLSearchParams({
-          originalName: file.name,
+          name: file.name,
+          mimeType: file.type,
         });
 
         return useRequestFetch()(`/api/task/${taskId}/attachment?${query}`, {

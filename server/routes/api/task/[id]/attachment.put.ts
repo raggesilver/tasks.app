@@ -58,10 +58,11 @@ export default defineEventHandler(async (event) => {
   //   });
   // }
 
-  const { originalName } = await getValidatedQuery(
+  const { name, mimeType } = await getValidatedQuery(
     event,
     z.object({
-      originalName: z.string(),
+      name: z.string().min(1),
+      mimeType: z.string().min(1),
     }).parseAsync,
   );
 
@@ -73,7 +74,9 @@ export default defineEventHandler(async (event) => {
       .values({
         taskId: task.id,
         workspaceId: task.workspaceId,
-        originalName,
+        name,
+        mimeType,
+        size: contentLength,
       })
       .returning()
       .execute();

@@ -80,7 +80,7 @@ const isActive = computed(() => isDropping.value);
 <template>
   <div
     ref="wrapper"
-    class="relative overflow-hidden"
+    class="relative"
     @dragover.prevent="onDragOver"
     @dragenter="onDragEnter"
     @dragleave="onDragLeave"

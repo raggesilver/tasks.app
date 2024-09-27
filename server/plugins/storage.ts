@@ -11,10 +11,7 @@ export default defineNitroPlugin((nitro) => {
     },
   });
 
-  console.log("S3 client initialized");
-
   nitro.hooks.hook("request", (event) => {
-    console.log("Setting S3 client on event context");
     event.context.$s3 = client;
   });
 });

@@ -179,7 +179,7 @@ const onFileDropped = async (files: File[]) => {
 
 <template>
   <Dialog v-if="enabled" v-model:open="isOpen">
-    <DialogScrollContent no-close-button>
+    <DialogScrollContent no-close-button class="max-w-3xl">
       <FileDropzone
         :max-file-size="MAX_FILE_SIZE"
         :enabled="enabled && !isTaskPending && !!task"

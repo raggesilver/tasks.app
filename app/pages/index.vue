@@ -1,5 +1,9 @@
 <script lang="ts" setup>
-import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
+import { useClamp } from "@vueuse/math";
+import { reactiveTransform } from "@vueuse/motion";
+import { AUTHORIZED_REDIRECT } from "~/lib/constants";
+
+const { loggedIn } = useUserSession();
 
 const links = {
   tos: "Terms of Service",
@@ -85,220 +89,415 @@ const getUserInitials = (name: string) =>
     .map((part) => part[0])
     .join("")
     .slice(0, 2);
+
+const heroElement = templateRef<HTMLImageElement>("hero");
+
+const { state, transform } = reactiveTransform({
+  scale: 0.5,
+});
+
+// const { motionProperties } = useMotionProperties(heroElement, {
+//   scale: 0.5,
+// });
+
+const { height: windowHeight } = useWindowSize();
+const { y: heroY } = useElementBounding(heroElement);
+const progress = ref(0);
+const clamppedProgress = useClamp(progress, 0, 1);
+
+watchEffect(() => {
+  progress.value =
+    (heroY.value - windowHeight.value * 0.3) / windowHeight.value;
+
+  if (state.scale) {
+    if (import.meta.env.SSR) {
+      state.scale = 1 - clamppedProgress.value * 0.5;
+    } else {
+      requestAnimationFrame(() => {
+        state.scale = 1 - clamppedProgress.value * 0.5;
+      });
+    }
+  }
+});
 </script>
 
 <template>
   <div class="flex flex-col min-h-[100vh]">
-    <header
-      class="px-4 lg:px-6 h-14 flex items-center border-b sticky top-0 bg-background/60 backdrop-filter backdrop-blur-lg"
-    >
-      <NuxtLink class="flex items-center justify-center" to="#">
-        <Icon name="lucide:check" class="h-6 w-6" />
-        <span class="ml-2 font-bold text-lg">Tasks.app</span>
-      </NuxtLink>
-      <div class="ml-auto flex items-center">
-        <Sheet>
-          <SheetTrigger as-child>
-            <Button class="sm:hidden" size="icon" variant="outline">
-              <Icon name="lucide:menu" class="h-6 w-6" />
-              <span class="sr-only">Toggle Menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right">
-            <nav class="grid gap-6 py-6 text-lg font-medium">
-              <NuxtLink
-                class="text-sm font-medium hover:underline underline-offset-4"
-                to="#"
-              >
-                {{ links.features }}
-              </NuxtLink>
-              <NuxtLink
-                class="text-sm font-medium hover:underline underline-offset-4"
-                to="#"
-              >
-                {{ links.pricing }}
-              </NuxtLink>
-              <NuxtLink
-                class="text-sm font-medium hover:underline underline-offset-4"
-                to="#"
-              >
-                {{ links.about }}
-              </NuxtLink>
-              <NuxtLink
-                class="text-sm font-medium hover:underline underline-offset-4"
-                to="#"
-              >
-                {{ links.contact }}
-              </NuxtLink>
-            </nav>
-          </SheetContent>
-        </Sheet>
-        <nav class="hidden gap-4 sm:gap-6 sm:flex">
+    <header class="postition sticky top-0 left-0 w-full py-4 px-2 sm:px-4 z-20">
+      <div class="sm:container">
+        <nav
+          class="container bg-primary/90 text-background h-16 rounded-full backdrop-blur-lg flex items-center gap-8"
+        >
+          <NuxtLink to="/" class="font-bold">Tasks.app</NuxtLink>
+          <div class="hidden sm:flex mx-auto items-center gap-4">
+            <NuxtLink to="/features">{{ links.features }}</NuxtLink>
+            <NuxtLink to="/pricing">{{ links.pricing }}</NuxtLink>
+            <NuxtLink to="/about">{{ links.about }}</NuxtLink>
+            <NuxtLink to="/contact">{{ links.contact }}</NuxtLink>
+          </div>
+
           <NuxtLink
-            class="text-sm font-medium hover:underline underline-offset-4"
-            to="#"
+            :to="loggedIn ? AUTHORIZED_REDIRECT : '/sign-in'"
+            class="hidden sm:inline-flex items-center justify-center bg-background text-foreground h-12 px-8 py-2 -mr-6 rounded-full text-sm font-semibold"
           >
-            {{ links.features }}
+            {{ loggedIn ? "Go to App" : "Sign In" }}
           </NuxtLink>
-          <NuxtLink
-            class="text-sm font-medium hover:underline underline-offset-4"
-            to="#"
-          >
-            {{ links.pricing }}
-          </NuxtLink>
-          <NuxtLink
-            class="text-sm font-medium hover:underline underline-offset-4"
-            to="#"
-          >
-            {{ links.about }}
-          </NuxtLink>
-          <NuxtLink
-            class="text-sm font-medium hover:underline underline-offset-4"
-            to="#"
-          >
-            {{ links.contact }}
-          </NuxtLink>
+
+          <Sheet>
+            <SheetTrigger as-child>
+              <button
+                class="ml-auto -mr-2 inline-flex sm:hidden items-center justify-center bg-transparent border-none text-background h-12 aspect-square"
+              >
+                <Icon name="lucide:menu" class="h-6 w-6" />
+                <span class="sr-only">Toggle Menu</span>
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <SheetTitle class="sr-only">Navigation Menu</SheetTitle>
+              <SheetDescription class="sr-only"></SheetDescription>
+              <nav class="grid gap-6 py-6 text-lg font-medium">
+                <NuxtLink
+                  class="text-sm font-medium hover:underline underline-offset-4"
+                  to="#"
+                  >{{ links.features }}</NuxtLink
+                >
+                <NuxtLink
+                  class="text-sm font-medium hover:underline underline-offset-4"
+                  to="#"
+                  >{{ links.pricing }}</NuxtLink
+                >
+                <NuxtLink
+                  class="text-sm font-medium hover:underline underline-offset-4"
+                  to="#"
+                  >{{ links.about }}</NuxtLink
+                >
+                <NuxtLink
+                  class="text-sm font-medium hover:underline underline-offset-4"
+                  to="#"
+                  >{{ links.contact }}</NuxtLink
+                >
+              </nav>
+            </SheetContent>
+          </Sheet>
         </nav>
       </div>
     </header>
-    <main class="flex-1">
-      <section class="w-full py-12 md:py-24 lg:py-32 border-b">
-        <div class="px-4 md:px-6 space-y-10 xl:space-y-16">
-          <div
-            class="grid max-w-[1300px] mx-auto gap-4 px-4 sm:px-6 md:px-10 md:grid-cols-2 md:gap-16"
-          >
-            <div>
-              <h1
-                class="lg:leading-tighter text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem ]"
+    <main>
+      <div class="p-2 sm:p-8">
+        <section
+          class="w-full min-h-[80vh] rounded-3xl flex flex-col items-center overflow-hidden sm:container"
+        >
+          <div class="flex-1 flex flex-col gap-8 items-center justify-center">
+            <h1
+              class="text-5xl font-black tracking-tight w-3/4 max-w-[600px] text-center animate-in slide-in-from-top animate-duration-500"
+            >
+              <span>Stay on top of your tasks with </span>
+              <span
+                class="!bg-clip-text text-transparent !bg-cover !bg-center"
+                style="
+                  background: linear-gradient(
+                    to top left,
+                    #2cd8d5,
+                    #c5c1ff,
+                    #ffbac3
+                  );
+                "
+                >Tasks.app</span
               >
-                {{ index.title }}
-              </h1>
-            </div>
-            <div class="flex flex-col items-start space-y-4">
-              <p class="mx-auto max-w-[700px] md:text-xl text-muted-foreground">
-                {{ index.headline }}
-              </p>
-              <div class="space-x-4">
-                <Button as-child>
-                  <NuxtLink to="/sign-in">{{ index.cta }}</NuxtLink>
-                </Button>
-              </div>
-            </div>
-          </div>
-          <NuxtImg
-            width="1270"
-            src="https://utfs.io/f/824defbc-2546-47fe-abc9-c29873c08771-qb97hq.webp"
-            class="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-cover object-[center_10%]"
-            densities="x1 x2 x3"
-            alt="Screenshot of the app"
-            :placeholder="[240, 160, 90, 5]"
-          />
-        </div>
-      </section>
-      <section class="w-full py-12 md:py-24 lg:py-32">
-        <div class="container space-y-12 px-4 md:px-6">
-          <div
-            class="flex flex-col items-center justify-center space-y-4 text-center"
-          >
-            <div class="space-y-2">
-              <div
-                class="inline-block rounded-lg px-3 py-1 mb-8 text-sm text-background bg-foreground/70"
-              >
-                {{ index.keyFeatures }}
-              </div>
-              <h2 class="text-3xl font-bold tracking-tighter sm:text-5xl">
-                {{ index.keyFeaturesDescription }}
-              </h2>
+            </h1>
+            <div class="flex flex-col items-center justify-center gap-4 w-full">
               <p
-                class="max-w-[900px] mx-auto text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
+                class="text-xl sm:max-w-[800px] text-center animate-forwards animate-in slide-in-from-top animate-duration-1000"
               >
-                {{ index.keyFeaturesHeadline }}
+                Organize your tasks, boost your productivity, and collaborate
+                with our powerful task management solution.
               </p>
+              <Button
+                as-child
+                size="lg"
+                class="opacity-0 animate-in fade-in animate-out fade-out-100 slide-out-from-bottom animate-duration-1000 animate-delay-[1.2s] animate-forwards animate-ease-out"
+              >
+                <NuxtLink to="/sign-in">Start now</NuxtLink>
+              </Button>
             </div>
           </div>
+        </section>
+
+        <section>
+          <NuxtImg
+            ref="hero"
+            src="https://utfs.io/f/jqXQ3kEK1W3LCkpoXjdeonZVqOX7FmrDSjuRPbMIHfvKiLht"
+            alt="Screenshot of the app"
+            format="webp"
+            :style="{ transform }"
+            class="sm:container transition-all duration-200"
+          />
           <div
-            class="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3"
+            class="max-w-3xl mx-auto grid sm:grid-cols-2 gap-8 mt-8 text-justify indent-xl [&>*]:duration-200"
           >
-            <div v-for="i of 6" :key="i" class="grid gap-1">
-              <h3 class="text-lg font-bold">
-                {{ index.features[i - 1].title }}
-              </h3>
-              <p class="text-sm text-muted-foreground">
-                {{ index.features[i - 1].description }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section
-        class="w-full py-12 md:py-24 lg:py-32 bg-purple-200 dark:bg-purple-900"
-      >
-        <div
-          class="container grid items-center justify-center gap-12 px-4 text-center md:px-6"
-        >
-          <div class="space-y-3">
-            <h2 class="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-              {{ index.testimonials.title }}
-            </h2>
-            <p
-              class="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
-            >
-              {{ index.testimonials.caption }}
+            <p v-motion-slide-visible-left>
+              With a focus on simplicity and ease of use, Tasks.app is the
+              perfect solution for managing your tasks and projects.
+            </p>
+            <span aria-hidden="true" class="lt-sm:hidden"></span>
+            <span aria-hidden="true" class="lt-sm:hidden"></span>
+            <p v-motion-slide-visible-right>
+              Whether you're a freelancer, small business owner, or part of a
+              large team, Tasks.app has everything you need.
             </p>
           </div>
-          <div
-            class="mx-auto grid max-w-5xl grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3"
-          >
-            <Card v-for="i of 3" :key="i" class="flex flex-col justify-between">
-              <CardHeader class="flex flex-row items-center space-x-2">
-                <Avatar>
-                  <!-- <AvatarImage src="/avatars/03.png" /> -->
-                  <AvatarFallback>{{
-                    getUserInitials(index.testimonials.testimonials[i - 1].name)
-                  }}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p class="text-left text-sm font-medium leading-none">
-                    {{ index.testimonials.testimonials[i - 1].name }}
+        </section>
+
+        <div
+          class="mt-32 invert-theme bg-background text-foreground -sm:mx-8 px-8 py-32"
+        >
+          <section>
+            <div class="container">
+              <div
+                class="flex flex-col items-center justify-center gap-8 text-center"
+              >
+                <div class="space-y-2">
+                  <div
+                    class="inline-block rounded-lg px-3 py-1 mb-8 text-sm text-background bg-foreground/70"
+                  >
+                    Key Features
+                  </div>
+                  <h2 class="text-3xl font-bold tracking-tighter sm:text-5xl">
+                    Boost your productivity with Tasks.app.
+                  </h2>
+                  <p
+                    class="max-w-[900px] mx-auto text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
+                  >
+                    Manage your tasks, set deadlines, and collaborate with your
+                    team all in one place.
                   </p>
+                </div>
+              </div>
+              <div
+                class="mx-auto mt-16 grid items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:grid-cols-3"
+              >
+                <div v-for="i of 6" :key="i" class="grid gap-1">
+                  <h3 class="text-lg font-bold">
+                    {{ index.features[i - 1].title }}
+                  </h3>
                   <p class="text-sm text-muted-foreground">
-                    {{ index.testimonials.testimonials[i - 1].position }}
+                    {{ index.features[i - 1].description }}
                   </p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div class="space-y-4">
-                  <p class="text-base leading-relaxed">
-                    "{{ index.testimonials.testimonials[i - 1].quote }}"
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </div>
+          </section>
         </div>
-      </section>
-      <section class="w-full py-12 md:py-24 lg:py-32">
-        <div
-          class="container grid items-center gap-6 px-4 md:px-6 lg:grid-cols-2 lg:gap-10"
-        >
-          <div class="space-y-2">
-            <h2 class="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-              {{ index.outro.title }}
-            </h2>
-            <p
-              class="max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
-            >
-              {{ index.outro.caption }}
-            </p>
-          </div>
-          <div class="flex flex-col gap-2 min-[400px]:flex-row">
-            <Button as-child class="mr-auto">
-              <NuxtLink to="/sign-in">{{ index.cta }}</NuxtLink>
-            </Button>
-          </div>
-        </div>
-      </section>
+      </div>
     </main>
-    <app-footer />
+    <!-- <header -->
+    <!--   class="px-4 lg:px-6 h-14 flex items-center border-b sticky top-0 bg-background/60 backdrop-filter backdrop-blur-lg" -->
+    <!-- > -->
+    <!--   <NuxtLink class="flex items-center justify-center" to="#"> -->
+    <!--     <Icon name="lucide:check" class="h-6 w-6" /> -->
+    <!--     <span class="ml-2 font-bold text-lg">Tasks.app</span> -->
+    <!--   </NuxtLink> -->
+    <!--   <div class="ml-auto flex items-center"> -->
+    <!--     <Sheet> -->
+    <!--       <SheetTrigger as-child> -->
+    <!--         <Button class="sm:hidden" size="icon" variant="outline"> -->
+    <!--           <Icon name="lucide:menu" class="h-6 w-6" /> -->
+    <!--           <span class="sr-only">Toggle Menu</span> -->
+    <!--         </Button> -->
+    <!--       </SheetTrigger> -->
+    <!--       <SheetContent side="right"> -->
+    <!--         <nav class="grid gap-6 py-6 text-lg font-medium"> -->
+    <!--           <NuxtLink -->
+    <!--             class="text-sm font-medium hover:underline underline-offset-4" -->
+    <!--             to="#" -->
+    <!--           > -->
+    <!--             {{ links.features }} -->
+    <!--           </NuxtLink> -->
+    <!--           <NuxtLink -->
+    <!--             class="text-sm font-medium hover:underline underline-offset-4" -->
+    <!--             to="#" -->
+    <!--           > -->
+    <!--             {{ links.pricing }} -->
+    <!--           </NuxtLink> -->
+    <!--           <NuxtLink -->
+    <!--             class="text-sm font-medium hover:underline underline-offset-4" -->
+    <!--             to="#" -->
+    <!--           > -->
+    <!--             {{ links.about }} -->
+    <!--           </NuxtLink> -->
+    <!--           <NuxtLink -->
+    <!--             class="text-sm font-medium hover:underline underline-offset-4" -->
+    <!--             to="#" -->
+    <!--           > -->
+    <!--             {{ links.contact }} -->
+    <!--           </NuxtLink> -->
+    <!--         </nav> -->
+    <!--       </SheetContent> -->
+    <!--     </Sheet> -->
+    <!--     <nav class="hidden gap-4 sm:gap-6 sm:flex"> -->
+    <!--       <NuxtLink -->
+    <!--         class="text-sm font-medium hover:underline underline-offset-4" -->
+    <!--         to="#" -->
+    <!--       > -->
+    <!--         {{ links.features }} -->
+    <!--       </NuxtLink> -->
+    <!--       <NuxtLink -->
+    <!--         class="text-sm font-medium hover:underline underline-offset-4" -->
+    <!--         to="#" -->
+    <!--       > -->
+    <!--         {{ links.pricing }} -->
+    <!--       </NuxtLink> -->
+    <!--       <NuxtLink -->
+    <!--         class="text-sm font-medium hover:underline underline-offset-4" -->
+    <!--         to="#" -->
+    <!--       > -->
+    <!--         {{ links.about }} -->
+    <!--       </NuxtLink> -->
+    <!--       <NuxtLink -->
+    <!--         class="text-sm font-medium hover:underline underline-offset-4" -->
+    <!--         to="#" -->
+    <!--       > -->
+    <!--         {{ links.contact }} -->
+    <!--       </NuxtLink> -->
+    <!--     </nav> -->
+    <!--   </div> -->
+    <!-- </header> -->
+    <!-- <main class="flex-1"> -->
+    <!--   <section class="w-full py-12 md:py-24 lg:py-32 border-b"> -->
+    <!--     <div class="px-4 md:px-6 space-y-10 xl:space-y-16"> -->
+    <!--       <div -->
+    <!--         class="grid max-w-[1300px] mx-auto gap-4 px-4 sm:px-6 md:px-10 md:grid-cols-2 md:gap-16" -->
+    <!--       > -->
+    <!--         <div> -->
+    <!--           <h1 -->
+    <!--             class="lg:leading-tighter text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem ]" -->
+    <!--           > -->
+    <!--             {{ index.title }} -->
+    <!--           </h1> -->
+    <!--         </div> -->
+    <!--         <div class="flex flex-col items-start space-y-4"> -->
+    <!--           <p class="mx-auto max-w-[700px] md:text-xl text-muted-foreground"> -->
+    <!--             {{ index.headline }} -->
+    <!--           </p> -->
+    <!--           <div class="space-x-4"> -->
+    <!--             <Button as-child> -->
+    <!--               <NuxtLink to="/sign-in">{{ index.cta }}</NuxtLink> -->
+    <!--             </Button> -->
+    <!--           </div> -->
+    <!--         </div> -->
+    <!--       </div> -->
+    <!--       <NuxtImg -->
+    <!--         width="1270" -->
+    <!--         src="https://utfs.io/f/824defbc-2546-47fe-abc9-c29873c08771-qb97hq.webp" -->
+    <!--         class="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-cover object-[center_10%]" -->
+    <!--         densities="x1 x2 x3" -->
+    <!--         alt="Screenshot of the app" -->
+    <!--         :placeholder="[240, 160, 90, 5]" -->
+    <!--       /> -->
+    <!--     </div> -->
+    <!--   </section> -->
+    <!--   <section class="w-full py-12 md:py-24 lg:py-32"> -->
+    <!--     <div class="container space-y-12 px-4 md:px-6"> -->
+    <!--       <div -->
+    <!--         class="flex flex-col items-center justify-center space-y-4 text-center" -->
+    <!--       > -->
+    <!--         <div class="space-y-2"> -->
+    <!--           <div -->
+    <!--             class="inline-block rounded-lg px-3 py-1 mb-8 text-sm text-background bg-foreground/70" -->
+    <!--           > -->
+    <!--             {{ index.keyFeatures }} -->
+    <!--           </div> -->
+    <!--           <h2 class="text-3xl font-bold tracking-tighter sm:text-5xl"> -->
+    <!--             {{ index.keyFeaturesDescription }} -->
+    <!--           </h2> -->
+    <!--           <p -->
+    <!--             class="max-w-[900px] mx-auto text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed" -->
+    <!--           > -->
+    <!--             {{ index.keyFeaturesHeadline }} -->
+    <!--           </p> -->
+    <!--         </div> -->
+    <!--       </div> -->
+    <!--       <div -->
+    <!--         class="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3" -->
+    <!--       > -->
+    <!--         <div v-for="i of 6" :key="i" class="grid gap-1"> -->
+    <!--           <h3 class="text-lg font-bold"> -->
+    <!--             {{ index.features[i - 1].title }} -->
+    <!--           </h3> -->
+    <!--           <p class="text-sm text-muted-foreground"> -->
+    <!--             {{ index.features[i - 1].description }} -->
+    <!--           </p> -->
+    <!--         </div> -->
+    <!--       </div> -->
+    <!--     </div> -->
+    <!--   </section> -->
+    <!--   <section -->
+    <!--     class="w-full py-12 md:py-24 lg:py-32 bg-purple-200 dark:bg-purple-900" -->
+    <!--   > -->
+    <!--     <div -->
+    <!--       class="container grid items-center justify-center gap-12 px-4 text-center md:px-6" -->
+    <!--     > -->
+    <!--       <div class="space-y-3"> -->
+    <!--         <h2 class="text-3xl font-bold tracking-tighter md:text-4xl/tight"> -->
+    <!--           {{ index.testimonials.title }} -->
+    <!--         </h2> -->
+    <!--         <p -->
+    <!--           class="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed" -->
+    <!--         > -->
+    <!--           {{ index.testimonials.caption }} -->
+    <!--         </p> -->
+    <!--       </div> -->
+    <!--       <div -->
+    <!--         class="mx-auto grid max-w-5xl grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3" -->
+    <!--       > -->
+    <!--         <Card v-for="i of 3" :key="i" class="flex flex-col justify-between"> -->
+    <!--           <CardHeader class="flex flex-row items-center space-x-2"> -->
+    <!--             <Avatar> -->
+    <!--               <AvatarFallback>{{ -->
+    <!--                 getUserInitials(index.testimonials.testimonials[i - 1].name) -->
+    <!--               }}</AvatarFallback> -->
+    <!--             </Avatar> -->
+    <!--             <div> -->
+    <!--               <p class="text-left text-sm font-medium leading-none"> -->
+    <!--                 {{ index.testimonials.testimonials[i - 1].name }} -->
+    <!--               </p> -->
+    <!--               <p class="text-sm text-muted-foreground"> -->
+    <!--                 {{ index.testimonials.testimonials[i - 1].position }} -->
+    <!--               </p> -->
+    <!--             </div> -->
+    <!--           </CardHeader> -->
+    <!--           <CardContent> -->
+    <!--             <div class="space-y-4"> -->
+    <!--               <p class="text-base leading-relaxed"> -->
+    <!--                 "{{ index.testimonials.testimonials[i - 1].quote }}" -->
+    <!--               </p> -->
+    <!--             </div> -->
+    <!--           </CardContent> -->
+    <!--         </Card> -->
+    <!--       </div> -->
+    <!--     </div> -->
+    <!--   </section> -->
+    <!--   <section class="w-full py-12 md:py-24 lg:py-32"> -->
+    <!--     <div -->
+    <!--       class="container grid items-center gap-6 px-4 md:px-6 lg:grid-cols-2 lg:gap-10" -->
+    <!--       <div class="space-y-2"> -->
+    <!--         <h2 class="text-3xl font-bold tracking-tighter md:text-4xl/tight"> -->
+    <!--           {{ index.outro.title }} -->
+    <!--         </h2> -->
+    <!--         <p -->
+    <!--           class="max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed" -->
+    <!--         > -->
+    <!--           {{ index.outro.caption }} -->
+    <!--         </p> -->
+    <!--       </div> -->
+    <!--       <div class="flex flex-col gap-2 min-[400px]:flex-row"> -->
+    <!--         <Button as-child class="mr-auto"> -->
+    <!--           <NuxtLink to="/sign-in">{{ index.cta }}</NuxtLink> -->
+    <!--         </Button> -->
+    <!--       </div> -->
+    <!--     </div> -->
+    <!--   </section> -->
+    <!-- </main> -->
+    <app-footer class="mt-48" />
   </div>
 </template>

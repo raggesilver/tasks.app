@@ -52,28 +52,21 @@ export const oauth = pgTable(
 export type OauthEntity = typeof oauth.$inferSelect;
 export type NewOauthEntity = typeof oauth.$inferInsert;
 
-export const workspaces = pgTable(
-  "workspaces",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    name: varchar("name", { length: 255 }).notNull(),
-    slug: varchar("slug", { length: 255 }).notNull(),
-    ownerId: uuid("owner_id")
-      .notNull()
-      .references(() => users.id, {
-        // TODO: we do need to handle worspaces and account deletion, but
-        // cascading might not be the right call.
-        // onDelete: "cascade",
-      }),
-    // TODO: add status columns and sunset status columns' order field.
-    //statusColumnIds: uuid("status_column_ids").array().notNull().default([]),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  },
-  (table) => ({
-    slugIndex: uniqueIndex().on(table.slug),
-  }),
-);
+export const workspaces = pgTable("workspaces", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  ownerId: uuid("owner_id")
+    .notNull()
+    .references(() => users.id, {
+      // TODO: we do need to handle worspaces and account deletion, but
+      // cascading might not be the right call.
+      // onDelete: "cascade",
+    }),
+  // TODO: add status columns and sunset status columns' order field.
+  //statusColumnIds: uuid("status_column_ids").array().notNull().default([]),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
 
 export type Workspace = typeof workspaces.$inferSelect;
 export type NewWorkspace = typeof workspaces.$inferInsert;

@@ -99,6 +99,13 @@
       "when": 1728124349678,
       "tag": "0013_clumsy_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1728127088722,
+      "tag": "0014_good_gabe_jones",
+      "breakpoints": true
     }
   ]
 }

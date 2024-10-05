@@ -1,7 +1,7 @@
 import { AUTHORIZED_REDIRECT, UNAUTHORIZED_REDIRECT } from "~/lib/constants";
 import { getOrCreateUser } from "~~/server/services/user";
 
-export default oauthGoogleEventHandler({
+export default defineOAuthGoogleEventHandler({
   config: {
     ...(import.meta.dev && {
       redirectURL: "https://localhost:3000/auth/google",

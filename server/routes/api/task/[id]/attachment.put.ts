@@ -73,6 +73,7 @@ export default defineEventHandler(async (event) => {
         name,
         mimeType,
         size: contentLength,
+        uploadedBy: user.id,
       })
       .returning()
       .execute();

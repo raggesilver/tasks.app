@@ -201,6 +201,9 @@ export const attachments = pgTable("attachments", {
   name: varchar("name", { length: 255 }).notNull(),
   mimeType: varchar("mime_type", { length: 255 }).notNull(),
   size: integer("size").notNull(),
+  uploadedBy: uuid("uploaded_by").references(() => users.id, {
+    onDelete: "set null",
+  }),
   // Later we may want to store alt text for images, duration for videos, etc.
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });

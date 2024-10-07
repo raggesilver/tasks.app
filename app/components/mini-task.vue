@@ -21,7 +21,7 @@ const onDragEnd = () => {
 };
 
 const hasFooterContent = computed(() => {
-  return props.task.assignees.length > 0;
+  return props.task.assignees.length > 0 || props.task.attachments.length > 0;
 });
 
 const labelMap = computed(() => {

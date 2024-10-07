@@ -108,8 +108,11 @@ const doDeleteTask = async () => {
       isOpen.value = false;
       toast(`Task "${title}" deleted successfully`);
     })
-    .catch((error) => {
-      toast.error(error.message);
+    .catch((error: FetchError) => {
+      toast.error(
+        error.response?._data?.message ??
+          "An unexpected error occurred while deleting the task.",
+      );
     });
 };
 
@@ -125,7 +128,7 @@ const editTask = form.handleSubmit(async (values) => {
     })
     .catch((error: FetchError) => {
       formError.value =
-        (error.data?.message as string) ?? "Failed to create workspace.";
+        error.response?._data?.message ?? "Failed to create workspace.";
     });
 });
 
@@ -167,7 +170,13 @@ const onFileDropped = async (files: File[]) => {
       file,
     })
       .then(() => toast.success(`File ${file.name} uploaded successfully`))
-      .catch((error: FetchError) => toast.error(error.message)),
+      .catch((error: FetchError) => {
+        toast.error(
+          error.response?._data?.message ??
+            "An unexpected error occurred while uploading your file.",
+          { duration: Infinity },
+        );
+      }),
   );
 
   await Promise.all(uploadPromises);

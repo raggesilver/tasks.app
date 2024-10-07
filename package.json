@@ -14,10 +14,10 @@
     "test:ci": "vitest --run --coverage"
   },
   "dependencies": {
-    "@nuxt/icon": "^1.5.2",
+    "@nuxt/icon": "^1.5.4",
     "@radix-icons/vue": "^1.0.0",
-    "@tanstack/vue-query": "^5.59.0",
-    "@tanstack/vue-query-devtools": "^5.59.0",
+    "@tanstack/vue-query": "^5.59.1",
+    "@tanstack/vue-query-devtools": "^5.59.1",
     "@vee-validate/zod": "^4.13.2",
     "@vueuse/core": "^11.1.0",
     "@vueuse/router": "^11.1.0",
@@ -40,7 +40,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@dotenvx/dotenvx": "^1.14.2",
+    "@dotenvx/dotenvx": "^1.15.0",
     "@hebilicious/vue-query-nuxt": "^0.3.0",
     "@iconify-json/fa6-brands": "^1.2.0",
     "@iconify-json/lucide": "^1.2.7",
@@ -52,7 +52,7 @@
     "@sentry/node": "^8.33.1",
     "@sentry/vue": "^8.33.1",
     "@types/slug": "^5.0.9",
-    "@unocss/nuxt": "^0.63.2",
+    "@unocss/nuxt": "^0.63.3",
     "@vitest/coverage-v8": "^2.1.2",
     "@vue/test-utils": "^2.4.6",
     "@vueuse/nuxt": "^11.1.0",

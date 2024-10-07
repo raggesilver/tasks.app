@@ -1,4 +1,6 @@
-import type { Sentry } from "@sentry/node";
+import type { CloudFrontClient } from "@aws-sdk/client-cloudfront";
+import type { S3Client } from "@aws-sdk/client-s3";
+import type Sentry from "@sentry/node";
 
 declare module "#app" {
   interface PageMeta {
@@ -12,6 +14,8 @@ declare module "#app" {
 declare module "h3" {
   interface H3EventContext {
     $sentry?: Sentry;
+    $s3?: S3Client;
+    $cloudfront?: CloudFrontClient;
   }
 }
 

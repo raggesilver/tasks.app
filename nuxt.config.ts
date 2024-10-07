@@ -26,6 +26,22 @@ export default defineNuxtConfig({
       // proxy the requests to PostHog
       posthogHost: "https://us.i.posthog.com",
     },
+    aws: {
+      accessKeyId: "",
+      endpointUrlS3: "",
+      region: "auto",
+      secretAccessKey: "",
+      signing: {
+        privateKey: "",
+        publicKey: "",
+        /**
+         * This needs to be generated with CreatePublicKeyCommand. The
+         * credentials used to generate this key must have admin privileges.
+         */
+        publicKeyId: "",
+      },
+    },
+    bucketName: "",
   },
 
   nitro: {
@@ -47,6 +63,7 @@ export default defineNuxtConfig({
         "vaul-vue",
         "@vee-validate/zod",
         "zod",
+        "radix-vue",
       ],
     },
   },

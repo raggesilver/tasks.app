@@ -8,7 +8,8 @@ export default withNuxt(
       // root elements in some cases, so it would be nice if we could 
       // conditionally turn this off, rather than having to disable it globally.
       "vue/no-multiple-template-root": "off",
-      // This is annoying and works fine.
+      // Vue transpiles this to valid HTML, so it doesn't matter. Plus, not
+      // closing tags physically hurts me.
       "vue/html-self-closing": "off",
       // We use ts-ignore to stop infinite type recursion in some cases. We 
       // should find a better solution.

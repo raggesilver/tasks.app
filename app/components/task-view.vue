@@ -159,20 +159,18 @@ const onFileDropped = async (files: File[]) => {
     return;
   }
 
-  for (const file of files) {
-    await addAttachment({
+  const uploadPromises = files.map((file) =>
+    addAttachment({
       taskId: task.value.id,
       workspaceId: task.value.workspaceId,
       columnId: task.value.statusColumnId,
       file,
     })
-      .then(() => {
-        toast.success(`File ${file.name} uploaded successfully`);
-      })
-      .catch((error: FetchError) => {
-        toast.error(error.message);
-      });
-  }
+      .then(() => toast.success(`File ${file.name} uploaded successfully`))
+      .catch((error: FetchError) => toast.error(error.message)),
+  );
+
+  await Promise.all(uploadPromises);
 };
 </script>
 

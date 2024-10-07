@@ -1,6 +1,7 @@
 import { and, eq, or, sql } from "drizzle-orm";
 import { db } from "../db/db";
 import {
+  attachments,
   collaborators,
   labels,
   tasks,
@@ -41,6 +42,26 @@ export const isUserWorkspaceCollaborator = (
     .where(
       and(
         eq(workspaces.id, workspaceId),
+        or(eq(collaborators.userId, userId), eq(workspaces.ownerId, userId)),
+      ),
+    )
+    .limit(1)
+    .execute()
+    .then((rows) => rows[0]?.res === 1);
+
+export const isUserWorkspaceCollaboratorForAttachment = (
+  userId: string,
+  attachmentId: string,
+) =>
+  db
+    .select({ res: sql`1` })
+    .from(attachments)
+    .leftJoin(tasks, eq(tasks.id, attachments.taskId))
+    .leftJoin(workspaces, eq(workspaces.id, tasks.workspaceId))
+    .leftJoin(collaborators, eq(collaborators.workspaceId, tasks.workspaceId))
+    .where(
+      and(
+        eq(attachments.id, attachmentId),
         or(eq(collaborators.userId, userId), eq(workspaces.ownerId, userId)),
       ),
     )
@@ -149,4 +170,11 @@ export async function isUserAllowedToCreateOrModifyColumns(
   workspaceId: string,
 ): Promise<boolean> {
   return isUserWorkspaceCollaborator(userId, workspaceId);
+}
+
+export async function isUserAllowedToDeleteAttachment(
+  _userId: string,
+  _attachmentId: string,
+): Promise<boolean> {
+  return true;
 }

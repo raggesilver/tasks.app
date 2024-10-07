@@ -73,6 +73,11 @@ export const addTaskLabelSchema = z.object({
   labelId: z.string().uuid(),
 });
 
+export const uploadAttachmentSchema = z.object({
+  originalName: z.string().min(1).max(255),
+  contentLength: z.number().int().min(1).optional(),
+});
+
 export type CreateWorkspaceInput = z.infer<typeof createWorkspaceSchema>;
 export type UpdateWorkspaceInput = z.infer<typeof updateWorkspaceSchema>;
 

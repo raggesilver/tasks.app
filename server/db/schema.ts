@@ -183,6 +183,34 @@ export const assignees = pgTable(
 export type Assignee = typeof assignees.$inferSelect;
 export type NewAssignee = typeof assignees.$inferInsert;
 
+export const attachments = pgTable("attachments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, {
+      // onDelete: "cascade", // We need to remove the file from S3
+    }),
+  taskId: uuid("task_id")
+    .notNull()
+    .references(() => tasks.id, {
+      // onDelete: "cascade", // We need to remove the file from S3
+    }),
+  // commentId: uuid("comment_id").references(() => comments.id, {
+  //   onDelete: "cascade",
+  // }),
+  name: varchar("name", { length: 255 }).notNull(),
+  mimeType: varchar("mime_type", { length: 255 }).notNull(),
+  size: integer("size").notNull(),
+  uploadedBy: uuid("uploaded_by").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  // Later we may want to store alt text for images, duration for videos, etc.
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export type Attachment = typeof attachments.$inferSelect;
+export type NewAttachment = typeof attachments.$inferInsert;
+
 export const labels = pgTable("labels", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
@@ -319,6 +347,7 @@ export const tasksRelations = relations(tasks, ({ one, many }) => ({
   }),
   assignees: many(assignees),
   labels: many(taskLabels),
+  attachments: many(attachments),
 }));
 
 export const labelsRelations = relations(labels, ({ one, many }) => ({
@@ -351,6 +380,17 @@ export const assigneesRelations = relations(assignees, ({ one }) => ({
   }),
 }));
 
+export const attachmentsRelations = relations(attachments, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [attachments.workspaceId],
+    references: [workspaces.id],
+  }),
+  task: one(tasks, {
+    fields: [attachments.taskId],
+    references: [tasks.id],
+  }),
+}));
+
 export type TaskWithAssignees = Task & { assignees: Assignee[] };
 
 /**
@@ -361,4 +401,5 @@ export type TaskWithAssignees = Task & { assignees: Assignee[] };
 export type TaskWithEverything = Task & {
   labels: TaskLabel[];
   assignees: Assignee[];
+  attachments: Attachment[];
 };

@@ -5,7 +5,6 @@ import { FetchError } from "ofetch";
 import { useForm } from "vee-validate";
 import { toast } from "vue-sonner";
 import { MAX_FILE_SIZE } from "~/lib/constants";
-import { formatFileSize } from "~/lib/utils";
 import { updateTaskSchema } from "~/lib/validation";
 
 const props = defineProps<{
@@ -342,9 +341,9 @@ const onFileDropped = async (files: File[]) => {
             </div>
 
             <div class="flex gap-4 py-4">
-              <div class="flex flex-col gap-8 flex-grow-1">
+              <div class="flex flex-col gap-8 flex-grow-1 max-w-full">
                 <section>
-                  <p class="text-sm text-muted-foreground">Description</p>
+                  <h3 class="font-bold mb-2">Description</h3>
                   <DialogDescription
                     class="text-base text-foreground whitespace-pre-wrap"
                   >
@@ -353,33 +352,25 @@ const onFileDropped = async (files: File[]) => {
                 </section>
 
                 <!-- Temporary -->
-                <ul class="">
-                  <li
-                    v-for="attachment of task.attachments"
-                    :key="attachment.id"
-                  >
-                    <a
-                      :href="`/api/attachment/${attachment.id}`"
-                      :download="attachment.name"
+                <!-- <ScrollArea class="w-full whitespace-nowrap"> -->
+                <div
+                  v-if="task.attachments.length > 0"
+                  class="overflow-x-auto pb-4"
+                >
+                  <ul class="flex flex-row gap-2">
+                    <li
+                      v-for="attachment of task.attachments"
+                      :key="attachment.id"
                     >
-                      <img
-                        v-if="attachment.mimeType.startsWith('image')"
-                        :src="`/api/attachment/${attachment.id}`"
-                      />
-
-                      <template v-else>
-                        {{ attachment.name }}
-                        <span class="text-xs text-muted-foreground"
-                          >{{ attachment.mimeType }},
-                          {{ formatFileSize(attachment.size) }}</span
-                        >
-                      </template>
-                    </a>
-                  </li>
-                </ul>
+                      <AttachmentPreview :attachment />
+                    </li>
+                  </ul>
+                </div>
+                <!--   <ScrollBar orientation="horizontal" /> -->
+                <!-- </ScrollArea> -->
 
                 <section>
-                  <h2 class="font-bold mb-2">Activity</h2>
+                  <h3 class="font-bold mb-2">Activity</h3>
 
                   <ol class="text-xs flex flex-col gap-2 text-muted-foreground">
                     <li v-if="task.lastUpdatedById">

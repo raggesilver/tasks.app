@@ -44,7 +44,9 @@ const toggleLabel = async (labelId: string) => {
 </script>
 
 <template>
-  <div class="flex flex-row gap-1 items-center flex-wrap">
+  <div
+    class="flex flex-row gap-2 items-center flex-wrap select-none cursor-default"
+  >
     <div
       v-for="label of task.labels"
       :key="`${label.labelId}-${label.taskId}`"

@@ -19,5 +19,19 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const storage = useStorageS3(event);
+
+  const cookie = await storage.getWorkspaceAccessCookie(id);
+
+  for (const key in cookie) {
+    setCookie(event, key, cookie[key as keyof typeof cookie] as string);
+  }
+
+  // const cookieString = Object.entries(cookie)
+  //   .map(([key, value]) => `${key}=${value}`)
+  //   .join("; ");
+  //
+  // setResponseHeader(event, "Set-Cookie", cookieString);
+
   return workspace;
 });

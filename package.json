@@ -14,10 +14,10 @@
     "test:ci": "vitest --run --coverage"
   },
   "dependencies": {
-    "@aws-sdk/client-cloudfront": "^3.665.0",
-    "@aws-sdk/client-s3": "^3.665.0",
+    "@aws-sdk/client-cloudfront": "^3.666.0",
+    "@aws-sdk/client-s3": "^3.666.0",
     "@aws-sdk/cloudfront-signer": "^3.662.0",
-    "@aws-sdk/s3-request-presigner": "^3.665.0",
+    "@aws-sdk/s3-request-presigner": "^3.666.0",
     "@nuxt/icon": "^1.5.4",
     "@radix-icons/vue": "^1.0.0",
     "@tanstack/vue-query": "^5.59.1",
@@ -27,7 +27,7 @@
     "@vueuse/router": "^11.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "drizzle-orm": "^0.33.0",
+    "drizzle-orm": "^0.34.1",
     "drizzle-zod": "^0.5.1",
     "nuxt-auth-utils": "^0.4.4",
     "postgres": "^3.4.4",
@@ -44,7 +44,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@dotenvx/dotenvx": "^1.15.0",
+    "@dotenvx/dotenvx": "^1.16.0",
     "@hebilicious/vue-query-nuxt": "^0.3.0",
     "@iconify-json/fa6-brands": "^1.2.0",
     "@iconify-json/lucide": "^1.2.7",
@@ -61,7 +61,7 @@
     "@vitest/coverage-v8": "^2.1.2",
     "@vue/test-utils": "^2.4.6",
     "@vueuse/nuxt": "^11.1.0",
-    "drizzle-kit": "^0.24.2",
+    "drizzle-kit": "^0.25.0",
     "happy-dom": "^15.7.4",
     "nuxt": "^3.13.2",
     "prettier": "^3.3.3",

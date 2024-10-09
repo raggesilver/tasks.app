@@ -42,6 +42,9 @@ export default defineNuxtConfig({
       },
     },
     bucketName: "",
+    session: {
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+    },
   },
 
   nitro: {

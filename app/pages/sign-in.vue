@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 definePageMeta({
   middleware: ["no-auth"],
+  layout: false,
 });
 
 useHead({

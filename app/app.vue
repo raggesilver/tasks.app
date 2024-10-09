@@ -23,6 +23,8 @@ client.setDefaultOptions({
   },
 });
 
+const route = useRoute();
+
 useHead({
   titleTemplate: (title) => (title ? `${title} | Tasks.app` : "Tasks.app"),
 });
@@ -34,7 +36,7 @@ useHead({
       <NuxtPage />
     </NuxtLayout>
 
-    <VueQueryDevtools />
+    <VueQueryDevtools v-if="route.path.startsWith('/app')" />
     <Toaster rich-colors close-button class="z-100" />
   </div>
 </template>

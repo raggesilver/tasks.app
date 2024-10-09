@@ -14,6 +14,9 @@ export default withNuxt(
       // We use ts-ignore to stop infinite type recursion in some cases. We 
       // should find a better solution.
       "@typescript-eslint/ban-ts-comment": "warn",
+      // Vue allows optional (undefined) props. No clue why this complains when
+      // some prop isn't initialized in `withDefaults`.
+      "vue/require-default-prop": "off",
     },
   },
   {

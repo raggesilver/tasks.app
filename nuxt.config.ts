@@ -81,6 +81,7 @@ export default defineNuxtConfig({
     "nuxt-auth-utils",
     "@nuxt/icon",
     "@vueuse/nuxt",
+    "@vueuse/motion/nuxt",
     "@hebilicious/vue-query-nuxt",
     "@nuxt/content",
     "@nuxt/image",

@@ -12,7 +12,7 @@ const {
   data: tasks,
   suspense,
   isPending,
-} = useTasks(props.column.workspaceId, props.column.id);
+} = useTasks(props.column.boardId, props.column.id);
 const { mutateAsync: mutateTask } = useTaskMutation();
 
 if (import.meta.env.SSR) {
@@ -345,7 +345,7 @@ const doDeleteColumn = async () => {
       <!-- List of tasks -->
       <EditColumn v-model:is-open="showEditModal" :column />
       <CreateTask
-        v-bind="{ workspaceId: column.workspaceId, statusColumnId: column.id }"
+        v-bind="{ boardId: column.boardId, statusColumnId: column.id }"
         v-model:is-open="showCreateTaskModal"
       />
     </CardContent>

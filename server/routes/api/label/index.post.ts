@@ -1,20 +1,18 @@
-import { createWorkspaceLabelSchema } from "~/lib/validation";
-import { isUserWorkspaceCollaborator } from "~~/server/services/authorization";
+import { createBoardLabelSchema } from "~/lib/validation";
+import { isUserBoardCollaborator } from "~~/server/services/authorization";
 import { createLabel } from "~~/server/services/label";
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
   const data = await readValidatedBody(
     event,
-    createWorkspaceLabelSchema.parseAsync,
+    createBoardLabelSchema.parseAsync,
   );
 
-  if (
-    false === (await isUserWorkspaceCollaborator(user.id, data.workspaceId))
-  ) {
+  if (false === (await isUserBoardCollaborator(user.id, data.boardId))) {
     throw createError({
       status: 403,
-      message: "You are not authorized to modify this workspace",
+      message: "You are not authorized to modify this board",
     });
   }
 

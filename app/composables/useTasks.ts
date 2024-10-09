@@ -11,7 +11,7 @@ export const getStatusColumnTasksOptions = (
   });
 
 export const useTasks = (
-  workspaceId: MaybeRefOrGetter<string>,
+  boardId: MaybeRefOrGetter<string>,
   statusColumnId: MaybeRefOrGetter<string>,
 ) => {
   const client = useQueryClient();
@@ -21,7 +21,7 @@ export const useTasks = (
       queryKey: getStatusColumnTasksOptions(statusColumnId).queryKey,
       queryFn: () =>
         useRequestFetch()(
-          `/api/column/${workspaceId}/${statusColumnId}/get-tasks`,
+          `/api/column/${boardId}/${statusColumnId}/get-tasks`,
         ).then((res) =>
           res.map((task) => {
             const normalized = normalizeDates(task);

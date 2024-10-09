@@ -13,15 +13,13 @@ import PopoverTrigger from "../ui/popover/PopoverTrigger.vue";
 
 const props = defineProps<{
   taskId: string;
-  workspaceId: string;
+  boardId: string;
 }>();
 
-const { data: collaborators, suspense } = useWorkspaceCollaborators(
-  props.workspaceId,
-);
+const { data: collaborators, suspense } = useBoardCollaborators(props.boardId);
 const { data: task, suspense: taskSuspense } = useTask(props.taskId);
 
-// It is unlikely that we won't have the workspace's collaborators and task data
+// It is unlikely that we won't have the board's collaborators and task data
 // already in cache, so awaiting for suspense here is fine.
 await Promise.all([suspense(), taskSuspense()]);
 

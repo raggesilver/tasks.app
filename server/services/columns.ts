@@ -7,7 +7,7 @@ import { db } from "../db/db";
 import { statusColumns, type StatusColumn } from "../db/schema";
 import { DuplicateError, isPostgresError } from "../lib/errors";
 
-// This service does not perform RBAC checks on users/workspaces before
+// This service does not perform RBAC checks on users/boards before
 // executing queries. We leave this to the resolver layer.
 
 /**
@@ -23,7 +23,7 @@ export const createStatusColumn = async ({
   userId,
   ...data
 }: CreateStatusColumnInput & {
-  workspaceId: string;
+  boardId: string;
   userId: string;
 }): Promise<StatusColumn> => {
   try {
@@ -33,8 +33,8 @@ export const createStatusColumn = async ({
         ...data,
         createdById: userId,
         // Set the order to the maximum order + 1, or 0 if there are no status
-        // columns for this workspace.
-        order: sql`COALESCE((SELECT MAX(${statusColumns.order}) + 1 FROM ${statusColumns} WHERE ${statusColumns.workspaceId} = ${data.workspaceId}), 0)`,
+        // columns for this board.
+        order: sql`COALESCE((SELECT MAX(${statusColumns.order}) + 1 FROM ${statusColumns} WHERE ${statusColumns.boardId} = ${data.boardId}), 0)`,
       })
       .returning()
       .execute()
@@ -50,39 +50,39 @@ export const createStatusColumn = async ({
 // export const updateStatusColumn = async (
 
 export const getStatusColumn = async (
-  workspaceId: string,
+  boardId: string,
   id: string,
 ): Promise<StatusColumn | null> => {
   return db.query.statusColumns
     .findFirst({
       where: (table, { eq, and }) =>
-        and(eq(table.workspaceId, workspaceId), eq(table.id, id)),
+        and(eq(table.boardId, boardId), eq(table.id, id)),
     })
     .execute()
     .then((row) => row ?? null);
 };
 
 /**
- * Get all status columns for a workspace.
+ * Get all status columns for a board.
  *
- * @param workspaceId - The workspace ID.
+ * @param boardId - The board ID.
  * @returns A list of status columns.
  *
- * @throws {NotFoundError} If the workspace does not exist.
+ * @throws {NotFoundError} If the board does not exist.
  */
 export const getStatusColumns = async (
-  workspaceId: string,
+  boardId: string,
 ): Promise<StatusColumn[]> => {
   return db.query.statusColumns
     .findMany({
-      where: (table, { eq }) => eq(table.workspaceId, workspaceId),
+      where: (table, { eq }) => eq(table.boardId, boardId),
       orderBy: (table, { asc }) => asc(table.order),
     })
     .execute();
 };
 
 export const updateStatusColumn = async (
-  workspaceId: string,
+  boardId: string,
   id: string,
   data: UpdateStatusColumnInput,
 ): Promise<StatusColumn | null> => {
@@ -92,7 +92,7 @@ export const updateStatusColumn = async (
     const current = await tx.query.statusColumns
       .findFirst({
         where: (table, { eq, and }) =>
-          and(eq(table.workspaceId, workspaceId), eq(table.id, id)),
+          and(eq(table.boardId, boardId), eq(table.id, id)),
       })
       .execute();
 
@@ -105,7 +105,7 @@ export const updateStatusColumn = async (
           .set({ order: sql`${statusColumns.order} + 1` })
           .where(
             and(
-              eq(statusColumns.workspaceId, workspaceId),
+              eq(statusColumns.boardId, boardId),
               lt(statusColumns.order, current.order),
               gte(statusColumns.order, data.order),
             ),
@@ -117,7 +117,7 @@ export const updateStatusColumn = async (
           .set({ order: sql`${statusColumns.order} - 1` })
           .where(
             and(
-              eq(statusColumns.workspaceId, workspaceId),
+              eq(statusColumns.boardId, boardId),
               gt(statusColumns.order, current.order),
               lte(statusColumns.order, data.order),
             ),
@@ -129,12 +129,7 @@ export const updateStatusColumn = async (
     return tx
       .update(statusColumns)
       .set(data)
-      .where(
-        and(
-          eq(statusColumns.workspaceId, workspaceId),
-          eq(statusColumns.id, id),
-        ),
-      )
+      .where(and(eq(statusColumns.boardId, boardId), eq(statusColumns.id, id)))
       .returning()
       .execute()
       .then((rows) => rows[0]);
@@ -144,14 +139,14 @@ export const updateStatusColumn = async (
 };
 
 export const deleteStatusColumn = async (
-  workspaceId: string,
+  boardId: string,
   id: string,
 ): Promise<boolean> => {
   return await db.transaction(async (tx) => {
     const current = await tx.query.statusColumns
       .findFirst({
         where: (table, { eq, and }) =>
-          and(eq(table.workspaceId, workspaceId), eq(table.id, id)),
+          and(eq(table.boardId, boardId), eq(table.id, id)),
       })
       .execute();
 
@@ -159,12 +154,7 @@ export const deleteStatusColumn = async (
 
     const deleted = await tx
       .delete(statusColumns)
-      .where(
-        and(
-          eq(statusColumns.workspaceId, workspaceId),
-          eq(statusColumns.id, id),
-        ),
-      )
+      .where(and(eq(statusColumns.boardId, boardId), eq(statusColumns.id, id)))
       .returning()
       .execute();
 
@@ -177,7 +167,7 @@ export const deleteStatusColumn = async (
       .set({ order: sql`${statusColumns.order} - 1` })
       .where(
         and(
-          eq(statusColumns.workspaceId, workspaceId),
+          eq(statusColumns.boardId, boardId),
           gt(statusColumns.order, current.order),
         ),
       )

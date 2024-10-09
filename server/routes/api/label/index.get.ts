@@ -1,23 +1,21 @@
 import { z } from "zod";
-import { isUserWorkspaceCollaborator } from "~~/server/services/authorization";
-import { getLabelsForWorkspace } from "~~/server/services/label";
+import { isUserBoardCollaborator } from "~~/server/services/authorization";
+import { getLabelsForBoard } from "~~/server/services/label";
 
 const schema = z.object({
-  workspaceId: z.string().uuid(),
+  boardId: z.string().uuid(),
 });
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
   const query = await getValidatedQuery(event, schema.parseAsync);
 
-  if (
-    false === (await isUserWorkspaceCollaborator(user.id, query.workspaceId))
-  ) {
+  if (false === (await isUserBoardCollaborator(user.id, query.boardId))) {
     throw createError({
       status: 403,
-      message: "You are not authorized to view this workspace",
+      message: "You are not authorized to view this board",
     });
   }
 
-  return getLabelsForWorkspace(query.workspaceId);
+  return getLabelsForBoard(query.boardId);
 });

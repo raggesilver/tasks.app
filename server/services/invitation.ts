@@ -9,7 +9,7 @@ import {
 /**
  * Create a new invitation link.
  *
- * This function will deactivate all other invitation links for the workspace if
+ * This function will deactivate all other invitation links for the board if
  * the new invitation link is active (the default behavior).
  *
  * @param data - The data for the new invitation link.
@@ -20,11 +20,11 @@ export async function createInvitation(
 ): Promise<InvitationLink> {
   return db.transaction(async (tx) => {
     if (data.active !== false) {
-      // Deactivate all other invitation links for the workspace
+      // Deactivate all other invitation links for the board
       await tx
         .update(invitationLinks)
         .set({ active: false })
-        .where(eq(invitationLinks.workspaceId, data.workspaceId))
+        .where(eq(invitationLinks.boardId, data.boardId))
         .execute();
     }
 
@@ -46,13 +46,13 @@ export async function getInvitationById(
     .then((res) => res ?? null);
 }
 
-export async function getActiveInvitationForWorkspace(
-  workspaceId: string,
+export async function getActiveInvitationForBoard(
+  boardId: string,
 ): Promise<InvitationLink | null> {
   return db.query.invitationLinks
     .findFirst({
       where: (table, { and, eq }) =>
-        and(eq(table.workspaceId, workspaceId), eq(table.active, true)),
+        and(eq(table.boardId, boardId), eq(table.active, true)),
     })
     .execute()
     .then((res) => res ?? null);

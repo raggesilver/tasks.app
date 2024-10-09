@@ -37,17 +37,14 @@ const {
 const isOpen = ref(true);
 const isEditing = ref(false);
 const route = useRoute();
-const workspaceId = computed(() => route.params.id.toString());
+const boardId = computed(() => route.params.id.toString());
 const showSubmitShortcut = ref(false);
 
-const { data: workspace } = useWorkspace(workspaceId);
+const { data: board } = useBoard(boardId);
 const { mutateAsync: addAttachment } = useAddTaskAttachmentMutation();
 
-// This component is not mounted on the server. Once we make this dialog
-// server-rendered, we can uncomment the code bellow.
-// if (import.meta.env.SSR) {
-//   await Promise.all([suspense(), workspaceSuspense()]);
-// }
+// This component is not mounted on the server. Once it is we should await
+// for the queries above.
 
 // If we fail to load the task, present an error and close the task view. Vue
 // Query's retry logic will attempt to load the task multiple times before
@@ -81,9 +78,7 @@ const form = useForm({
 const formError = ref<string | null>(null);
 
 const title = computed(() =>
-  isTaskPending.value
-    ? null
-    : `${task.value?.title} on ${workspace.value?.name}`,
+  isTaskPending.value ? null : `${task.value?.title} on ${board.value?.name}`,
 );
 
 useHead({
@@ -128,7 +123,7 @@ const editTask = form.handleSubmit(async (values) => {
     })
     .catch((error: FetchError) => {
       formError.value =
-        error.response?._data?.message ?? "Failed to create workspace.";
+        error.response?._data?.message ?? "Failed to create board.";
     });
 });
 
@@ -165,7 +160,7 @@ const onFileDropped = async (files: File[]) => {
   const uploadPromises = files.map((file) =>
     addAttachment({
       taskId: task.value.id,
-      workspaceId: task.value.workspaceId,
+      boardId: task.value.boardId,
       columnId: task.value.statusColumnId,
       file,
     })
@@ -328,10 +323,7 @@ const onFileDropped = async (files: File[]) => {
                 :user-id="assignee.userId"
                 class="w-8 h-8 [&:not(:first-child)]:-ml-4 border border-border transition-all"
               />
-              <ManageTaskAssignees
-                :task-id="task.id"
-                :workspace-id="workspaceId"
-              >
+              <ManageTaskAssignees :task-id="task.id" :board-id="boardId">
                 <Button
                   variant="outline"
                   class="w-8 h-8 p-0 rounded-full shrink-0"

@@ -1,6 +1,6 @@
 import { validateId } from "~/lib/validation";
 import { db } from "~~/server/db/db";
-import { isUserWorkspaceCollaborator } from "~~/server/services/authorization";
+import { isUserBoardCollaborator } from "~~/server/services/authorization";
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
@@ -22,10 +22,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if (
-    false ===
-    (await isUserWorkspaceCollaborator(user.id, attachment.workspaceId))
-  ) {
+  if (false === (await isUserBoardCollaborator(user.id, attachment.boardId))) {
     throw createError({
       status: 403,
       message: "You are not authorized to view this attachment",

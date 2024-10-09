@@ -5,7 +5,7 @@
         <Icon name="lucide:check" class="h-6 w-6" />
         Tasks.app
       </nuxt-link>
-      <CreateWorkspace />
+      <CreateBoard />
       <span aria-hidden="true" class="mx-auto" />
       <!-- This div is used as a target for component teleports -->
       <div

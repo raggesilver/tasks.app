@@ -20,12 +20,10 @@ export const getLabelById = async (id: string): Promise<Label | null> => {
     .then((label) => label ?? null);
 };
 
-export const getLabelsForWorkspace = async (
-  workspaceId: string,
-): Promise<Label[]> => {
+export const getLabelsForBoard = async (boardId: string): Promise<Label[]> => {
   return db.query.labels
     .findMany({
-      where: (table, { eq }) => eq(table.workspaceId, workspaceId),
+      where: (table, { eq }) => eq(table.boardId, boardId),
     })
     .execute();
 };

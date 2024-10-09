@@ -9,42 +9,39 @@ import {
 } from "~/components/ui/table";
 import { getInitials } from "~/lib/utils";
 import type { PublicUser } from "~/lib/validation";
-import type { User, Workspace } from "~~/server/db/schema";
+import type { Board, User } from "~~/server/db/schema";
 
 const props = defineProps<{
-  workspace: Workspace;
+  board: Board;
   collaborators: (User | PublicUser)[];
 }>();
 
 const { user: self } = useUserSession();
 
 // A list of collaborators that are not the current user. We don't want to allow
-// the current user to remove themselves from the workspace.
+// the current user to remove themselves from the board.
 const nonSelfCollaborators = computed(() =>
   props.collaborators.filter(
     (collaborator) => collaborator.id !== self.value?.id,
   ),
 );
 
-const { mutateAsync, status: mutationStatus } =
-  useRemoveWorkspaceCollaborator();
+const { mutateAsync, status: mutationStatus } = useRemoveBoardCollaborator();
 
 const onRemoveCollaborator = (collaborator: User | PublicUser) => {
-  // Remove collaborator from workspace
+  // Remove collaborator from board
   if (mutationStatus.value === "pending") {
     return;
   }
 
-  mutateAsync({ workspaceId: props.workspace.id, userId: collaborator.id })
+  mutateAsync({ boardId: props.board.id, userId: collaborator.id })
     .then(() => {
       toast.success(
-        `${collaborator.fullName} has been removed from the workspace.`,
+        `${collaborator.fullName} has been removed from the board.`,
       );
     })
     .catch((error) => {
-      toast.error(
-        `Failed to remove ${collaborator.fullName} from the workspace.`,
-      );
+      toast.error(`Failed to remove ${collaborator.fullName} from the board.`);
       console.error(error);
     });
 };
@@ -55,7 +52,7 @@ const onRemoveCollaborator = (collaborator: User | PublicUser) => {
     <SheetHeader>
       <SheetTitle>Manage Collaborators</SheetTitle>
       <SheetDescription>
-        Add or remove collaborators to the {{ workspace.name }} workspace.
+        Add or remove collaborators to the {{ board.name }} board.
       </SheetDescription>
     </SheetHeader>
 
@@ -66,7 +63,7 @@ const onRemoveCollaborator = (collaborator: User | PublicUser) => {
         v-if="nonSelfCollaborators.length === 0"
         class="block text-center text-sm"
       >
-        There are no collaborators on this workspace besides you.
+        There are no collaborators on this board besides you.
       </span>
 
       <Table v-else class="w-full text-sm">
@@ -96,7 +93,7 @@ const onRemoveCollaborator = (collaborator: User | PublicUser) => {
               <Button
                 type="submit"
                 variant="destructive"
-                :aria-label="`Remove ${user.fullName} from the workspace`"
+                :aria-label="`Remove ${user.fullName} from the board`"
                 size="sm"
                 @click="() => onRemoveCollaborator(user)"
               >

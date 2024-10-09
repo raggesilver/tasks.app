@@ -2,54 +2,51 @@ import { and, eq, or, sql } from "drizzle-orm";
 import { db } from "../db/db";
 import {
   attachments,
+  boards,
   collaborators,
   labels,
   tasks,
-  workspaces,
+  type Board,
   type User,
-  type Workspace,
 } from "../db/schema";
 
 /**
- * Check if a user is the owner of a workspace.
+ * Check if a user is the owner of a board.
  *
  * @param userId The user ID.
- * @param workspaceId The workspace ID.
+ * @param boardId The board ID.
  */
-export const isUserWorkspaceOwner = (userId: string, workspaceId: string) =>
+export const isUserBoardOwner = (userId: string, boardId: string) =>
   db
     .select({ res: sql`1` })
-    .from(workspaces)
-    .where(and(eq(workspaces.ownerId, userId), eq(workspaces.id, workspaceId)))
+    .from(boards)
+    .where(and(eq(boards.ownerId, userId), eq(boards.id, boardId)))
     .limit(1)
     .execute()
     .then((rows) => rows[0]?.res === 1);
 
 /**
- * Check if a user is a collaborator or owner of a workspace.
+ * Check if a user is a collaborator or owner of a board.
  *
  * @param userId The user ID.
- * @param workspaceId The workspace ID.
+ * @param boardId The board ID.
  */
-export const isUserWorkspaceCollaborator = (
-  userId: string,
-  workspaceId: string,
-) =>
+export const isUserBoardCollaborator = (userId: string, boardId: string) =>
   db
     .select({ res: sql`1` })
-    .from(workspaces)
-    .leftJoin(collaborators, eq(collaborators.workspaceId, workspaceId))
+    .from(boards)
+    .leftJoin(collaborators, eq(collaborators.boardId, boardId))
     .where(
       and(
-        eq(workspaces.id, workspaceId),
-        or(eq(collaborators.userId, userId), eq(workspaces.ownerId, userId)),
+        eq(boards.id, boardId),
+        or(eq(collaborators.userId, userId), eq(boards.ownerId, userId)),
       ),
     )
     .limit(1)
     .execute()
     .then((rows) => rows[0]?.res === 1);
 
-export const isUserWorkspaceCollaboratorForAttachment = (
+export const isUserBoardCollaboratorForAttachment = (
   userId: string,
   attachmentId: string,
 ) =>
@@ -57,12 +54,12 @@ export const isUserWorkspaceCollaboratorForAttachment = (
     .select({ res: sql`1` })
     .from(attachments)
     .leftJoin(tasks, eq(tasks.id, attachments.taskId))
-    .leftJoin(workspaces, eq(workspaces.id, tasks.workspaceId))
-    .leftJoin(collaborators, eq(collaborators.workspaceId, tasks.workspaceId))
+    .leftJoin(boards, eq(boards.id, tasks.boardId))
+    .leftJoin(collaborators, eq(collaborators.boardId, tasks.boardId))
     .where(
       and(
         eq(attachments.id, attachmentId),
-        or(eq(collaborators.userId, userId), eq(workspaces.ownerId, userId)),
+        or(eq(collaborators.userId, userId), eq(boards.ownerId, userId)),
       ),
     )
     .limit(1)
@@ -70,44 +67,44 @@ export const isUserWorkspaceCollaboratorForAttachment = (
     .then((rows) => rows[0]?.res === 1);
 
 /**
- * Check if a user is a collaborator or owner of the workspace that a task
+ * Check if a user is a collaborator or owner of the board that a task
  * belongs to.
  *
  * @param userId The user ID.
  * @param taskId The task ID.
  */
-export const isUserWorkspaceCollaboratorForTask = (
+export const isUserBoardCollaboratorForTask = (
   userId: string,
   taskId: string,
 ) =>
   db
     .select({ res: sql`1` })
     .from(tasks)
-    .leftJoin(workspaces, eq(workspaces.id, tasks.workspaceId))
-    .leftJoin(collaborators, eq(collaborators.workspaceId, tasks.workspaceId))
+    .leftJoin(boards, eq(boards.id, tasks.boardId))
+    .leftJoin(collaborators, eq(collaborators.boardId, tasks.boardId))
     .where(
       and(
         eq(tasks.id, taskId),
-        or(eq(collaborators.userId, userId), eq(workspaces.ownerId, userId)),
+        or(eq(collaborators.userId, userId), eq(boards.ownerId, userId)),
       ),
     )
     .limit(1)
     .execute()
     .then((rows) => rows[0]?.res === 1);
 
-export const isUserWorkspaceCollaboratorForLabel = (
+export const isUserBoardCollaboratorForLabel = (
   userId: string,
   labelId: string,
 ) =>
   db
     .select({ res: sql`1` })
     .from(labels)
-    .leftJoin(workspaces, eq(workspaces.id, labels.workspaceId))
-    .leftJoin(collaborators, eq(collaborators.workspaceId, labels.workspaceId))
+    .leftJoin(boards, eq(boards.id, labels.boardId))
+    .leftJoin(collaborators, eq(collaborators.boardId, labels.boardId))
     .where(
       and(
         eq(labels.id, labelId),
-        or(eq(collaborators.userId, userId), eq(workspaces.ownerId, userId)),
+        or(eq(collaborators.userId, userId), eq(boards.ownerId, userId)),
       ),
     )
     .limit(1)
@@ -116,60 +113,60 @@ export const isUserWorkspaceCollaboratorForLabel = (
 
 // ...
 
-export async function isUserAllowedToEditWorkspace(
+export async function isUserAllowedToEditBoard(
   user: User,
-  workspace: Workspace,
+  board: Board,
 ): Promise<boolean> {
-  return workspace.ownerId === user.id;
+  return board.ownerId === user.id;
 }
 
-export async function isUserAllowedToViewWorkspace(
+export async function isUserAllowedToViewBoard(
   user: User,
-  workspace: Workspace | string,
+  board: Board | string,
 ): Promise<boolean> {
-  const workspaceId = typeof workspace === "string" ? workspace : workspace.id;
+  const boardId = typeof board === "string" ? board : board.id;
 
-  if (typeof workspace !== "string" && workspace.ownerId === user.id) {
+  if (typeof board !== "string" && board.ownerId === user.id) {
     return true;
   }
 
-  return isUserWorkspaceCollaborator(user.id, workspaceId);
+  return isUserBoardCollaborator(user.id, boardId);
 }
 
-export async function isUserAllowedToDeleteWorkspace(
+export async function isUserAllowedToDeleteBoard(
   user: User,
-  workspace: Workspace,
+  board: Board,
 ): Promise<boolean> {
-  return workspace.ownerId === user.id;
+  return board.ownerId === user.id;
 }
 
 export async function isUserAllowedToModifyLabel(
   userId: string,
   labelId: string,
 ): Promise<boolean> {
-  // Currently, only workspace owners can modify labels.
+  // Currently, only board owners can modify labels.
   return db
     .select({ res: sql`1` })
     .from(labels)
-    .leftJoin(workspaces, eq(workspaces.id, labels.workspaceId))
-    .where(and(eq(labels.id, labelId), eq(workspaces.ownerId, userId)))
+    .leftJoin(boards, eq(boards.id, labels.boardId))
+    .where(and(eq(labels.id, labelId), eq(boards.ownerId, userId)))
     .limit(1)
     .execute()
     .then((rows) => rows[0]?.res === 1);
 }
 
-export async function isUserAllowedToCreateOrModifyWorkspaceInvitation(
+export async function isUserAllowedToCreateOrModifyBoardInvitation(
   userId: string,
-  workspaceId: string,
+  boardId: string,
 ): Promise<boolean> {
-  return isUserWorkspaceOwner(userId, workspaceId);
+  return isUserBoardOwner(userId, boardId);
 }
 
 export async function isUserAllowedToCreateOrModifyColumns(
   userId: string,
-  workspaceId: string,
+  boardId: string,
 ): Promise<boolean> {
-  return isUserWorkspaceCollaborator(userId, workspaceId);
+  return isUserBoardCollaborator(userId, boardId);
 }
 
 export async function isUserAllowedToDeleteAttachment(

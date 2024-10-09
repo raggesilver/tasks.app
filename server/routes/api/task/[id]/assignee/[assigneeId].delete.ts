@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isUserWorkspaceCollaboratorForTask } from "~~/server/services/authorization";
+import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization";
 import { removeAssigneeFromTask } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     }).parseAsync,
   );
 
-  if (false === (await isUserWorkspaceCollaboratorForTask(user.id, taskId))) {
+  if (false === (await isUserBoardCollaboratorForTask(user.id, taskId))) {
     throw createError({
       status: 403,
       message: "You are not authorized to modify this task",

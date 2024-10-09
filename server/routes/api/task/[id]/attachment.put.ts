@@ -3,8 +3,8 @@ import { MAX_FILE_SIZE } from "~/lib/constants";
 import { validateId } from "~/lib/validation";
 import { db } from "~~/server/db/db";
 import { type Attachment, attachments } from "~~/server/db/schema";
-import { isUserWorkspaceCollaboratorForTask } from "~~/server/services/authorization";
-// import { isUserWorkspaceCollaboratorForTask } from "~~/server/services/authorization";
+import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization";
+// import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization";
 import { getTaskById } from "~~/server/services/task";
 
 // Our hosting platform does not charge ingress fees or egress fees to our S3
@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if (false === (await isUserWorkspaceCollaboratorForTask(user.id, task.id))) {
+  if (false === (await isUserBoardCollaboratorForTask(user.id, task.id))) {
     throw createError({
       status: 403,
       message: "You are not authorized to access this task",
@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
       .insert(attachments)
       .values({
         taskId: task.id,
-        workspaceId: task.workspaceId,
+        boardId: task.boardId,
         name,
         mimeType,
         size: contentLength,

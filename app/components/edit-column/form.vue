@@ -28,12 +28,12 @@ const form = useForm({
 const queryClient = useQueryClient();
 
 const updateColumn = (
-  workspaceId: string,
+  boardId: string,
   columnId: string,
   data: SchemaType,
 ): Promise<StatusColumn> => {
   // @ts-ignore TypeScript complains about excessive stack depth comparing types
-  return $fetch(`/api/column/${workspaceId}/${columnId}`, {
+  return $fetch(`/api/column/${boardId}/${columnId}`, {
     method: "PATCH",
     body: data,
   });
@@ -41,7 +41,7 @@ const updateColumn = (
 
 const { mutateAsync } = useMutation({
   mutationFn: (data: SchemaType) =>
-    updateColumn(props.column.workspaceId, props.column.id, data),
+    updateColumn(props.column.boardId, props.column.id, data),
   onSuccess: (data) => {
     const normalized: StatusColumn = {
       ...data,
@@ -53,7 +53,7 @@ const { mutateAsync } = useMutation({
       normalized,
     );
     queryClient.setQueryData<StatusColumn[]>(
-      ["workspace-columns", props.column.workspaceId],
+      ["board-columns", props.column.boardId],
       (old) => {
         if (old) {
           return old.map((col) =>

@@ -4,7 +4,7 @@ import { db } from "~~/server/db/db";
 import { attachments } from "~~/server/db/schema";
 import {
   isUserAllowedToDeleteAttachment,
-  isUserWorkspaceCollaboratorForAttachment,
+  isUserBoardCollaboratorForAttachment,
 } from "~~/server/services/authorization";
 
 export default defineEventHandler(async (event) => {
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     validateId("id").parseAsync,
   );
 
-  if (false === (await isUserWorkspaceCollaboratorForAttachment(user.id, id))) {
+  if (false === (await isUserBoardCollaboratorForAttachment(user.id, id))) {
     throw createError({
       status: 403,
       message: "You are not authorized to view this attachment",

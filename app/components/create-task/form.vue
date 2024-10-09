@@ -9,7 +9,7 @@ import type { TaskWithEverything } from "~~/server/db/schema";
 import { Textarea } from "../ui/textarea";
 
 const props = defineProps<{
-  workspaceId: string;
+  boardId: string;
   statusColumnId: string;
 }>();
 
@@ -29,7 +29,7 @@ const queryClient = useQueryClient();
 const createTask = (data: SchemaType): Promise<TaskWithEverything> => {
   // @ts-ignore TypeScript complains about excessive stack depth comparing types
   return $fetch(
-    `/api/column/${props.workspaceId}/${props.statusColumnId}/add-task`,
+    `/api/column/${props.boardId}/${props.statusColumnId}/add-task`,
     {
       method: "POST",
       body: data,

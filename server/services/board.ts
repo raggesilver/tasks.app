@@ -1,5 +1,4 @@
-import { and, eq, or, sql } from "drizzle-orm";
-import { union } from "drizzle-orm/pg-core";
+import { and, eq, or } from "drizzle-orm";
 import type { UpdateBoardInput } from "~/lib/validation";
 import { db } from "../db/db";
 import {
@@ -65,43 +64,31 @@ export async function getBoardById(
 
 export async function getAllBoards(userId: string): Promise<Board[]> {
   return db
-    .select()
+    .selectDistinctOn([boards.id])
     .from(boards)
     .leftJoin(collaborators, eq(boards.id, collaborators.boardId))
-    .leftJoin(users, eq(users.id, collaborators.userId))
-    .where(or(eq(users.id, userId), eq(boards.ownerId, userId)))
+    .where(
+      or(
+        eq(boards.ownerId, userId),
+        and(
+          eq(collaborators.boardId, boards.id),
+          eq(collaborators.userId, userId),
+        ),
+      ),
+    )
     .execute()
     .then((rows) => rows.map((row) => row.boards));
 }
 
 export async function getBoardCollaborators(boardId: string): Promise<User[]> {
-  return union(
-    db
-      .select({
-        id: users.id,
-        email: users.email,
-        fullName: users.fullName,
-        profilePictureUrl: users.profilePictureUrl,
-        createdAt: users.createdAt,
-        updatedAt: users.updatedAt,
-      })
-      .from(users)
-      .leftJoin(collaborators, eq(users.id, collaborators.userId))
-      .where(eq(collaborators.boardId, boardId)),
-    db
-      .select({
-        id: users.id,
-        email: users.email,
-        fullName: users.fullName,
-        profilePictureUrl: users.profilePictureUrl,
-        createdAt: users.createdAt,
-        updatedAt: users.updatedAt,
-      })
-      .from(users)
-      .where(
-        eq(users.id, sql`(SELECT owner_id FROM boards WHERE id = ${boardId})`),
-      ),
-  );
+  return db
+    .selectDistinctOn([users.id])
+    .from(users)
+    .leftJoin(collaborators, eq(collaborators.boardId, boardId))
+    .leftJoin(boards, eq(boards.id, boardId))
+    .where(or(eq(users.id, collaborators.userId), eq(users.id, boards.ownerId)))
+    .execute()
+    .then((rows) => rows.map((row) => row.users));
 }
 
 export async function updateBoardById(

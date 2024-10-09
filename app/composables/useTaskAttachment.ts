@@ -11,7 +11,7 @@ export const useAddTaskAttachmentMutation = () => {
         file,
       }: {
         taskId: string;
-        workspaceId: string;
+        boardId: string;
         columnId: string;
         file: File;
       }) => {

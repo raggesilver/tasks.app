@@ -7,8 +7,8 @@ export default defineEventHandler(async (event) => {
   // TODO: we still need to set better rules for how users are able to search
   // for others. Currently, any user can search for any other user, which is
   // (likely) not ideal. In the future, we may want to narrow the search on a
-  // workspace basis — users will only be able to search for other users within
-  // the same workspace.
+  // board basis — users will only be able to search for other users within
+  // the same board.
   //
   // The same goes for the get user endpoint.
 

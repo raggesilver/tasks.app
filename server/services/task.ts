@@ -44,7 +44,7 @@ export const getTaskById = async (
 };
 
 export const getTasksForStatusColumn = async (
-  workspaceId: string,
+  boardId: string,
   statusColumnId: string,
 ): Promise<TaskWithEverything[]> => {
   return db.query.tasks
@@ -52,7 +52,7 @@ export const getTasksForStatusColumn = async (
       where: (table, { eq, and }) =>
         and(
           eq(table.statusColumnId, statusColumnId),
-          eq(table.workspaceId, workspaceId),
+          eq(table.boardId, boardId),
         ),
       with: {
         assignees: true,

@@ -10,7 +10,7 @@ import type { StatusColumn } from "~~/server/db/schema";
 const localSchema = createStatusColumnSchema.pick({ name: true });
 type SchemaType = z.infer<typeof localSchema>;
 
-const workspaceId = useRouteParamSafe("id") as Ref<string>;
+const boardId = useRouteParamSafe("id") as Ref<string>;
 const emit = defineEmits(["dismiss"]);
 
 const schema = toTypedSchema(localSchema);
@@ -23,7 +23,7 @@ const queryClient = useQueryClient();
 
 const { mutateAsync } = useMutation({
   mutationFn: (data: SchemaType) =>
-    $fetch(`/api/column/${workspaceId.value}`, {
+    $fetch(`/api/column/${boardId.value}`, {
       method: "POST",
       body: data,
     }),
@@ -38,7 +38,7 @@ const { mutateAsync } = useMutation({
       normalized,
     );
     queryClient.setQueryData<StatusColumn[]>(
-      ["workspace-columns", workspaceId],
+      ["board-columns", boardId],
       (old) => {
         if (old) {
           return [...old, normalized];

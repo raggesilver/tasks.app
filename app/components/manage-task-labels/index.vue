@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { toast } from "vue-sonner";
-import { WORKSPACE_DATA_KEY } from "~/lib/injection-keys";
+import { BOARD_DATA_KEY } from "~/lib/injection-keys";
 import type { TaskWithEverything } from "~~/server/db/schema";
 
 const props = defineProps<{
   task: TaskWithEverything;
 }>();
 
-const { labels } = inject(WORKSPACE_DATA_KEY)!;
+const { labels } = inject(BOARD_DATA_KEY)!;
 
 const { mutateAsync: addLabel } = useTaskAddLabelMutation();
 const { mutateAsync: removeLabel } = useTaskRemoveLabelMutation();

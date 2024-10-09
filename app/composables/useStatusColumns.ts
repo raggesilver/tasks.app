@@ -9,31 +9,27 @@ export const getStatusColumnOptions = (
     queryKey: ["status-column", statusColumnId],
   });
 
-export const getWorkspaceColumnsOptions = (
-  workspaceId: MaybeRefOrGetter<string>,
-) =>
+export const getBoardColumnsOptions = (boardId: MaybeRefOrGetter<string>) =>
   queryOptions<StatusColumn[]>({
-    queryKey: ["workspace-columns", workspaceId],
+    queryKey: ["board-columns", boardId],
   });
 
-export const useStatusColumns = (workspaceId: MaybeRefOrGetter<string>) => {
+export const useStatusColumns = (boardId: MaybeRefOrGetter<string>) => {
   const client = useQueryClient();
 
   return useQuery(
     {
-      queryKey: getWorkspaceColumnsOptions(workspaceId).queryKey,
+      queryKey: getBoardColumnsOptions(boardId).queryKey,
       queryFn: () =>
-        useRequestFetch()(`/api/column/${toValue(workspaceId)}`).then(
-          (columns) => {
-            const normalized = normalizeDates<StatusColumn>(columns);
+        useRequestFetch()(`/api/column/${toValue(boardId)}`).then((columns) => {
+          const normalized = normalizeDates<StatusColumn>(columns);
 
-            for (const col of normalized) {
-              client.setQueryData(getStatusColumnOptions(col.id).queryKey, col);
-            }
+          for (const col of normalized) {
+            client.setQueryData(getStatusColumnOptions(col.id).queryKey, col);
+          }
 
-            return normalized;
-          },
-        ),
+          return normalized;
+        }),
     },
     client,
   );
@@ -56,7 +52,7 @@ export const useStatusColumnMutation = (
         newOrder: number;
       }) =>
         useRequestFetch()<StatusColumn>(
-          `/api/column/${col.workspaceId}/${col.id}`,
+          `/api/column/${col.boardId}/${col.id}`,
           {
             method: "PATCH",
             body: { order: newOrder },
@@ -71,11 +67,9 @@ export const useStatusColumnMutation = (
 
         // await client.setQueryData(["status-column", column.id], column);
 
-        await client.invalidateQueries(
-          getWorkspaceColumnsOptions(column.workspaceId),
-        );
+        await client.invalidateQueries(getBoardColumnsOptions(column.boardId));
 
-        await client.invalidateQueries(getWorkspaceOptions(column.workspaceId));
+        await client.invalidateQueries(getBoardOptions(column.boardId));
 
         options.onSuccess?.(column);
       },
@@ -102,14 +96,12 @@ export const useDeleteStatusColumn = (
     {
       mutationFn: async (column: StatusColumn) =>
         await useRequestFetch()<null>(
-          `/api/column/${column.workspaceId}/${column.id}`,
+          `/api/column/${column.boardId}/${column.id}`,
           { method: "DELETE" },
         ),
       onSuccess: async (_, column) => {
         // We need to invalidate all columns as their order might have changed.
-        await client.invalidateQueries(
-          getWorkspaceColumnsOptions(column.workspaceId),
-        );
+        await client.invalidateQueries(getBoardColumnsOptions(column.boardId));
 
         client.removeQueries(getStatusColumnOptions(column.id));
 

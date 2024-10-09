@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isUserWorkspaceCollaboratorForTask } from "~~/server/services/authorization";
+import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization";
 import { removeLabelFromTask } from "~~/server/services/task";
 
 const paramsSchema = z.object({
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     paramsSchema.parseAsync,
   );
 
-  if (false === (await isUserWorkspaceCollaboratorForTask(user.id, taskId))) {
+  if (false === (await isUserBoardCollaboratorForTask(user.id, taskId))) {
     throw createError({
       status: 403,
       message: "You are not authorized to modify this task",

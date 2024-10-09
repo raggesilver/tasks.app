@@ -1,6 +1,6 @@
 import { addAssigneeSchema, validateId } from "~/lib/validation";
 import { DuplicateError, NotFoundError } from "~~/server/lib/errors";
-import { isUserWorkspaceCollaboratorForTask } from "~~/server/services/authorization";
+import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization";
 import { addAssigneeToTask } from "~~/server/services/task";
 
 export default defineEventHandler(async (event) => {
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     validateId("id").parseAsync,
   );
 
-  if (false === (await isUserWorkspaceCollaboratorForTask(user.id, taskId))) {
+  if (false === (await isUserBoardCollaboratorForTask(user.id, taskId))) {
     throw createError({
       status: 403,
       message: "You are not authorized to modify this task",

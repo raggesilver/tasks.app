@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { WORKSPACE_DATA_KEY } from "~/lib/injection-keys";
+import { BOARD_DATA_KEY } from "~/lib/injection-keys";
 import type { Label, Task, TaskWithEverything } from "~~/server/db/schema";
 
 const props = defineProps<{
@@ -7,7 +7,7 @@ const props = defineProps<{
   onDragStart?: (event: DragEvent, task: Task) => void;
 }>();
 
-const { labels } = inject(WORKSPACE_DATA_KEY)!;
+const { labels } = inject(BOARD_DATA_KEY)!;
 
 const isDragging = ref(false);
 

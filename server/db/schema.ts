@@ -52,32 +52,56 @@ export const oauth = pgTable(
 export type OauthEntity = typeof oauth.$inferSelect;
 export type NewOauthEntity = typeof oauth.$inferInsert;
 
-export const workspaces = pgTable("workspaces", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: varchar("name", { length: 255 }).notNull(),
-  ownerId: uuid("owner_id")
-    .notNull()
-    .references(() => users.id, {
-      // TODO: we do need to handle worspaces and account deletion, but
-      // cascading might not be the right call.
-      // onDelete: "cascade",
-    }),
-  // TODO: add status columns and sunset status columns' order field.
-  //statusColumnIds: uuid("status_column_ids").array().notNull().default([]),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+// TODO: Real workspace
 
-export type Workspace = typeof workspaces.$inferSelect;
-export type NewWorkspace = typeof workspaces.$inferInsert;
+// const workspaces = pgTable("workspaces", {
+//   id: uuid("id").primaryKey().defaultRandom(),
+//   name: varchar("name", { length: 255 }).notNull(),
+//   ownerId: uuid("owner_id")
+//     .notNull()
+//     .references(() => users.id),
+//   createdAt: timestamp("created_at").notNull().defaultNow(),
+//   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+// });
+
+// export type Workspace = typeof workspaces.$inferSelect;
+// export type NewWorkspace = typeof workspaces.$inferInsert;
+
+// Workspaces became boards
+export const boards = pgTable(
+  "boards",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: varchar("name", { length: 255 }).notNull(),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    // workspaceId: uuid("workspace_id")
+    //   .notNull()
+    //   .references(() => workspaces.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  // (table) => ({
+  //   name: uniqueIndex().on(table.workspaceId, table.name),
+  // }),
+);
+
+export type Board = typeof boards.$inferSelect;
+export type NewBoard = typeof boards.$inferInsert;
 
 export const statusColumns = pgTable(
   "status_columns",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    workspaceId: uuid("workspace_id")
+    // workspaceId: uuid("workspace_id")
+    //   .notNull()
+    //   .references(() => workspaces.id, {
+    //     onDelete: "cascade",
+    //   }),
+    boardId: uuid("board_id")
       .notNull()
-      .references(() => workspaces.id, {
+      .references(() => boards.id, {
         onDelete: "cascade",
       }),
     name: varchar("name", { length: 255 }).notNull(),
@@ -92,7 +116,7 @@ export const statusColumns = pgTable(
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (table) => ({
-    uniqueIndex: uniqueIndex().on(table.workspaceId, table.name),
+    uniqueIndex: uniqueIndex().on(table.boardId, table.name),
     // We cannot have two columns with the same order in the same workspace.
     // This is now handled with unique constraint created manually in migartion
     // 0004_dusty_hitman.sql
@@ -106,11 +130,16 @@ export type NewStatusColumn = typeof statusColumns.$inferInsert;
 export const collaborators = pgTable(
   "collaborators",
   {
-    workspaceId: uuid("workspace_id")
+    boardId: uuid("board_id")
       .notNull()
-      .references(() => workspaces.id, {
+      .references(() => boards.id, {
         onDelete: "cascade",
       }),
+    // workspaceId: uuid("workspace_id")
+    //   .notNull()
+    //   .references(() => workspaces.id, {
+    //     onDelete: "cascade",
+    //   }),
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, {
@@ -118,8 +147,8 @@ export const collaborators = pgTable(
       }),
   },
   (table) => ({
-    uniqueIndex: uniqueIndex().on(table.workspaceId, table.userId),
-    pk: primaryKey({ columns: [table.workspaceId, table.userId] }),
+    uniqueIndex: uniqueIndex().on(table.boardId, table.userId),
+    pk: primaryKey({ columns: [table.boardId, table.userId] }),
   }),
 );
 
@@ -130,9 +159,9 @@ export const tasks = pgTable(
   "tasks",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    workspaceId: uuid("workspace_id")
+    boardId: uuid("board_id")
       .notNull()
-      .references(() => workspaces.id, {
+      .references(() => boards.id, {
         onDelete: "cascade",
       }),
     statusColumnId: uuid("status_column_id")
@@ -185,9 +214,9 @@ export type NewAssignee = typeof assignees.$inferInsert;
 
 export const attachments = pgTable("attachments", {
   id: uuid("id").primaryKey().defaultRandom(),
-  workspaceId: uuid("workspace_id")
+  boardId: uuid("board_id")
     .notNull()
-    .references(() => workspaces.id, {
+    .references(() => boards.id, {
       // onDelete: "cascade", // We need to remove the file from S3
     }),
   taskId: uuid("task_id")
@@ -215,9 +244,9 @@ export const labels = pgTable("labels", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
   color: varchar("color", { length: 255 }).notNull(),
-  workspaceId: uuid("workspace_id")
+  boardId: uuid("board_id")
     .notNull()
-    .references(() => workspaces.id, {
+    .references(() => boards.id, {
       onDelete: "cascade",
     }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -255,9 +284,9 @@ export const invitationLinks = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     // In the future we may allow restricting invitations to specific email(s)
     // email: varchar("email", { length: 255 }).notNull(),
-    workspaceId: uuid("workspace_id")
+    boardId: uuid("board_id")
       .notNull()
-      .references(() => workspaces.id, {
+      .references(() => boards.id, {
         onDelete: "cascade",
       }),
     // expiresAt: timestamp("expires_at").notNull(),
@@ -268,7 +297,7 @@ export const invitationLinks = pgTable(
     // We need to make sure that we don't have multiple active invitation links
     // for the same workspace.
     uniqueIndex: uniqueIndex()
-      .on(table.workspaceId, table.active)
+      .on(table.boardId, table.active)
       .where(sql`${table.active} = true`),
   }),
 );
@@ -294,15 +323,15 @@ export const collaboratorsRelations = relations(collaborators, ({ one }) => ({
     fields: [collaborators.userId],
     references: [users.id],
   }),
-  workspace: one(workspaces, {
-    fields: [collaborators.workspaceId],
-    references: [workspaces.id],
+  board: one(boards, {
+    fields: [collaborators.boardId],
+    references: [boards.id],
   }),
 }));
 
-export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
+export const boardsRelations = relations(boards, ({ one, many }) => ({
   owner: one(users, {
-    fields: [workspaces.ownerId],
+    fields: [boards.ownerId],
     references: [users.id],
   }),
   collaborators: many(collaborators),
@@ -312,9 +341,9 @@ export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
 export const statusColumnsRelations = relations(
   statusColumns,
   ({ one, many }) => ({
-    workspace: one(workspaces, {
-      fields: [statusColumns.workspaceId],
-      references: [workspaces.id],
+    board: one(boards, {
+      fields: [statusColumns.boardId],
+      references: [boards.id],
     }),
     lastUpdatedBy: one(users, {
       fields: [statusColumns.lastUpdatedById],
@@ -329,9 +358,9 @@ export const statusColumnsRelations = relations(
 );
 
 export const tasksRelations = relations(tasks, ({ one, many }) => ({
-  workspace: one(workspaces, {
-    fields: [tasks.workspaceId],
-    references: [workspaces.id],
+  board: one(boards, {
+    fields: [tasks.boardId],
+    references: [boards.id],
   }),
   statusColumn: one(statusColumns, {
     fields: [tasks.statusColumnId],
@@ -351,9 +380,9 @@ export const tasksRelations = relations(tasks, ({ one, many }) => ({
 }));
 
 export const labelsRelations = relations(labels, ({ one, many }) => ({
-  workspace: one(workspaces, {
-    fields: [labels.workspaceId],
-    references: [workspaces.id],
+  board: one(boards, {
+    fields: [labels.boardId],
+    references: [boards.id],
   }),
   tasks: many(taskLabels),
 }));
@@ -381,9 +410,9 @@ export const assigneesRelations = relations(assignees, ({ one }) => ({
 }));
 
 export const attachmentsRelations = relations(attachments, ({ one }) => ({
-  workspace: one(workspaces, {
-    fields: [attachments.workspaceId],
-    references: [workspaces.id],
+  board: one(boards, {
+    fields: [attachments.boardId],
+    references: [boards.id],
   }),
   task: one(tasks, {
     fields: [attachments.taskId],

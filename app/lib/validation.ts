@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-export const createWorkspaceSchema = z.object({
+export const createBoardSchema = z.object({
   name: z.string().min(5).max(255),
 });
 
-export const updateWorkspaceSchema = z.object({
+export const updateBoardSchema = z.object({
   name: z.string().min(5).max(255),
 });
 
@@ -47,26 +47,26 @@ export const publicUserSchema = z.object({
 });
 
 export const createInvitationSchema = z.object({
-  workspaceId: z.string().uuid(),
+  boardId: z.string().uuid(),
 });
 
 export const deactivateInvitationSchema = z.object({
   invitationId: z.string().uuid(),
-  workspaceId: z.string().uuid(),
+  boardId: z.string().uuid(),
 });
 
 export const addAssigneeSchema = z.object({
   userId: z.string().uuid(),
 });
 
-export const createWorkspaceLabelSchema = z.object({
+export const createBoardLabelSchema = z.object({
   name: z.string().min(3).max(255),
   color: z.string(),
-  workspaceId: z.string().uuid(),
+  boardId: z.string().uuid(),
 });
 
-export const updateWorkspaceLabelSchema = createWorkspaceLabelSchema
-  .omit({ workspaceId: true })
+export const updateBoardLabelSchema = createBoardLabelSchema
+  .omit({ boardId: true })
   .partial();
 
 export const addTaskLabelSchema = z.object({
@@ -78,8 +78,8 @@ export const uploadAttachmentSchema = z.object({
   contentLength: z.number().int().min(1).optional(),
 });
 
-export type CreateWorkspaceInput = z.infer<typeof createWorkspaceSchema>;
-export type UpdateWorkspaceInput = z.infer<typeof updateWorkspaceSchema>;
+export type CreateBoardInput = z.infer<typeof createBoardSchema>;
+export type UpdateBoardInput = z.infer<typeof updateBoardSchema>;
 
 export type CreateStatusColumnInput = z.infer<typeof createStatusColumnSchema>;
 export type UpdateStatusColumnInput = z.infer<typeof updateStatusColumnSchema>;
@@ -97,13 +97,9 @@ export type DeactivateInvitationInput = z.infer<
 
 export type AddAssigneeInput = z.infer<typeof addAssigneeSchema>;
 
-export type CreateWorkspaceLabelInput = z.infer<
-  typeof createWorkspaceLabelSchema
->;
+export type CreateBoardLabelInput = z.infer<typeof createBoardLabelSchema>;
 
-export type UpdateWorkspaceLabelInput = z.infer<
-  typeof updateWorkspaceLabelSchema
->;
+export type UpdateBoardLabelInput = z.infer<typeof updateBoardLabelSchema>;
 
 export type AddTaskLabelInput = z.infer<typeof addTaskLabelSchema>;
 

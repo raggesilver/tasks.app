@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { addTaskLabelSchema } from "~/lib/validation";
 import { isPostgresError, PgErrorCode } from "~~/server/lib/errors";
-import { isUserWorkspaceCollaboratorForTask } from "~~/server/services/authorization";
+import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization";
 import { addLabelToTask } from "~~/server/services/task";
 
 const paramSchema = z.object({ id: z.string().uuid() });
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     paramSchema.parseAsync,
   );
 
-  if (false === (await isUserWorkspaceCollaboratorForTask(user.id, taskId))) {
+  if (false === (await isUserBoardCollaboratorForTask(user.id, taskId))) {
     throw createError({
       status: 403,
       message: "You are not authorized to modify this task",

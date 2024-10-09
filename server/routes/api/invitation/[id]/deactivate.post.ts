@@ -1,5 +1,5 @@
 import { deactivateInvitationSchema } from "~/lib/validation";
-import { isUserAllowedToCreateOrModifyWorkspaceInvitation } from "~~/server/services/authorization";
+import { isUserAllowedToCreateOrModifyBoardInvitation } from "~~/server/services/authorization";
 import { deactivateInvitationById } from "~~/server/services/invitation";
 
 export default defineEventHandler(async (event) => {
@@ -12,10 +12,7 @@ export default defineEventHandler(async (event) => {
 
   if (
     false ===
-    (await isUserAllowedToCreateOrModifyWorkspaceInvitation(
-      user.id,
-      data.workspaceId,
-    ))
+    (await isUserAllowedToCreateOrModifyBoardInvitation(user.id, data.boardId))
   ) {
     throw createError({
       status: 403,

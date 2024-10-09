@@ -9,11 +9,11 @@ import type { H3Event } from "h3";
 import type { Attachment } from "../db/schema";
 
 /**
- * We generate the key with workspace and task ids as prefixes to make bulk
+ * We generate the key with board and task ids as prefixes to make bulk
  * operations and cookie-based authorization easier.
  */
 const getKeyForAttachment = (attachment: Attachment) =>
-  `${attachment.workspaceId}/${attachment.taskId}/${attachment.id}`;
+  `${attachment.boardId}/${attachment.taskId}/${attachment.id}`;
 
 export const useStorageS3 = (event: H3Event) => {
   const client = event.context.$s3;
@@ -53,7 +53,7 @@ export const useStorageS3 = (event: H3Event) => {
         { expiresIn: 3600 },
       );
     },
-    async getWorkspaceAccessCookie(workspaceId: string) {
+    async getBoardAccessCookie(boardId: string) {
       const cloudfront = event.context.$cloudfront;
       const { privateKey } = useRuntimeConfig().aws.signing;
 
@@ -64,7 +64,7 @@ export const useStorageS3 = (event: H3Event) => {
       const policy = {
         Statement: [
           {
-            Resource: `${config.AWS_ENDPOINT_URL_S3}/${config.BUCKET_NAME}/${workspaceId}/*`,
+            Resource: `${config.AWS_ENDPOINT_URL_S3}/${config.BUCKET_NAME}/${boardId}/*`,
             Condition: {
               DateLessThan: {
                 "AWS:EpochTime": Math.floor(Date.now() / 1000) + 60 * 60, // 1 hour

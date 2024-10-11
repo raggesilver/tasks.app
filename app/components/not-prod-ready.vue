@@ -3,6 +3,7 @@ const hasAgreed = useCookie<boolean>("__agree_not_prod_ready", {
   decode: (v) => v === "true",
   encode: (v) => v.toString(),
   maxAge: 60 * 60 * 24 * 365,
+  default: () => false,
 });
 
 const onClickUnderstood = () => {

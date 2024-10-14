@@ -43,5 +43,5 @@ export default defineEventHandler(async (event) => {
 
   await addCollaboratorById(invitation.boardId, user.id);
 
-  return sendRedirect(event, `/app/board/${invitation.boardId}`);
+  return sendRedirect(event, `/app/b/${invitation.boardId}`);
 });

@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS "status_columns_board_id_order_index";

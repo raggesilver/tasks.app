@@ -36,8 +36,8 @@ const details = ref([
   ["Unlimited Tasks", "✓", "✓", "✓"],
   ["Unlimited Comments", "✓", "✓", "✓"],
   ["Unlimited Logs", "✓", "✓", "✓"],
-  ["Unlimited Boards", "Up to 15 per board", "✓", "✓"],
-  ["Unlimited Collaborators", "Up to 15 per board", "✓", "✓"],
+  ["Unlimited Boards", "✓", "✓", "✓"],
+  ["Unlimited Collaborators", "Up to 15 per workspace", "✓", "✓"],
   ["File Uploads", "✗", "100 GB storage", "Custom"],
 ]);
 </script>
@@ -68,9 +68,9 @@ const details = ref([
       <p class="text-center text-sm text-muted-foreground">
         All plans apply to a single
         <EasyTooltip
-          tooltip="A board is a collection of boards, tasks, and collaborators. It is the equivalent of an organization."
+          tooltip="A workspace is a collection of boards, tasks, and collaborators. It is the equivalent of an organization."
         >
-          <span class="underline italic">board</span> </EasyTooltip
+          <span class="underline italic">workspace</span> </EasyTooltip
         >.
       </p>
     </section>

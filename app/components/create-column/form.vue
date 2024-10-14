@@ -5,25 +5,31 @@ import { useForm } from "vee-validate";
 import { toast } from "vue-sonner";
 import type { z } from "zod";
 import { createStatusColumnSchema } from "~/lib/validation";
-import type { StatusColumn } from "~~/server/db/schema";
+import type { Board, StatusColumn } from "~~/server/db/schema";
 
-const localSchema = createStatusColumnSchema.pick({ name: true });
-type SchemaType = z.infer<typeof localSchema>;
+const props = defineProps<{
+  board: Board;
+}>();
 
-const boardId = useRouteParamSafe("id") as Ref<string>;
+type SchemaType = z.infer<typeof createStatusColumnSchema>;
+
 const emit = defineEmits(["dismiss"]);
 
-const schema = toTypedSchema(localSchema);
+const schema = toTypedSchema(createStatusColumnSchema);
 
 const form = useForm({
   validationSchema: schema,
+  initialValues: {
+    name: "",
+    workspaceId: props.board.workspaceId,
+  },
 });
 
 const queryClient = useQueryClient();
 
 const { mutateAsync } = useMutation({
   mutationFn: (data: SchemaType) =>
-    $fetch(`/api/column/${boardId.value}`, {
+    $fetch(`/api/column/${props.board.id}`, {
       method: "POST",
       body: data,
     }),
@@ -38,7 +44,7 @@ const { mutateAsync } = useMutation({
       normalized,
     );
     queryClient.setQueryData<StatusColumn[]>(
-      ["board-columns", boardId],
+      ["board-columns", props.board.id],
       (old) => {
         if (old) {
           return [...old, normalized];

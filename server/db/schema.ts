@@ -115,7 +115,7 @@ export const statusColumns = pgTable(
   },
   (table) => ({
     uniqueIndex: uniqueIndex().on(table.boardId, table.name),
-    orderIndex: uniqueIndex().on(table.boardId, table.order),
+    // We add a unique constraint to order manually in 0022
   }),
 );
 

@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const createBoardSchema = z.object({
   name: z.string().min(5).max(255),
+  workspaceId: z.string().uuid(),
 });
 
 export const updateBoardSchema = z.object({
@@ -10,6 +11,7 @@ export const updateBoardSchema = z.object({
 
 export const createStatusColumnSchema = z.object({
   name: z.string().min(5).max(255),
+  workspaceId: z.string().uuid(),
 });
 
 export const updateStatusColumnSchema = createStatusColumnSchema

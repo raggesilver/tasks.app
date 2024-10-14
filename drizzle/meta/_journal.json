@@ -148,6 +148,20 @@
       "when": 1728623814367,
       "tag": "0020_huge_multiple_man",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1728942606440,
+      "tag": "0021_noisy_sauron",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1728942620245,
+      "tag": "0022_jittery_lord_tyger",
+      "breakpoints": true
     }
   ]
 }

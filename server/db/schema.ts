@@ -52,20 +52,18 @@ export const oauth = pgTable(
 export type OauthEntity = typeof oauth.$inferSelect;
 export type NewOauthEntity = typeof oauth.$inferInsert;
 
-// TODO: Real workspace
+export const workspaces = pgTable("workspaces", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  ownerId: uuid("owner_id")
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
 
-// const workspaces = pgTable("workspaces", {
-//   id: uuid("id").primaryKey().defaultRandom(),
-//   name: varchar("name", { length: 255 }).notNull(),
-//   ownerId: uuid("owner_id")
-//     .notNull()
-//     .references(() => users.id),
-//   createdAt: timestamp("created_at").notNull().defaultNow(),
-//   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-// });
-
-// export type Workspace = typeof workspaces.$inferSelect;
-// export type NewWorkspace = typeof workspaces.$inferInsert;
+export type Workspace = typeof workspaces.$inferSelect;
+export type NewWorkspace = typeof workspaces.$inferInsert;
 
 // Workspaces became boards
 export const boards = pgTable(
@@ -76,15 +74,15 @@ export const boards = pgTable(
     ownerId: uuid("owner_id")
       .notNull()
       .references(() => users.id),
-    // workspaceId: uuid("workspace_id")
-    //   .notNull()
-    //   .references(() => workspaces.id, { onDelete: "cascade" }),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  // (table) => ({
-  //   name: uniqueIndex().on(table.workspaceId, table.name),
-  // }),
+  (table) => ({
+    name: uniqueIndex().on(table.workspaceId, table.name),
+  }),
 );
 
 export type Board = typeof boards.$inferSelect;
@@ -94,11 +92,11 @@ export const statusColumns = pgTable(
   "status_columns",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    // workspaceId: uuid("workspace_id")
-    //   .notNull()
-    //   .references(() => workspaces.id, {
-    //     onDelete: "cascade",
-    //   }),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, {
+        onDelete: "cascade",
+      }),
     boardId: uuid("board_id")
       .notNull()
       .references(() => boards.id, {
@@ -117,10 +115,7 @@ export const statusColumns = pgTable(
   },
   (table) => ({
     uniqueIndex: uniqueIndex().on(table.boardId, table.name),
-    // We cannot have two columns with the same order in the same workspace.
-    // This is now handled with unique constraint created manually in migartion
-    // 0004_dusty_hitman.sql
-    // orderIndex: uniqueIndex().on(table.workspaceId, table.order),
+    orderIndex: uniqueIndex().on(table.boardId, table.order),
   }),
 );
 

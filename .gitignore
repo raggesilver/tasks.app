@@ -23,6 +23,6 @@ logs
 .env.*
 !.env.example
 
-/db-data
+/db-data*
 /cert
 /coverage

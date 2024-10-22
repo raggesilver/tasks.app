@@ -153,7 +153,11 @@ const iconForFileType = computed(() => {
         </EasyTooltip>
         <EasyTooltip tooltip="Open in new tab">
           <Button size="micro" variant="outline" as-child>
-            <NuxtLink :to="`/api/attachment/${attachment.id}`" external>
+            <NuxtLink
+              :to="`/api/attachment/${attachment.id}`"
+              external
+              target="_blank"
+            >
               <Icon name="lucide:external-link" class="w-3 h-3" />
             </NuxtLink>
           </Button>

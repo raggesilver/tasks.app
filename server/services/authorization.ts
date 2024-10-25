@@ -6,9 +6,48 @@ import {
   collaborators,
   labels,
   tasks,
+  workspaces,
   type Board,
   type User,
+  type Workspace,
 } from "../db/schema";
+
+export const isUserWorkspaceCollaborator = (
+  userId: string,
+  workspaceId: string,
+) =>
+  db
+    .select({ res: sql`1` })
+    .from(workspaces)
+    // FIXME: uncomment this once we have workspace collaborators
+    // .leftJoin(collaborators, eq(collaborators.workspaceId, workspaceId))
+    .where(
+      and(
+        eq(workspaces.id, workspaceId),
+        or(
+          eq(workspaces.ownerId, userId),
+          // eq(collaborators.userId, userId),
+        ),
+      ),
+    )
+    .limit(1)
+    .execute()
+    .then((rows) => rows[0]?.res === 1);
+
+/**
+ * Check if a user is the owner of a workspace.
+ *
+ * @param userId The user ID.
+ * @param workspaceId The workspace ID.
+ */
+export const isUserWorkspaceOwner = (userId: string, workspaceId: string) =>
+  db
+    .select({ res: sql`1` })
+    .from(workspaces)
+    .where(and(eq(workspaces.id, workspaceId), eq(workspaces.ownerId, userId)))
+    .limit(1)
+    .execute()
+    .then((rows) => rows[0]?.res === 1);
 
 /**
  * Check if a user is the owner of a board.
@@ -67,8 +106,8 @@ export const isUserBoardCollaboratorForAttachment = (
     .then((rows) => rows[0]?.res === 1);
 
 /**
- * Check if a user is a collaborator or owner of the board that a task
- * belongs to.
+ * Check if a user is a collaborator or owner of the board that a task belongs
+ * to.
  *
  * @param userId The user ID.
  * @param taskId The task ID.
@@ -112,6 +151,29 @@ export const isUserBoardCollaboratorForLabel = (
     .then((rows) => rows[0]?.res === 1);
 
 // ...
+
+export async function isUserAllowedToViewWorkspace(
+  user: User | string,
+  workspace: Workspace | string,
+): Promise<boolean> {
+  const userId = typeof user === "string" ? user : user.id;
+  const workspaceId = typeof workspace === "string" ? workspace : workspace.id;
+
+  return isUserWorkspaceCollaborator(userId, workspaceId);
+}
+
+export async function isUserAllowedToModifyWorkspace(
+  user: User | string,
+  workspace: Workspace | string,
+): Promise<boolean> {
+  const userId = typeof user === "string" ? user : user.id;
+
+  if (typeof workspace !== "string") {
+    return workspace.ownerId === userId;
+  }
+
+  return isUserWorkspaceOwner(userId, workspace);
+}
 
 export async function isUserAllowedToEditBoard(
   user: User,

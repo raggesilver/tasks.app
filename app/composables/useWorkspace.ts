@@ -2,7 +2,9 @@ import {
   queryOptions,
   type UndefinedInitialQueryOptions,
 } from "@tanstack/vue-query";
+import { getWorkspacesOptions } from "~/composables/useWorkspaces";
 import { normalizeDates } from "~/lib/utils";
+import type { CreateWorkspaceInput } from "~/lib/validation";
 import type { Workspace } from "~~/server/db/schema";
 
 export const getWorkspaceOptions = (id: MaybeRefOrGetter<string>) =>
@@ -27,4 +29,25 @@ export const useWorkspace = <T extends UndefinedInitialQueryOptions>(
     },
     client,
   );
+};
+
+export const useCreateWorkspaceMutation = () => {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateWorkspaceInput) =>
+      useRequestFetch()("/api/workspace", {
+        method: "POST",
+        body: data,
+      }).then((response) => normalizeDates<Workspace>(response)),
+    onSuccess: (workspace) => {
+      client.setQueryData(
+        getWorkspaceOptions(workspace.id).queryKey,
+        workspace,
+      );
+      client.setQueryData(getWorkspacesOptions().queryKey, (workspaces) =>
+        workspaces ? [workspace, ...workspaces] : undefined,
+      );
+    },
+  });
 };

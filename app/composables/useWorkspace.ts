@@ -51,3 +51,24 @@ export const useCreateWorkspaceMutation = () => {
     },
   });
 };
+
+export const useUpdateWorkspaceMutation = () => {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateWorkspaceInput }) =>
+      useRequestFetch()(`/api/workspace/${id}`, {
+        method: "PUT",
+        body: data,
+      }).then((response) => normalizeDates<Workspace>(response)),
+    onSuccess: (workspace) => {
+      client.setQueryData(
+        getWorkspaceOptions(workspace.id).queryKey,
+        workspace,
+      );
+      client.setQueryData(getWorkspacesOptions().queryKey, (workspaces) =>
+        workspaces?.concat(workspace),
+      );
+    },
+  });
+};

@@ -4,7 +4,10 @@ import {
 } from "@tanstack/vue-query";
 import { getWorkspacesOptions } from "~/composables/useWorkspaces";
 import { normalizeDates } from "~/lib/utils";
-import type { CreateWorkspaceInput } from "~/lib/validation";
+import type {
+  CreateWorkspaceInput,
+  UpdateWorkspaceInput,
+} from "~/lib/validation";
 import type { Workspace } from "~~/server/db/schema";
 
 export const getWorkspaceOptions = (id: MaybeRefOrGetter<string>) =>

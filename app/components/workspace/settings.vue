@@ -28,14 +28,6 @@ const page = useQueryParam<ValidPage>("settings", {
 
 <template>
   <div class="space-y-8">
-    <section>
-      <SheetTitle>Workspace Settings</SheetTitle>
-      <SheetDescription
-        >Customize rules, permissions, members, and much more for your entire
-        workspace.
-      </SheetDescription>
-    </section>
-
     <Tabs v-model:model-value="page">
       <TabsList>
         <TabsTrigger

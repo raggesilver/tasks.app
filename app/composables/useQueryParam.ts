@@ -8,13 +8,13 @@ export const useQueryParam = <T extends string>(
   const route = useRoute();
   const router = useRouter();
 
-  return computed<T>({
+  return computed<T | undefined>({
     get() {
       const val = route.query[toValue(key)]?.toString();
       if (options?.validate && !options.validate(val)) {
-        return toValue(options?.defaultValue);
+        return toValue(options?.defaultValue) as T | undefined;
       }
-      return val ?? toValue(options?.defaultValue);
+      return (val ?? toValue(options?.defaultValue)) as T | undefined;
     },
     set(val) {
       if (options?.validate && !options.validate(val)) {

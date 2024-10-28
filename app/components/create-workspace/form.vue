@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { toTypedSchema } from "@vee-validate/zod";
-import type { FetchError } from "ofetch";
 import { useForm } from "vee-validate";
 import { toast } from "vue-sonner";
 import { useCreateWorkspaceMutation } from "~/composables/useWorkspace";
+import { getFetchErrorMessage } from "~/lib/utils";
 import { createWorkspaceSchema } from "~/lib/validation";
 
 const emit = defineEmits(["dismiss"]);
@@ -26,9 +26,9 @@ const onSubmit = form.handleSubmit(async (values) => {
     await mutateAsync(values);
     emit("dismiss");
     toast.success(`Workspace ${values.name} created!`);
-  } catch (error: FetchError) {
+  } catch (error) {
     // TODO: track error
-    toast.error(error.data?.message ?? "An unknown error occurred.");
+    toast.error(getFetchErrorMessage(error));
   }
 });
 </script>

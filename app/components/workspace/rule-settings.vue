@@ -7,7 +7,17 @@ defineProps<{
 </script>
 
 <template>
-  <div>
-    <h3>Rule Settings</h3>
+  <div class="space-y-lg mt-6">
+    <section>
+      <SheetTitle>Workspace Rules</SheetTitle>
+      <SheetDescription>
+        Control who can access and/or modify your workspace. Add board-level
+        rules for fine-grained control.
+      </SheetDescription>
+    </section>
+
+    <div class="text-muted-foreground text-center">
+      <ComingSoon />
+    </div>
   </div>
 </template>

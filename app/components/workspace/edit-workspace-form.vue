@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { toTypedSchema } from "@vee-validate/zod";
-import type { FetchError } from "ofetch";
 import { useForm } from "vee-validate";
 import { toast } from "vue-sonner";
+import { getFetchErrorMessage } from "~/lib/utils";
 import { updateWorkspaceSchema } from "~/lib/validation";
 import type { Workspace } from "~~/server/db/schema";
 
@@ -19,16 +19,23 @@ const form = useForm({
   },
 });
 
+const isModified = computed(() => {
+  return form.meta.value.dirty;
+});
+
 const { mutateAsync, isPending } = useUpdateWorkspaceMutation();
 
-const handleSubmit = form.handleSubmit(async (values) => {
-  if (isPending.value) return;
+const handleSubmit = form.handleSubmit(async (values, { resetForm }) => {
+  if (isPending.value || !isModified.value) return;
 
   try {
     await mutateAsync({ id: props.workspace.id, data: values });
+
+    resetForm({ values });
+
     toast.success("Workspace updated successfully.");
-  } catch (error: FetchError) {
-    toast.error(error.data?.message ?? "An unexpected error occurred.");
+  } catch (error) {
+    toast.error(getFetchErrorMessage(error));
   }
 });
 </script>

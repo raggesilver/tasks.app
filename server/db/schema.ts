@@ -130,11 +130,6 @@ export const collaborators = pgTable(
       .references(() => boards.id, {
         onDelete: "cascade",
       }),
-    // workspaceId: uuid("workspace_id")
-    //   .notNull()
-    //   .references(() => workspaces.id, {
-    //     onDelete: "cascade",
-    //   }),
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, {
@@ -149,6 +144,33 @@ export const collaborators = pgTable(
 
 export type Collaborator = typeof collaborators.$inferSelect;
 export type NewCollaborator = typeof collaborators.$inferInsert;
+
+export const workspaceCollaborators = pgTable(
+  "workspace_collaborators",
+  {
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, {
+        onDelete: "cascade",
+      }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "cascade",
+      }),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.workspaceId, table.userId] }),
+  }),
+);
+
+export type WorkspaceCollaborator = typeof workspaceCollaborators.$inferSelect;
+export type NewWorkspaceCollaborator =
+  typeof workspaceCollaborators.$inferInsert;
+
+// If we ever wish to prevent users from setting other users as board
+// collaborators when they are already workspace collaborators, we can
+// make use of triggers to prevent insertions into the collaborators table.
 
 export const tasks = pgTable(
   "tasks",
@@ -324,6 +346,20 @@ export const collaboratorsRelations = relations(collaborators, ({ one }) => ({
   }),
 }));
 
+export const workspaceCollaboratorsRelations = relations(
+  workspaceCollaborators,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [workspaceCollaborators.userId],
+      references: [users.id],
+    }),
+    workspace: one(workspaces, {
+      fields: [workspaceCollaborators.workspaceId],
+      references: [workspaces.id],
+    }),
+  }),
+);
+
 export const boardsRelations = relations(boards, ({ one, many }) => ({
   owner: one(users, {
     fields: [boards.ownerId],
@@ -331,6 +367,18 @@ export const boardsRelations = relations(boards, ({ one, many }) => ({
   }),
   collaborators: many(collaborators),
   statusColumns: many(statusColumns),
+  workspace: one(workspaces, {
+    fields: [boards.workspaceId],
+    references: [workspaces.id],
+  }),
+}));
+
+export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [workspaces.ownerId],
+    references: [users.id],
+  }),
+  boards: many(boards),
 }));
 
 export const statusColumnsRelations = relations(
@@ -418,9 +466,8 @@ export const attachmentsRelations = relations(attachments, ({ one }) => ({
 export type TaskWithAssignees = Task & { assignees: Assignee[] };
 
 /**
- * This is a type that represents a task with all the related data.
- * It's useful when we want to fetch a task with all the related data in one
- * query.
+ * This is a type that represents a task with all the related data. It's useful
+ * when we want to fetch a task with all the related data in one query.
  */
 export type TaskWithEverything = Task & {
   labels: TaskLabel[];

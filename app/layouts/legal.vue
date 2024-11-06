@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const production = ref(import.meta.env.NODE_ENV === "production");
+const production = useRequestURL().hostname.includes("localhost");
 </script>
 
 <template>

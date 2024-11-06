@@ -47,12 +47,12 @@ export default defineNuxtConfig({
     },
   },
 
-  nitro: {
-    prerender: {
-      crawlLinks: false,
-      routes: ["/legal/privacy-policy", "/legal/tos"],
-    },
-  },
+  // nitro: {
+  //   prerender: {
+  //     crawlLinks: false,
+  //     routes: ["/legal/privacy-policy", "/legal/tos"],
+  //   },
+  // },
 
   vite: {
     optimizeDeps: {

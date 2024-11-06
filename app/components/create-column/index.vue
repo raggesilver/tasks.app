@@ -44,7 +44,7 @@ const description = "Create a new status column to organize your tasks.";
     </Drawer>
   </ClientOnly>
 
-  <Button variant="outline" @click="isOpen = true">
-    New Column <Icon name="lucide:plus" />
+  <Button variant="secondary" size="sm" @click="isOpen = true">
+    New Column <Icon name="lucide:plus" class="h-[1em] ml-1" />
   </Button>
 </template>

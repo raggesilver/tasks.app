@@ -51,12 +51,12 @@ const showCreateWorkspace = ref(false);
           class="flex flex-col items-center justify-center p-4 border-2 border-dashed bg-transparent"
         >
           <Button
+            variant="secondary"
             size="sm"
-            variant="ghost"
+            class="flex items-center gap-2"
             @click="() => (showCreateWorkspace = true)"
           >
-            Create
-            <Icon class="h-[1.2em] ml-1" name="lucide:plus" />
+            Create <Icon name="lucide:plus" />
           </Button>
         </Card>
       </div>

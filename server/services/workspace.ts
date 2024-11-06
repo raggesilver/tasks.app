@@ -1,10 +1,12 @@
-import { eq, or } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { db } from "../db/db";
 import {
   boards,
   collaborators,
   type NewWorkspace,
   type Workspace,
+  type WorkspaceCollaborator,
+  workspaceCollaborators,
   workspaces,
 } from "../db/schema";
 
@@ -77,4 +79,67 @@ export async function updateWorkspace(
     .returning()
     .execute()
     .then(([workspace]) => workspace);
+}
+
+/**
+ * Add a user as a collaborator to a workspace.
+ *
+ * @param workspaceId - The unique identifier of the workspace.
+ * @param userId - The unique identifier of the user to add as a collaborator.
+ * @returns A promise that resolves to the created workspace collaborator
+ *   object.
+ */
+export async function addWorkspaceCollaborator(
+  workspaceId: string,
+  userId: string,
+): Promise<WorkspaceCollaborator> {
+  return db
+    .insert(workspaceCollaborators)
+    .values({ workspaceId, userId })
+    .returning()
+    .execute()
+    .then(([collaborator]) => collaborator);
+}
+
+/**
+ * Removes a user as a collaborator from a workspace.
+ *
+ * @param workspaceId - The unique identifier of the workspace.
+ * @param userId - The unique identifier of the user to remove as a
+ *   collaborator.
+ * @returns A promise that resolves to a boolean indicating whether the user was
+ *   successfully removed as a collaborator.
+ */
+export async function removeWorkspaceCollaborator(
+  workspaceId: string,
+  userId: string,
+): Promise<boolean> {
+  return db
+    .delete(workspaceCollaborators)
+    .where(
+      and(
+        eq(workspaceCollaborators.workspaceId, workspaceId),
+        eq(workspaceCollaborators.userId, userId),
+      ),
+    )
+    .returning()
+    .execute()
+    .then((res) => res?.length > 0);
+}
+
+/**
+ * Retrieves a list of collaborators for a workspace.
+ *
+ * @param workspaceId - The unique identifier of the workspace.
+ * @returns A promise that resolves to an array of workspace collaborator
+ *   objects.
+ */
+export async function getWorkspaceCollaborators(
+  workspaceId: string,
+): Promise<WorkspaceCollaborator[]> {
+  return db.query.workspaceCollaborators
+    .findMany({
+      where: (table, { eq }) => eq(table.workspaceId, workspaceId),
+    })
+    .execute();
 }

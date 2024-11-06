@@ -47,7 +47,7 @@ const description = computed(
   </ClientOnly>
 
   <Button
-    variant="outline"
+    variant="secondary"
     size="sm"
     class="flex items-center gap-2"
     @click="isOpen = true"

@@ -6,55 +6,61 @@ const props = defineProps<{
   workspace: Workspace;
 }>();
 
+const workspaceId = computed(() => props.workspace.id);
+
 const {
   data: collaborators,
   isPending,
   suspense,
-} = useWorkspaceCollaborators(() => props.workspace.id);
+} = useWorkspaceCollaborators(workspaceId);
 
 const {
   data: invitationLink,
   isPending: isInvitationLinkPending,
   suspense: invitationLinkSuspense,
-} = useWorkspaceInvitationLink(() => props.workspace.id);
+} = useWorkspaceInvitationLink(workspaceId);
 
 const { mutateAsync: createInvitationLink, isPending: isCreatingLink } =
-  useCreateWorkspaceInvitationLinkMutation(() => props.workspace.id);
+  useCreateWorkspaceInvitationLinkMutation(workspaceId);
 
 const { mutateAsync: disableInvitationLink, isPending: isDisablingLink } =
-  useDeactivateWorkspaceInvitationLinkMutation(() => props.workspace.id);
+  useDeactivateWorkspaceInvitationLinkMutation(workspaceId);
 
 if (import.meta.env.SSR) {
   await Promise.all([suspense(), invitationLinkSuspense()]);
 }
 
-const generateAndCopyLink = async (id: string) => {
+const generateLink = async (id: string) => {
   const _url = useRequestURL();
 
   const url = new URL("/api/invitation/accept", _url.origin);
   url.searchParams.set("token", id);
 
-  return navigator.clipboard
-    .writeText(url.toString())
-    .then(() => toast.success("Link copied to clipboard."))
-    .catch((err) => {
-      console.error(err);
-      toast.error("Failed to copy link to clipboard.");
-    });
+  return url.toString();
 };
 
 const onInviteWithLink = async () => {
   if (isCreatingLink.value) return;
 
-  if (invitationLink.value) {
-    // invitationLink.value.id
-    await generateAndCopyLink(invitationLink.value.id);
-    return;
-  }
+  // We need to use ClipboardItem with async content in order for this to work
+  // in Safari. Otherwise, it will throw an error when we try writing to the
+  // clipboard after awaiting for a promise.
+  const item = new ClipboardItem({
+    "text/plain": new Promise((resolve) => {
+      if (invitationLink.value) {
+        resolve(generateLink(invitationLink.value.id));
+      } else {
+        createInvitationLink()
+          .then(({ id }) => resolve(generateLink(id)))
+          .catch(() => toast.error("Failed to create invitation link."));
+      }
+    }),
+  });
 
-  const invitation = await createInvitationLink();
-  console.log({ invitation });
-  await generateAndCopyLink(invitation.id);
+  await navigator.clipboard
+    .write([item])
+    .then(() => toast.success("Invitation link copied to clipboard."))
+    .catch(() => toast.error("Failed to copy invitation link to clipboard."));
 };
 
 const onDisableLink = async () => {
@@ -78,8 +84,6 @@ const onDisableLink = async () => {
       </SheetDescription>
     </section>
 
-    <p>Invitation link: {{ JSON.stringify(invitationLink, null, 2) }}</p>
-
     <section>
       <h3 class="font-semibold">Invite Collaborators</h3>
       <div class="flex flex-col md:flex-row gap-x-4 gap-y-2">
@@ -90,10 +94,20 @@ const onDisableLink = async () => {
         </p>
         <div class="flex flex-col gap-2 flex-1">
           <Button @click="onInviteWithLink">
-            Invite with link <LazyActivityIndicator v-if="isCreatingLink" />
-            <Icon v-else name="lucide:link" class="ml-1" />
+            {{ invitationLink === null ? "Invite with link" : "Copy link" }}
+            <LazyActivityIndicator v-if="isCreatingLink" />
+            <Icon
+              v-else-if="invitationLink === null"
+              name="lucide:link"
+              class="ml-1"
+            />
+            <Icon v-else name="lucide:clipboard" class="ml-1" />
           </Button>
-          <Button variant="secondary" @click="onDisableLink">
+          <Button
+            v-if="invitationLink"
+            variant="secondary"
+            @click="onDisableLink"
+          >
             Disable link
             <LazyActivityIndicator v-if="isDisablingLink" />
           </Button>

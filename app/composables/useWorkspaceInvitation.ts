@@ -41,7 +41,7 @@ export const useCreateWorkspaceInvitationLinkMutation = (
       }).then((response) => normalizeDates<InvitationLink>(response)),
     onSuccess: (result) => {
       client.setQueryData(
-        getWorkspaceInvitationLinkOptions(workspaceId).queryKey,
+        getWorkspaceInvitationLinkOptions(toValue(workspaceId)).queryKey,
         result,
       );
     },
@@ -61,19 +61,11 @@ export const useDeactivateWorkspaceInvitationLinkMutation = (
           method: "POST",
         },
       ),
-    onSuccess: async (result) => {
-      const activeWorkspaceInvitationLink = client.getQueryData(
-        getWorkspaceInvitationLinkOptions(workspaceId).queryKey,
+    onSuccess: async () => {
+      client.setQueryData(
+        getWorkspaceInvitationLinkOptions(toValue(workspaceId)).queryKey,
+        null,
       );
-
-      console.log({ result, activeWorkspaceInvitationLink });
-
-      if (activeWorkspaceInvitationLink?.id === result.id) {
-        client.setQueryData(
-          getWorkspaceInvitationLinkOptions(workspaceId).queryKey,
-          null,
-        );
-      }
     },
   });
 };

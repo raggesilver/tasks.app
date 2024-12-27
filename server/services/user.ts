@@ -129,6 +129,15 @@ export async function getOrCreateUser(
     return { user, oauthEntity };
   });
 
+  usePosthog().capture({
+    event: "new user",
+    distinctId: user.id,
+    properties: {
+      name: user.fullName,
+      email: user.email,
+    },
+  });
+
   return user;
 }
 

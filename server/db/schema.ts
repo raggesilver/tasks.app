@@ -1,6 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   integer,
   pgTable,
   primaryKey,
@@ -301,25 +302,51 @@ export const invitationLinks = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     // In the future we may allow restricting invitations to specific email(s)
     // email: varchar("email", { length: 255 }).notNull(),
-    boardId: uuid("board_id")
-      .notNull()
-      .references(() => boards.id, {
-        onDelete: "cascade",
-      }),
+    workspaceId: uuid("workspace_id").references(() => workspaces.id, {
+      onDelete: "cascade",
+    }),
+    boardId: uuid("board_id").references(() => boards.id, {
+      onDelete: "cascade",
+    }),
     // expiresAt: timestamp("expires_at").notNull(),
     active: boolean("active").notNull().default(true),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (table) => ({
-    // We need to make sure that we don't have multiple active invitation links
-    // for the same workspace.
-    uniqueIndex: uniqueIndex()
+    // Unique constraint for active workspace invites
+    workspaceUniqueIndex: uniqueIndex()
+      .on(table.workspaceId, table.active)
+      .where(sql`${table.active} = true AND ${table.workspaceId} IS NOT NULL`),
+    // Unique constraint for active board invites
+    boardUniqueIndex: uniqueIndex()
       .on(table.boardId, table.active)
-      .where(sql`${table.active} = true`),
+      .where(sql`${table.active} = true AND ${table.boardId} IS NOT NULL`),
+    validInvitation: check(
+      "valid_invitation_target",
+      sql`(
+        (${table.workspaceId} IS NULL AND ${table.boardId} IS NOT NULL) OR 
+        (${table.workspaceId} IS NOT NULL AND ${table.boardId} IS NULL)
+      )`,
+    ),
   }),
 );
 
-export type InvitationLink = typeof invitationLinks.$inferSelect;
+type _InvitationLink = Omit<
+  typeof invitationLinks.$inferSelect,
+  "boardId" | "workspaceId"
+>;
+
+export type InvitationLink = _InvitationLink &
+  (
+    | {
+        workspaceId: string;
+        boardId: null;
+      }
+    | {
+        workspaceId: null;
+        boardId: string;
+      }
+  );
 export type NewInvitationLink = typeof invitationLinks.$inferInsert;
 
 // Relations

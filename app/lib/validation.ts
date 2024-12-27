@@ -56,14 +56,23 @@ export const publicUserSchema = z.object({
   profilePictureUrl: z.string().url().optional(),
 });
 
-export const createInvitationSchema = z.object({
-  boardId: z.string().uuid(),
-});
+export const createInvitationSchema = z
+  .object({
+    boardId: z.string().uuid(),
+  })
+  .or(z.object({ workspaceId: z.string().uuid() }));
 
-export const deactivateInvitationSchema = z.object({
-  invitationId: z.string().uuid(),
-  boardId: z.string().uuid(),
-});
+export const deactivateInvitationSchema = z
+  .object({
+    invitationId: z.string().uuid(),
+    boardId: z.string().uuid(),
+  })
+  .or(
+    z.object({
+      invitationId: z.string().uuid(),
+      workspaceId: z.string().uuid(),
+    }),
+  );
 
 export const addAssigneeSchema = z.object({
   userId: z.string().uuid(),

@@ -263,6 +263,13 @@ export async function isUserAllowedToModifyLabel(
     .then((rows) => rows[0]?.res === 1);
 }
 
+export async function isUserAllowedToCreateOrModifyWorkspaceInvitation(
+  userId: string,
+  workspaceId: string,
+): Promise<boolean> {
+  return isUserWorkspaceOwner(userId, workspaceId);
+}
+
 export async function isUserAllowedToCreateOrModifyBoardInvitation(
   userId: string,
   boardId: string,

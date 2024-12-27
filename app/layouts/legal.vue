@@ -1,24 +1,22 @@
 <script setup lang="ts">
-const production = useRequestURL().hostname.includes("localhost");
+const production = computed(() => useRequestURL().hostname.includes("fly.dev"));
 </script>
 
 <template>
-  <div
-    v-if="!production"
-    class="text-background bg-foreground py-4 sticky top-0 left-0 z-50"
-  >
+  <div v-if="!production" class="text-background bg-foreground py-4">
     <p class="max-w-[65ch] w-full text-justify mx-auto px-4 md:px-0">
       You are on a preview deployment. The Terms of Service and Privacy Policy
       are drafts and may never become official.
     </p>
   </div>
+  <NavBarLanding />
   <main v-once :class="{ production }">
     <slot />
   </main>
   <app-footer />
 </template>
 
-<style>
+<style scoped>
 main {
   position: relative;
 }

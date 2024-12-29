@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
 
   const storage = useStorageS3(event);
 
-  const response = await storage.deleteAttachmentsFromS3([attachment]);
+  const response = await storage.deleteAttachments([attachment]);
 
   if (response[0] !== attachment.id) {
     throw createError({

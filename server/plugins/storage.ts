@@ -6,6 +6,7 @@ export default defineNitroPlugin((nitro) => {
   const client = new S3Client({
     region: config.aws.region,
     endpoint: config.aws.endpointUrlS3,
+    forcePathStyle: config.aws.endpointUrlS3.startsWith("http://localhost"),
     credentials: {
       accessKeyId: config.aws.accessKeyId,
       secretAccessKey: config.aws.secretAccessKey,

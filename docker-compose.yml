@@ -2,17 +2,53 @@ services:
   database:
     image: "postgres:16-alpine"
     ports:
-      - 5432:5432
+      - 5413:5432
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: postgres
     user: 1000:1000
     volumes:
-      - ./db-data/:/var/lib/postgresql/data/
+      - appdata-db:/var/lib/postgresql/data/
     # health check postgres ready
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 2s
       timeout: 5s
       retries: 15
+
+  minio:
+    image: "minio/minio"
+    ports:
+      - "9022:9000"
+      - "9023:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - appdata-minio:/data
+    command: server --console-address ":9001" /data
+
+  # redis:
+  #   image: "redis:alpine"
+  #   ports:
+  #     - "6339:6379"
+
+volumes:
+  appdata-db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./appdata/db-data
+  appdata-minio:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./appdata/minio-data

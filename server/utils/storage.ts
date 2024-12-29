@@ -80,9 +80,7 @@ export const useStorageS3 = (event: H3Event) => {
         policy: JSON.stringify(policy),
       });
     },
-    async deleteAttachmentsFromS3(
-      attachments: Attachment[],
-    ): Promise<string[]> {
+    async deleteAttachments(attachments: Attachment[]): Promise<string[]> {
       const response = await client.send(
         new DeleteObjectsCommand({
           Bucket: config.bucketName,
@@ -102,3 +100,5 @@ export const useStorageS3 = (event: H3Event) => {
     },
   };
 };
+
+export type StorageAdapter = ReturnType<typeof useStorageS3>;

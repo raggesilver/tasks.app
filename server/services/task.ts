@@ -89,6 +89,10 @@ export const updateTask = async (
   return task ? getTaskById(id) : null;
 };
 
+/**
+ * Deletes a task. Attachments for this task must have been deleted before
+ * calling this function.
+ */
 export const deleteTask = async (id: string): Promise<boolean> => {
   return db
     .delete(tasks)

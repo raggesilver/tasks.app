@@ -96,6 +96,7 @@ export async function addWorkspaceCollaborator(
   return db
     .insert(workspaceCollaborators)
     .values({ workspaceId, userId })
+    .onConflictDoNothing()
     .returning()
     .execute()
     .then(([collaborator]) => collaborator);

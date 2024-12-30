@@ -81,27 +81,11 @@ const mountSheetSSR = useSSRSheetHelper(showSettings);
       />
     </template>
     <template #right-items>
-      <Popover>
-        <PopoverTrigger as-child>
-          <Button
-            size="sm"
-            variant="outline"
-            class="flex items-center gap-2"
-            title="Share board"
-            :disabled="!workspace"
-          >
-            Share <Icon name="lucide:share" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent align="end" class="w-full sm:w-[435px]">
-          <!-- <LazyShareBoard v-if="board" :board /> -->
-        </PopoverContent>
-      </Popover>
       <EasyTooltip
         v-if="workspace?.ownerId === user?.id"
         tooltip="Workspace Settings"
       >
-        <Button size="sm" variant="outline" class="w-8 p-0" as-child>
+        <Button as-child class="w-8 p-0" size="sm" variant="outline">
           <NuxtLink :to="{ query: { ...route.query, settings: '' } }">
             <Icon name="lucide:ellipsis" />
           </NuxtLink>
@@ -112,7 +96,7 @@ const mountSheetSSR = useSSRSheetHelper(showSettings);
       <template v-if="is404">
         <div class="flex-1 flex flex-col items-center justify-center">
           <h1 class="text-3xl font-extrabold">Board not found</h1>
-          <Button variant="link" as-child>
+          <Button as-child variant="link">
             <NuxtLink to="/app">Go back</NuxtLink>
           </Button>
         </div>
@@ -129,8 +113,8 @@ const mountSheetSSR = useSSRSheetHelper(showSettings);
           <Skeleton
             v-for="i in 3"
             :key="i"
-            class="shrink-0 h-[100px] bg-muted dark:bg-background"
             as="li"
+            class="shrink-0 h-[100px] bg-muted dark:bg-background"
           />
         </ol>
         <ol v-else class="standard-grid">
@@ -158,8 +142,8 @@ const mountSheetSSR = useSSRSheetHelper(showSettings);
     <Sheet v-model:open="showSettings">
       <SheetContent
         :ssr="mountSheetSSR"
-        class="w-[100vw] sm:w[75vw] lg:w-[50vw] !max-w-[100vh] overflow-y-auto"
         as="aside"
+        class="w-[100vw] sm:w[75vw] lg:w-[50vw] !max-w-[100vh] overflow-y-auto"
       >
         <WorkspaceSettings v-if="workspace" :workspace />
       </SheetContent>

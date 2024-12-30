@@ -7,6 +7,7 @@ import {
   workspaces,
 } from "~~/server/db/schema";
 import type { StorageAdapter } from "~~/server/utils/storage";
+import { encodeAttachmentName } from "~~/server/utils/storage";
 import { db } from "../db/db";
 import { cacheResult } from "../utils/cache";
 
@@ -45,7 +46,7 @@ class AttachmentService {
         headers: {
           "Content-Type": data.mimeType,
           "Content-Length": data.contentLength.toString(),
-          "Content-Disposition": `inline; filename="${data.name}"`,
+          "Content-Disposition": `inline; filename*=UTF-8''${encodeAttachmentName(data.name)}`,
         },
         body: stream,
         // @ts-expect-error For some reason, duplex is not in RequestInit type
@@ -60,27 +61,6 @@ class AttachmentService {
 
       return attachment;
     });
-  }
-
-  private async _invalidateWorkspaceCacheForAttachments(
-    attachments: Attachment[],
-  ) {
-    const _boards = new Set(
-      attachments.map((attachment) => attachment.boardId),
-    );
-    const _workspaces = await db
-      .select()
-      .from(workspaces)
-      .innerJoin(boards, eq(boards.workspaceId, workspaces.id))
-      .where(inArray(boards.id, Array.from(_boards)))
-      .execute();
-
-    await Promise.all(
-      _workspaces.map(async ({ workspaces: workspace }) => {
-        await invalidateCache(`getUsageForWorkspace_${workspace.id}`);
-        console.log("Deleted workspace usage cache for", workspace.id);
-      }),
-    );
   }
 
   async deleteAttachments(storage: StorageAdapter, _attachments: Attachment[]) {
@@ -128,6 +108,27 @@ class AttachmentService {
       .where(eq(boards.id, attachments.boardId))
       .execute()
       .then((rows) => rows[0]?.usage || 0);
+  }
+
+  private async _invalidateWorkspaceCacheForAttachments(
+    attachments: Attachment[],
+  ) {
+    const _boards = new Set(
+      attachments.map((attachment) => attachment.boardId),
+    );
+    const _workspaces = await db
+      .select()
+      .from(workspaces)
+      .innerJoin(boards, eq(boards.workspaceId, workspaces.id))
+      .where(inArray(boards.id, Array.from(_boards)))
+      .execute();
+
+    await Promise.all(
+      _workspaces.map(async ({ workspaces: workspace }) => {
+        await invalidateCache(`getUsageForWorkspace_${workspace.id}`);
+        console.log("Deleted workspace usage cache for", workspace.id);
+      }),
+    );
   }
 }
 

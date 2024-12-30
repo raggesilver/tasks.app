@@ -46,6 +46,9 @@ export default defineNuxtConfig({
       maxAge: 60 * 60 * 24 * 7, // 1 week
       password: process.env.NUXT_SESSION_PASSWORD || "",
     },
+    redis: {
+      url: "",
+    },
   },
 
   // nitro: {

@@ -17,6 +17,12 @@ services:
       timeout: 5s
       retries: 15
 
+  
+  redis:
+    image: redis:alpine
+    ports:
+        - "6399:6379"
+
   minio:
     image: "minio/minio"
     ports:

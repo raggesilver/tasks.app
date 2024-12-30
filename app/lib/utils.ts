@@ -15,6 +15,7 @@ export function getInitials(name: string) {
     .join("");
 }
 
+/** @deprecated Use `formatBytes` instead. */
 export function formatFileSize(bytes: number, decimals = 2) {
   const sizes = ["B", "KB", "MB", "GB", "TB"];
 
@@ -26,6 +27,22 @@ export function formatFileSize(bytes: number, decimals = 2) {
   return `${(bytes / Math.pow(1024, i)).toFixed(decimals)} ${sizes[i]}`;
 }
 
+export function formatBytes(bytes: number, decimals = 2) {
+  const units = ["bytes", "KiB", "MiB", "GiB", "TiB"];
+  let unitIndex = 0;
+
+  while (bytes >= 1024 && unitIndex < units.length - 1) {
+    bytes /= 1024;
+    unitIndex++;
+  }
+
+  const formatter = new Intl.NumberFormat("en", {
+    style: "decimal",
+    maximumFractionDigits: decimals,
+  });
+
+  return `${formatter.format(bytes)} ${units[unitIndex]}`;
+}
 type ObjectWithDates = { createdAt: Date; updatedAt?: Date };
 
 export function normalizeDates<T extends ObjectWithDates>(

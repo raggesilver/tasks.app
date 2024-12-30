@@ -31,6 +31,7 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.38.3",
     "drizzle-zod": "^0.6.1",
+    "ioredis": "^5.4.2",
     "nuxt-auth-utils": "^0.5.7",
     "postgres": "^3.4.4",
     "posthog-js": "^1.203.1",

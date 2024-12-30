@@ -3,6 +3,7 @@ import {
   LazyWorkspaceGeneralSettings,
   LazyWorkspaceMemberSettings,
   LazyWorkspaceRuleSettings,
+  LazyWorkspaceUsage,
 } from "#components";
 import type { Workspace } from "~~/server/db/schema";
 
@@ -10,13 +11,14 @@ defineProps<{
   workspace: Workspace;
 }>();
 
-const validPages = ["general", "members", "rules"] as const;
+const validPages = ["general", "members", "rules", "usage"] as const;
 type ValidPage = (typeof validPages)[number];
 
 const components = {
   general: LazyWorkspaceGeneralSettings,
   members: LazyWorkspaceMemberSettings,
   rules: LazyWorkspaceRuleSettings,
+  usage: LazyWorkspaceUsage,
 };
 
 const page = useQueryParam<ValidPage>("settings", {

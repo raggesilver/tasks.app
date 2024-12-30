@@ -4,6 +4,6 @@
   "compilerOptions": {
     // Nuxt 4 added sets this to true by default. A bunch of things in our
     // backend are not ready for this yet.
-    "noUncheckedIndexedAccess": false,
+    "noUncheckedIndexedAccess": false
   }
 }

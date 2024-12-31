@@ -98,10 +98,10 @@ const onDisableLink = async () => {
             <LazyActivityIndicator v-if="isCreatingLink" />
             <Icon
               v-else-if="invitationLink === null"
-              name="lucide:link"
               class="ml-1"
+              name="lucide:link"
             />
-            <Icon v-else name="lucide:clipboard" class="ml-1" />
+            <Icon v-else class="ml-1" name="lucide:clipboard" />
           </Button>
           <Button
             v-if="invitationLink"
@@ -115,8 +115,18 @@ const onDisableLink = async () => {
       </div>
     </section>
 
-    <div v-if="!isPending">
-      {{ collaborators }}
+    <div v-if="collaborators" class="flex flex-col gap-2">
+      <div v-if="collaborators.length === 0" class="py-8">
+        <p class="text-muted-foreground text-center">
+          There are no collaborators on this workspace.
+        </p>
+      </div>
+      <template v-else>
+        <WorkspaceMemberRow
+          v-for="collaborator of collaborators"
+          :key="`${collaborator.userId}-${collaborator.workspaceId}`"
+          :user-id="collaborator.userId"
+      /></template>
     </div>
   </div>
 </template>

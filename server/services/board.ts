@@ -2,12 +2,13 @@ import { and, eq, or } from "drizzle-orm";
 import type { UpdateBoardInput } from "~/lib/validation";
 import { db } from "../db/db";
 import {
+  type Board,
   boards,
   collaborators,
-  users,
-  type Board,
   type NewBoard,
   type User,
+  users,
+  workspaceCollaborators,
 } from "../db/schema";
 
 export async function createBoard(
@@ -38,9 +39,7 @@ export async function _getBoardById(id: string): Promise<Board | null> {
 
 // FIXME: this function is mixing authorization and data fetching. We should
 // check if the user has access to the board in a separate function.
-/**
- * @deprecated migrate to {@link _getBoardById}
- */
+/** @deprecated Migrate to {@link _getBoardById} */
 export async function getBoardById(
   userId: string,
   id: string,
@@ -67,6 +66,10 @@ export async function getAllBoards(userId: string): Promise<Board[]> {
     .selectDistinctOn([boards.id])
     .from(boards)
     .leftJoin(collaborators, eq(boards.id, collaborators.boardId))
+    .leftJoin(
+      workspaceCollaborators,
+      eq(workspaceCollaborators.workspaceId, boards.workspaceId),
+    )
     .where(
       or(
         eq(boards.ownerId, userId),
@@ -74,6 +77,7 @@ export async function getAllBoards(userId: string): Promise<Board[]> {
           eq(collaborators.boardId, boards.id),
           eq(collaborators.userId, userId),
         ),
+        eq(workspaceCollaborators.userId, userId),
       ),
     )
     .execute()
@@ -86,7 +90,17 @@ export async function getBoardCollaborators(boardId: string): Promise<User[]> {
     .from(users)
     .leftJoin(collaborators, eq(collaborators.boardId, boardId))
     .leftJoin(boards, eq(boards.id, boardId))
-    .where(or(eq(users.id, collaborators.userId), eq(users.id, boards.ownerId)))
+    .leftJoin(
+      workspaceCollaborators,
+      eq(workspaceCollaborators.userId, users.id),
+    )
+    .where(
+      or(
+        eq(users.id, collaborators.userId),
+        eq(users.id, boards.ownerId),
+        eq(workspaceCollaborators.userId, users.id),
+      ),
+    )
     .execute()
     .then((rows) => rows.map((row) => row.users));
 }

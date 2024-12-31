@@ -55,7 +55,17 @@ export async function getWorkspacesForUser(
     .from(workspaces)
     .leftJoin(boards, eq(boards.workspaceId, workspaces.id))
     .leftJoin(collaborators, eq(collaborators.boardId, boards.id))
-    .where(or(eq(collaborators.userId, userId), eq(workspaces.ownerId, userId)))
+    .leftJoin(
+      workspaceCollaborators,
+      eq(workspaceCollaborators.workspaceId, workspaces.id),
+    )
+    .where(
+      or(
+        eq(collaborators.userId, userId),
+        eq(workspaces.ownerId, userId),
+        eq(workspaceCollaborators.userId, userId),
+      ),
+    )
     .execute()
     .then((rows) => rows.map((row) => row.workspaces));
 }

@@ -2,15 +2,15 @@ import { and, eq, or, sql } from "drizzle-orm";
 import { db } from "../db/db";
 import {
   attachments,
+  type Board,
   boards,
   collaborators,
   labels,
   tasks,
-  workspaceCollaborators,
-  workspaces,
-  type Board,
   type User,
   type Workspace,
+  workspaceCollaborators,
+  workspaces,
 } from "../db/schema";
 
 // FIXME: there's currently a big issue with board ownership. In most cases,
@@ -33,12 +33,9 @@ export const isUserWorkspaceCollaborator = (
       eq(workspaceCollaborators.workspaceId, workspaceId),
     )
     .where(
-      and(
-        eq(workspaces.id, workspaceId),
-        or(
-          eq(workspaces.ownerId, userId),
-          eq(workspaceCollaborators.userId, userId),
-        ),
+      or(
+        eq(workspaces.ownerId, userId),
+        eq(workspaceCollaborators.userId, userId),
       ),
     )
     .limit(1)
@@ -88,7 +85,7 @@ export const isUserBoardCollaborator = (userId: string, boardId: string) =>
     .leftJoin(collaborators, eq(collaborators.boardId, boardId))
     .leftJoin(
       workspaceCollaborators,
-      eq(workspaceCollaborators.workspaceId, userId),
+      eq(workspaceCollaborators.workspaceId, boards.workspaceId),
     )
     .where(
       and(
@@ -99,7 +96,7 @@ export const isUserBoardCollaborator = (userId: string, boardId: string) =>
           // User is the board owner
           eq(boards.ownerId, userId),
           // User is a collaborator of the workspace the board belongs to
-          eq(workspaceCollaborators.workspaceId, boards.workspaceId),
+          eq(workspaceCollaborators.userId, userId),
         ),
       ),
     )

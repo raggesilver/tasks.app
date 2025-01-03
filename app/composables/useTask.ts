@@ -41,7 +41,7 @@ export const useCreateTaskMutation = () => {
         statusColumnId: string;
         data: CreateTaskInput;
       }) =>
-        // @ts-expect-error - Excessive stack depth.
+        // @ts-ignore
         useRequestFetch()(`/api/column/${boardId}/${statusColumnId}/add-task`, {
           method: "POST",
           body: data,

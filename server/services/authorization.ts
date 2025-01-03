@@ -14,12 +14,12 @@ import {
 } from "../db/schema";
 
 // FIXME: there's currently a big issue with board ownership. In most cases,
-// board owners are given more permission than workspace owners. This is not
-// right. Also, we are giving users access to boards and anything they contain
-// simply because they created the board. This is also not right. Users who
-// created boards and were later removed from the board (or workspace) should
-// not have access to the board or anything it contains. This is a security
-// issue.
+//  board owners are given more permission than workspace owners. This is not
+//  right. Also, we are giving users access to boards and anything they contain
+//  simply because they created the board. This is also not right. Users who
+//  created boards and were later removed from the board (or workspace) should
+//  not have access to the board or anything it contains. This is a security
+//  issue.
 
 export const isUserWorkspaceCollaborator = (
   userId: string,
@@ -249,6 +249,8 @@ export async function isUserAllowedToModifyLabel(
   userId: string,
   labelId: string,
 ): Promise<boolean> {
+  // FIXME: we need real permissions here. Workspace owners can't delete labels
+  //  if they didn't create the board...
   // Currently, only board owners can modify labels.
   return db
     .select({ res: sql`1` })

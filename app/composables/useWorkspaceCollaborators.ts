@@ -17,9 +17,38 @@ export const useWorkspaceCollaborators = (
     {
       queryKey: getWorkspaceCollaboratorsOptions(workspaceId).queryKey,
       queryFn: () =>
-        useRequestFetch()(
+        useRequestFetch()<WorkspaceCollaborator[]>(
           `/api/workspace/${toValue(workspaceId)}/collaborators`,
         ),
+    },
+    client,
+  );
+};
+
+export const useRemoveWorkspaceCollaborator = () => {
+  const client = useQueryClient();
+
+  return useMutation(
+    {
+      mutationFn: ({
+        workspaceId,
+        userId,
+      }: {
+        workspaceId: string;
+        userId: string;
+      }) =>
+        useRequestFetch()(
+          `/api/workspace/${workspaceId}/collaborator/${userId}`,
+          {
+            method: "DELETE",
+          },
+        ).then(() => ({ workspaceId, userId })),
+      onSuccess: ({ workspaceId, userId }) => {
+        client.setQueryData(
+          getWorkspaceCollaboratorsOptions(workspaceId).queryKey,
+          (collaborators) => collaborators?.filter((c) => c.userId !== userId),
+        );
+      },
     },
     client,
   );

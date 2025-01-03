@@ -1,8 +1,12 @@
 <script lang="ts" setup>
+import { toast } from "vue-sonner";
 import { usePublicUser } from "~/composables/usePublicUser";
+import { useRemoveWorkspaceCollaborator } from "~/composables/useWorkspaceCollaborators";
+import ActivityIndicator from "../activity-indicator.vue";
 
 const props = defineProps<{
   userId: string;
+  workspaceId: string;
 }>();
 
 const { user } = useUserSession();
@@ -12,14 +16,28 @@ const {
   isPending,
 } = usePublicUser(() => props.userId);
 
+const { mutateAsync: removeCollaborator, isPending: isRemovingCollaborator } =
+  useRemoveWorkspaceCollaborator();
+
 if (import.meta.env.SSR) {
   await suspense();
 }
 
 const isSelf = computed(() => collaborator.value?.id === user.value?.id);
 
-const removeCollaborator = async () => {
-  alert("Not implemented yet.");
+const onRemoveCollaborator = async () => {
+  if (isRemovingCollaborator.value || !collaborator.value) return;
+
+  try {
+    const name = collaborator.value.fullName;
+    await removeCollaborator({
+      workspaceId: props.workspaceId,
+      userId: props.userId,
+    });
+    toast.success(`Removed ${name} from workspace.`);
+  } catch {
+    toast.error("Failed to remove collaborator.");
+  }
 };
 
 const isMenuOpen = ref(false);
@@ -42,7 +60,8 @@ const isMenuOpen = ref(false);
     <DropdownMenu v-if="!isSelf" v-model:open="isMenuOpen">
       <DropdownMenuTrigger as-child class="member-row-menu transition-all">
         <Button class="w-6 h-6 p-0 ml-auto flex-shrink-0" variant="outline">
-          <Icon name="lucide:ellipsis" />
+          <ActivityIndicator v-if="isRemovingCollaborator" />
+          <Icon v-else name="lucide:ellipsis" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -51,9 +70,10 @@ const isMenuOpen = ref(false);
       >
         <DropdownMenuItem
           class="text-red-500 grid grid-cols-subgrid col-span-full"
-          @click="removeCollaborator"
+          @click="onRemoveCollaborator"
         >
-          <Icon name="lucide:trash" /> Remove Collaborator
+          <Icon name="lucide:trash" />
+          Remove Collaborator
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

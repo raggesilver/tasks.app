@@ -126,6 +126,7 @@ const onDisableLink = async () => {
           v-for="collaborator of collaborators"
           :key="`${collaborator.userId}-${collaborator.workspaceId}`"
           :user-id="collaborator.userId"
+          :workspace-id="collaborator.workspaceId"
       /></template>
     </div>
   </div>

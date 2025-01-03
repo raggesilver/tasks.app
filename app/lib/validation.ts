@@ -97,6 +97,8 @@ export const uploadAttachmentSchema = z.object({
   contentLength: z.number().int().min(1).optional(),
 });
 
+export type CreateTaskInput = z.infer<typeof createTaskSchema>;
+
 export type CreateWorkspaceInput = z.infer<typeof createWorkspaceSchema>;
 export type UpdateWorkspaceInput = z.infer<typeof updateWorkspaceSchema>;
 

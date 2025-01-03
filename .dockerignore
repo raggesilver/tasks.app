@@ -23,5 +23,13 @@ logs
 .env.*
 !.env.example
 
+/appdata
 /db-data
 /cert
+
+*.toml
+*.md 
+LICENSE
+.prettier*
+.eslint*
+.editorconfig

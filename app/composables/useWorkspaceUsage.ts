@@ -5,9 +5,7 @@ export const useWorkspaceUsage = (workspaceId: MaybeRefOrGetter<string>) => {
     {
       queryKey: ["workspace", workspaceId, "usage"],
       queryFn: async () =>
-        useRequestFetch()(`/api/workspace/${toValue(workspaceId)}/usage`).then(
-          (res) => res.usage,
-        ),
+        useRequestFetch()(`/api/workspace/${toValue(workspaceId)}/usage`),
     },
     client,
   );

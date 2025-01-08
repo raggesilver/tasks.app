@@ -47,7 +47,7 @@ const labelMap = computed(() => {
     @dragend="onDragEnd"
   >
     <NuxtLink :to="{ query: { 'view-task': task.id } }">
-      <CardHeader class="p-4">
+      <CardHeader class="p-4 gap-4">
         <div
           v-if="task.labels.length > 0"
           class="flex flex-row gap-1 items-center justify-start flex-wrap"
@@ -63,7 +63,10 @@ const labelMap = computed(() => {
       <CardFooter v-if="hasFooterContent" class="p-2 pt-0">
         <div class="flex flex-row gap-1 w-full items-center pl-2">
           <!-- Description Icon -->
-          <span class="flex items-center gap-1 text-muted-foreground">
+          <span
+            v-if="task.description"
+            class="flex items-center gap-1 text-muted-foreground"
+          >
             <Icon name="lucide:text" class="h-4" />
           </span>
           <!-- Attachment Icon -->

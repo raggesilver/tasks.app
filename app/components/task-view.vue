@@ -346,7 +346,12 @@ const onFileDropped = async (files: File[]) => {
                   <DialogDescription
                     class="text-base text-foreground whitespace-pre-wrap"
                   >
-                    {{ task.description }}
+                    <template v-if="task.description">{{
+                      task.description
+                    }}</template>
+                    <span v-else class="text-muted-foreground text-sm"
+                      >No description</span
+                    >
                   </DialogDescription>
                 </section>
 

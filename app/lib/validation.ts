@@ -32,13 +32,20 @@ export const updateStatusColumnSchema = createStatusColumnSchema
 
 export const createTaskSchema = z.object({
   title: z.string().min(4),
-  description: z.string().min(5),
+  description: z
+    .string()
+    .nullable()
+    .default(null)
+    .transform((v) => (v?.trim() === "" ? null : v)),
 });
 
 export const updateTaskSchema = z
   .object({
     title: z.string().min(4),
-    description: z.string().min(5),
+    description: z
+      .string()
+      .nullable()
+      .transform((v) => (v?.trim() === "" ? null : v)),
     statusColumnId: z.string().uuid(),
     order: z.number().int(),
   })

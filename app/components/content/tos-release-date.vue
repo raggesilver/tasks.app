@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const lastReleaseDate = "2024-08-27";
+const lastReleaseDate = "2025-01-08";
 
 const production = ref(process.env.NODE_ENV === "production");
 

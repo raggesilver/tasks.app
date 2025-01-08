@@ -3,7 +3,6 @@ import {
   GetObjectCommand,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
-import { getSignedCookies } from "@aws-sdk/cloudfront-signer";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import type { H3Event } from "h3";
 import type { Attachment } from "../db/schema";
@@ -64,33 +63,6 @@ export const useStorageS3 = (event: H3Event) => {
         }),
         { expiresIn: 3600 },
       );
-    },
-    async getBoardAccessCookie(boardId: string) {
-      const cloudfront = event.context.$cloudfront;
-      const { privateKey } = useRuntimeConfig().aws.signing;
-
-      if (!cloudfront) {
-        throw new Error("CloudFront client not available");
-      }
-
-      const policy = {
-        Statement: [
-          {
-            Resource: `${config.AWS_ENDPOINT_URL_S3}/${config.BUCKET_NAME}/${boardId}/*`,
-            Condition: {
-              DateLessThan: {
-                "AWS:EpochTime": Math.floor(Date.now() / 1000) + 60 * 60, // 1 hour
-              },
-            },
-          },
-        ],
-      };
-
-      return getSignedCookies({
-        keyPairId: config.aws.signing.publicKeyId,
-        privateKey,
-        policy: JSON.stringify(policy),
-      });
     },
     async deleteAttachments(attachments: Attachment[]): Promise<string[]> {
       const response = await client.send(

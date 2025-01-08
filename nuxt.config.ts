@@ -31,15 +31,6 @@ export default defineNuxtConfig({
       endpointUrlS3: "",
       region: "auto",
       secretAccessKey: "",
-      signing: {
-        privateKey: "",
-        publicKey: "",
-        /**
-         * This needs to be generated with CreatePublicKeyCommand. The
-         * credentials used to generate this key must have admin privileges.
-         */
-        publicKeyId: "",
-      },
     },
     bucketName: "",
     session: {

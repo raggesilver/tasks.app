@@ -21,7 +21,11 @@ const onDragEnd = () => {
 };
 
 const hasFooterContent = computed(() => {
-  return props.task.assignees.length > 0 || props.task.attachments.length > 0;
+  return (
+    props.task.assignees.length > 0 ||
+    props.task.attachments.length > 0 ||
+    props.task.description !== null
+  );
 });
 
 const labelMap = computed(() => {
@@ -43,7 +47,7 @@ const labelMap = computed(() => {
     @dragend="onDragEnd"
   >
     <NuxtLink :to="{ query: { 'view-task': task.id } }">
-      <CardHeader class="p-4">
+      <CardHeader class="p-4 gap-4">
         <div
           v-if="task.labels.length > 0"
           class="flex flex-row gap-1 items-center justify-start flex-wrap"
@@ -57,21 +61,26 @@ const labelMap = computed(() => {
         <CardTitle class="font-normal">{{ task.title }}</CardTitle>
       </CardHeader>
       <CardFooter v-if="hasFooterContent" class="p-2 pt-0">
-        <div class="flex flex-row gap-0.5 w-full items-center pl-2">
+        <div class="flex flex-row gap-1 w-full items-center pl-2">
+          <!-- Description Icon -->
+          <span
+            v-if="task.description"
+            class="flex items-center gap-1 text-muted-foreground"
+          >
+            <Icon name="lucide:text" class="h-4" />
+          </span>
+          <!-- Attachment Icon -->
           <LazyEasyTooltip
             v-if="task.attachments?.length > 0"
             :tooltip="`${task.attachments.length} attachments`"
           >
             <span class="flex items-center gap-1 text-muted-foreground">
-              <Icon name="lucide:paperclip" class="w-4 h-4" />
-              {{ task.attachments.length }}
+              <Icon name="lucide:file" class="h-4" />
             </span>
           </LazyEasyTooltip>
-          <!-- <ssr-time -->
-          <!--   :time="task.createdAt" -->
-          <!--   class="text-muted-foreground text-xs mr-auto ml-2" -->
-          <!-- /> -->
+
           <span aria-hidden="true" class="mx-auto" />
+
           <UserAvatar
             v-for="assignee in task.assignees"
             :key="assignee.userId"

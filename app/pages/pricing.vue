@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 const plans = ref([
   {
     title: "Free",
@@ -36,8 +36,13 @@ const details = ref([
   ["Unlimited Tasks", "✓", "✓", "✓"],
   ["Unlimited Comments", "✓", "✓", "✓"],
   ["Unlimited Logs", "✓", "✓", "✓"],
-  ["Unlimited Boards", "Up to 15 per board", "✓", "✓"],
-  ["Unlimited Collaborators", "Up to 15 per board", "✓", "✓"],
+  ["Unlimited Boards", "✓", "✓", "✓"],
+  [
+    "Unlimited Collaborators",
+    "Up to 15 per workspace",
+    "Up to 100 per workspace",
+    "$",
+  ],
   ["File Uploads", "✗", "100 GB storage", "Custom"],
 ]);
 </script>
@@ -68,9 +73,9 @@ const details = ref([
       <p class="text-center text-sm text-muted-foreground">
         All plans apply to a single
         <EasyTooltip
-          tooltip="A board is a collection of boards, tasks, and collaborators. It is the equivalent of an organization."
+          tooltip="A workspace is a collection of boards, tasks, and collaborators. It is the equivalent of an organization."
         >
-          <span class="underline italic">board</span> </EasyTooltip
+          <span class="underline italic">workspace</span> </EasyTooltip
         >.
       </p>
     </section>
@@ -103,7 +108,7 @@ const details = ref([
 
       <p class="indent-lg">
         Unlike other project management tools, we don't charge per user. Our
-        plans apply to one board, which, depending on your plan, may have
+        plans apply to one workspace, which, depending on your plan, may have
         unlimited collaborators.
       </p>
     </section>
@@ -111,7 +116,8 @@ const details = ref([
 </template>
 
 <style scoped>
-main > section:first-child > * {
+/* These look cheap. Let's disable them until we implement something better. */
+/* main > section:first-child > * {
   animation-name: fadeIn;
   animation-duration: 0.8s;
   animation-timing-function: ease-out;
@@ -139,5 +145,5 @@ main > section:not(:first-child) {
   100% {
     opacity: 1;
   }
-}
+} */
 </style>

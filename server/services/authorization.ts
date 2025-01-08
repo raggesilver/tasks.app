@@ -2,13 +2,60 @@ import { and, eq, or, sql } from "drizzle-orm";
 import { db } from "../db/db";
 import {
   attachments,
+  type Board,
   boards,
   collaborators,
   labels,
   tasks,
-  type Board,
   type User,
+  type Workspace,
+  workspaceCollaborators,
+  workspaces,
 } from "../db/schema";
+
+// FIXME: there's currently a big issue with board ownership. In most cases,
+//  board owners are given more permission than workspace owners. This is not
+//  right. Also, we are giving users access to boards and anything they contain
+//  simply because they created the board. This is also not right. Users who
+//  created boards and were later removed from the board (or workspace) should
+//  not have access to the board or anything it contains. This is a security
+//  issue.
+
+export const isUserWorkspaceCollaborator = (
+  userId: string,
+  workspaceId: string,
+) =>
+  db
+    .select({ res: sql`1` })
+    .from(workspaces)
+    .leftJoin(
+      workspaceCollaborators,
+      eq(workspaceCollaborators.workspaceId, workspaceId),
+    )
+    .where(
+      or(
+        eq(workspaces.ownerId, userId),
+        eq(workspaceCollaborators.userId, userId),
+      ),
+    )
+    .limit(1)
+    .execute()
+    .then((rows) => rows[0]?.res === 1);
+
+/**
+ * Check if a user is the owner of a workspace.
+ *
+ * @param userId The user ID.
+ * @param workspaceId The workspace ID.
+ */
+export const isUserWorkspaceOwner = (userId: string, workspaceId: string) =>
+  db
+    .select({ res: sql`1` })
+    .from(workspaces)
+    .where(and(eq(workspaces.id, workspaceId), eq(workspaces.ownerId, userId)))
+    .limit(1)
+    .execute()
+    .then((rows) => rows[0]?.res === 1);
 
 /**
  * Check if a user is the owner of a board.
@@ -36,10 +83,21 @@ export const isUserBoardCollaborator = (userId: string, boardId: string) =>
     .select({ res: sql`1` })
     .from(boards)
     .leftJoin(collaborators, eq(collaborators.boardId, boardId))
+    .leftJoin(
+      workspaceCollaborators,
+      eq(workspaceCollaborators.workspaceId, boards.workspaceId),
+    )
     .where(
       and(
         eq(boards.id, boardId),
-        or(eq(collaborators.userId, userId), eq(boards.ownerId, userId)),
+        or(
+          // User is a direct board collaborator
+          eq(collaborators.userId, userId),
+          // User is the board owner
+          eq(boards.ownerId, userId),
+          // User is a collaborator of the workspace the board belongs to
+          eq(workspaceCollaborators.userId, userId),
+        ),
       ),
     )
     .limit(1)
@@ -55,11 +113,19 @@ export const isUserBoardCollaboratorForAttachment = (
     .from(attachments)
     .leftJoin(tasks, eq(tasks.id, attachments.taskId))
     .leftJoin(boards, eq(boards.id, tasks.boardId))
-    .leftJoin(collaborators, eq(collaborators.boardId, tasks.boardId))
+    .leftJoin(collaborators, eq(collaborators.boardId, boards.id))
+    .leftJoin(
+      workspaceCollaborators,
+      eq(workspaceCollaborators.workspaceId, boards.workspaceId),
+    )
     .where(
       and(
         eq(attachments.id, attachmentId),
-        or(eq(collaborators.userId, userId), eq(boards.ownerId, userId)),
+        or(
+          eq(boards.ownerId, userId),
+          eq(collaborators.userId, userId),
+          eq(workspaceCollaborators.userId, userId),
+        ),
       ),
     )
     .limit(1)
@@ -67,8 +133,8 @@ export const isUserBoardCollaboratorForAttachment = (
     .then((rows) => rows[0]?.res === 1);
 
 /**
- * Check if a user is a collaborator or owner of the board that a task
- * belongs to.
+ * Check if a user is a collaborator or owner of the board that a task belongs
+ * to.
  *
  * @param userId The user ID.
  * @param taskId The task ID.
@@ -82,10 +148,18 @@ export const isUserBoardCollaboratorForTask = (
     .from(tasks)
     .leftJoin(boards, eq(boards.id, tasks.boardId))
     .leftJoin(collaborators, eq(collaborators.boardId, tasks.boardId))
+    .leftJoin(
+      workspaceCollaborators,
+      eq(workspaceCollaborators.workspaceId, boards.workspaceId),
+    )
     .where(
       and(
         eq(tasks.id, taskId),
-        or(eq(collaborators.userId, userId), eq(boards.ownerId, userId)),
+        or(
+          eq(collaborators.userId, userId),
+          eq(boards.ownerId, userId),
+          eq(workspaceCollaborators.userId, userId),
+        ),
       ),
     )
     .limit(1)
@@ -101,10 +175,18 @@ export const isUserBoardCollaboratorForLabel = (
     .from(labels)
     .leftJoin(boards, eq(boards.id, labels.boardId))
     .leftJoin(collaborators, eq(collaborators.boardId, labels.boardId))
+    .leftJoin(
+      workspaceCollaborators,
+      eq(workspaceCollaborators.workspaceId, boards.workspaceId),
+    )
     .where(
       and(
         eq(labels.id, labelId),
-        or(eq(collaborators.userId, userId), eq(boards.ownerId, userId)),
+        or(
+          eq(collaborators.userId, userId),
+          eq(boards.ownerId, userId),
+          eq(workspaceCollaborators.userId, userId),
+        ),
       ),
     )
     .limit(1)
@@ -112,6 +194,29 @@ export const isUserBoardCollaboratorForLabel = (
     .then((rows) => rows[0]?.res === 1);
 
 // ...
+
+export async function isUserAllowedToViewWorkspace(
+  user: User | string,
+  workspace: Workspace | string,
+): Promise<boolean> {
+  const userId = typeof user === "string" ? user : user.id;
+  const workspaceId = typeof workspace === "string" ? workspace : workspace.id;
+
+  return isUserWorkspaceCollaborator(userId, workspaceId);
+}
+
+export async function isUserAllowedToModifyWorkspace(
+  user: User | string,
+  workspace: Workspace | string,
+): Promise<boolean> {
+  const userId = typeof user === "string" ? user : user.id;
+
+  if (typeof workspace !== "string") {
+    return workspace.ownerId === userId;
+  }
+
+  return isUserWorkspaceOwner(userId, workspace);
+}
 
 export async function isUserAllowedToEditBoard(
   user: User,
@@ -144,6 +249,8 @@ export async function isUserAllowedToModifyLabel(
   userId: string,
   labelId: string,
 ): Promise<boolean> {
+  // FIXME: we need real permissions here. Workspace owners can't delete labels
+  //  if they didn't create the board...
   // Currently, only board owners can modify labels.
   return db
     .select({ res: sql`1` })
@@ -153,6 +260,13 @@ export async function isUserAllowedToModifyLabel(
     .limit(1)
     .execute()
     .then((rows) => rows[0]?.res === 1);
+}
+
+export async function isUserAllowedToCreateOrModifyWorkspaceInvitation(
+  userId: string,
+  workspaceId: string,
+): Promise<boolean> {
+  return isUserWorkspaceOwner(userId, workspaceId);
 }
 
 export async function isUserAllowedToCreateOrModifyBoardInvitation(

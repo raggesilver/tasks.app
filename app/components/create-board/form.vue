@@ -5,7 +5,11 @@ import { useForm } from "vee-validate";
 import { toast } from "vue-sonner";
 import type { z } from "zod";
 import { createBoardSchema } from "~/lib/validation";
-import type { Board } from "~~/server/db/schema";
+import type { Board, Workspace } from "~~/server/db/schema";
+
+const props = defineProps<{
+  workspace: Workspace;
+}>();
 
 const emit = defineEmits(["dismiss"]);
 
@@ -13,6 +17,10 @@ const schema = toTypedSchema(createBoardSchema);
 
 const form = useForm({
   validationSchema: schema,
+  initialValues: {
+    workspaceId: props.workspace.id,
+    name: "",
+  },
 });
 
 const queryClient = useQueryClient();
@@ -66,9 +74,16 @@ const onSubmit = form.handleSubmit((values) => {
 
 <template>
   <form class="p-4 pb-2 sm:p-0" @submit="onSubmit">
+    <FormField v-slot="{ componentField }" name="workspaceId">
+      <FormItem>
+        <FormControl>
+          <Input type="hidden" v-bind="componentField" disabled />
+        </FormControl>
+      </FormItem>
+    </FormField>
     <FormField v-slot="{ componentField }" name="name">
       <FormItem>
-        <FormLabel>Name</FormLabel>
+        <FormLabel>Board Name</FormLabel>
         <FormControl>
           <Input
             type="text"
@@ -76,10 +91,14 @@ const onSubmit = form.handleSubmit((values) => {
             v-bind="componentField"
           />
         </FormControl>
-        <FormDescription>This is the name of your board.</FormDescription>
         <FormMessage />
       </FormItem>
     </FormField>
+
+    <p class="mt-4 text-sm text-muted-foreground text-left">
+      The new board will inherit settings from the workspace, meaning workspace
+      members will have access to it.
+    </p>
     <p v-if="formError" class="mt-4 text-[0.8rem] font-medium text-destructive">
       {{ formError }}
     </p>

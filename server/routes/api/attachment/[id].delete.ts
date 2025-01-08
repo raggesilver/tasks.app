@@ -1,7 +1,6 @@
-import { eq } from "drizzle-orm";
 import { validateId } from "~/lib/validation";
 import { db } from "~~/server/db/db";
-import { attachments } from "~~/server/db/schema";
+import { attachmentService } from "~~/server/services/attachment";
 import {
   isUserAllowedToDeleteAttachment,
   isUserBoardCollaboratorForAttachment,
@@ -34,17 +33,7 @@ export default defineEventHandler(async (event) => {
   }))!;
 
   const storage = useStorageS3(event);
-
-  const response = await storage.deleteAttachmentsFromS3([attachment]);
-
-  if (response[0] !== attachment.id) {
-    throw createError({
-      status: 500,
-      message: "Failed to delete attachment",
-    });
-  }
-
-  await db.delete(attachments).where(eq(attachments.id, id)).execute();
+  await attachmentService.deleteAttachments(storage, [attachment]);
 
   return sendNoContent(event, 204);
 });

@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { MAX_FILE_SIZE } from "~/lib/constants";
 import { validateId } from "~/lib/validation";
-import { db } from "~~/server/db/db";
-import { type Attachment, attachments } from "~~/server/db/schema";
+import { attachmentService } from "~~/server/services/attachment";
 import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization";
 // import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization";
 import { getTaskById } from "~~/server/services/task";
@@ -62,47 +61,20 @@ export default defineEventHandler(async (event) => {
     }).parseAsync,
   );
 
-  const storage = useStorageS3(event);
+  try {
+    const storage = useStorageS3(event);
+    const attachment = await attachmentService.uploadFile(
+      storage,
+      getRequestWebStream(event)!,
+      { userId: user.id, task, name, mimeType, contentLength },
+    );
 
-  return db.transaction(async (tx): Promise<Attachment> => {
-    const [attachment] = await tx
-      .insert(attachments)
-      .values({
-        taskId: task.id,
-        boardId: task.boardId,
-        name,
-        mimeType,
-        size: contentLength,
-        uploadedBy: user.id,
-      })
-      .returning()
-      .execute();
-
-    const { url } = await storage.getPresignedUploadUrl({
-      attachment,
+    return attachment;
+  } catch (e: unknown) {
+    console.error("Failed to upload file", e);
+    throw createError({
+      status: 500,
+      message: "Failed to upload file",
     });
-
-    const response = await fetch(url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": mimeType,
-        "Content-Length": contentLength.toString(),
-        "Content-Disposition": `inline; filename="${name}"`,
-      },
-      body: getRequestWebStream(event),
-      // @ts-expect-error For some reason, duplex is not in RequestInit type
-      duplex: "half",
-    });
-
-    if (response.ok) {
-      return attachment;
-    } else {
-      const text = await response.text();
-      console.error("Failed to upload", text);
-      throw createError({
-        status: 500,
-        message: "Failed to upload file",
-      });
-    }
-  });
+  }
 });

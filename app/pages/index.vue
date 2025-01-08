@@ -2,6 +2,13 @@
 import { useMotionProperties, useSpring } from "@vueuse/motion";
 import { getInitials } from "~/lib/utils";
 
+useHead({
+  // We need to set this to null explicitly, otherwise when other pages with a
+  // title navigate to this page, the title will remain what it was on the other
+  // page. We need it to be null to use the default, empty template.
+  title: null,
+});
+
 const index = {
   title: "Stay on top of your tasks with our free Trello alternative.",
   headline:

@@ -31,28 +31,23 @@ export default defineNuxtConfig({
       endpointUrlS3: "",
       region: "auto",
       secretAccessKey: "",
-      signing: {
-        privateKey: "",
-        publicKey: "",
-        /**
-         * This needs to be generated with CreatePublicKeyCommand. The
-         * credentials used to generate this key must have admin privileges.
-         */
-        publicKeyId: "",
-      },
     },
     bucketName: "",
     session: {
       maxAge: 60 * 60 * 24 * 7, // 1 week
+      password: process.env.NUXT_SESSION_PASSWORD || "",
+    },
+    redis: {
+      url: "",
     },
   },
 
-  nitro: {
-    prerender: {
-      crawlLinks: false,
-      routes: ["/legal/privacy-policy", "/legal/tos"],
-    },
-  },
+  // nitro: {
+  //   prerender: {
+  //     crawlLinks: false,
+  //     routes: ["/legal/privacy-policy", "/legal/tos"],
+  //   },
+  // },
 
   vite: {
     optimizeDeps: {

@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import { useMediaQuery } from "@vueuse/core";
+import type { Board } from "~~/server/db/schema";
 import Form from "./form.vue";
+
+defineProps<{
+  board: Board;
+}>();
 
 const isDesktop = useMediaQuery("(min-width: 640px)");
 
@@ -19,7 +24,7 @@ const description = "Create a new status column to organize your tasks.";
           <DialogTitle>{{ title }}</DialogTitle>
           <DialogDescription>{{ description }}</DialogDescription>
         </DialogHeader>
-        <Form @dismiss="isOpen = false" />
+        <Form :board @dismiss="isOpen = false" />
       </DialogContent>
     </Dialog>
     <!-- And an iOS-like bottom sheet on mobile -->
@@ -29,7 +34,7 @@ const description = "Create a new status column to organize your tasks.";
           <DrawerTitle>{{ title }}</DrawerTitle>
           <DrawerDescription>{{ description }}</DrawerDescription>
         </DrawerHeader>
-        <Form @dismiss="isOpen = false" />
+        <Form :board @dismiss="isOpen = false" />
         <DrawerFooter class="pt-2">
           <DrawerClose as-child>
             <Button variant="outline">Cancel</Button>
@@ -39,7 +44,7 @@ const description = "Create a new status column to organize your tasks.";
     </Drawer>
   </ClientOnly>
 
-  <Button variant="outline" @click="isOpen = true">
-    New Column <Icon name="lucide:plus" />
+  <Button variant="secondary" size="sm" @click="isOpen = true">
+    New Column <Icon name="lucide:plus" class="h-[1em] ml-1" />
   </Button>
 </template>

@@ -18,8 +18,9 @@ const route = useRoute();
       <NuxtLink
         v-for="link in links"
         :key="link.value"
-        :to="`/app/board/${route.params.id}/settings${link.value}`"
+        :to="`/app/b/${route.params.id}/settings${link.value}`"
         class="link"
+        preload
       >
         {{ link.label }}
       </NuxtLink>

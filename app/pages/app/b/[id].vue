@@ -42,6 +42,17 @@ if (import.meta.env.SSR) {
   ]);
 }
 
+// FIXME: this is horribly inefficient. We should create an endpoint +
+// composable that fetches both the board and the workspace in a single request.
+const { data: workspace, suspense: workspaceSuspense } = useWorkspace(
+  () => board.value?.workspaceId as string,
+  { enabled: () => !!board.value },
+);
+
+if (import.meta.env.SSR) {
+  await workspaceSuspense();
+}
+
 provide(BOARD_DATA_KEY, {
   board,
   columns,
@@ -99,32 +110,36 @@ watch(
         :entries="[
           { title: 'Home', link: '/app' },
           {
+            title: workspace?.name ?? 'Workspace',
+            link: `/app/w/${board?.workspaceId}`,
+          },
+          {
             title: board?.name ?? 'Board',
-            link: `/app/board/${id}`,
+            link: `/app/b/${id}`,
           },
         ]"
       />
     </template>
     <template #right-items>
-      <Popover>
-        <PopoverTrigger as-child>
-          <Button
-            size="sm"
-            variant="outline"
-            class="flex items-center gap-2"
-            title="Share board"
-            :disabled="!board"
-          >
-            Share <Icon name="lucide:share" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent align="end" class="w-full sm:w-[435px]">
-          <LazyShareBoard v-if="board" :board />
-        </PopoverContent>
-      </Popover>
+      <!-- <Popover> -->
+      <!--   <PopoverTrigger as-child> -->
+      <!--     <Button -->
+      <!--       size="sm" -->
+      <!--       variant="outline" -->
+      <!--       class="flex items-center gap-2" -->
+      <!--       title="Share board" -->
+      <!--       :disabled="!board" -->
+      <!--     > -->
+      <!--       Share <Icon name="lucide:share" /> -->
+      <!--     </Button> -->
+      <!--   </PopoverTrigger> -->
+      <!--   <PopoverContent align="end" class="w-full sm:w-[435px]"> -->
+      <!--     <LazyShareBoard v-if="board" :board /> -->
+      <!--   </PopoverContent> -->
+      <!-- </Popover> -->
       <EasyTooltip v-if="board?.ownerId === user?.id" tooltip="Board Settings">
         <Button size="sm" variant="outline" class="w-8 p-0" as-child>
-          <NuxtLink :to="`/app/board/${id}/settings`">
+          <NuxtLink :to="`/app/b/${id}/settings`">
             <Icon name="lucide:ellipsis" />
           </NuxtLink>
         </Button>
@@ -164,7 +179,7 @@ watch(
               key="create-column"
               class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"
             >
-              <CreateColumn />
+              <CreateColumn v-if="board" :board />
             </li>
           </ol>
         </template>
@@ -183,14 +198,14 @@ watch(
             key="create-column"
             class="flex flex-col items-center justify-center p-8 border-2 rounded-lg border-dashed w-xs flex-shrink-0"
           >
-            <CreateColumn />
+            <CreateColumn v-if="board" :board />
           </li>
         </ol>
       </template>
     </div>
     <Sheet
       :open="isSettingsMounted"
-      @update:open="() => router.push(`/app/board/${id}`)"
+      @update:open="() => router.push(`/app/b/${id}`)"
     >
       <SheetContent :ssr="settingsSSR" as="aside" class="sm:max-w-lg">
         <NuxtPage />

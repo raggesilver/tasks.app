@@ -1,43 +1,67 @@
-<script setup lang="ts">
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+<script lang="ts" setup>
+import AppLayout from "~/layouts/app.vue";
 
 definePageMeta({
-  layout: "app",
+  layout: false,
 });
 
-const { data, isPending, suspense } = useBoards();
+const {
+  data: workspaces,
+  isPending: areWorkspacesPending,
+  suspense: workspacesSuspense,
+} = useWorkspaces();
+// const { data, isPending, suspense } = useBoards();
 
 // Block rendering until the data is fetched only in SSR. In the client, the
 // `isPending` flag will be used to show a skeleton loader.
 if (import.meta.env.SSR) {
-  await suspense();
+  // await suspense();
+  await workspacesSuspense();
+  // TODO: we need to create an API to favorite boards so we can show favorite
+  // boards in the front page (as opposed to just workspace or all boards)
 }
+
+const showCreateWorkspace = ref(false);
 </script>
 
 <template>
-  <div class="flex-grow flex flex-col gap-8 p-8">
-    <h1 class="text-3xl font-extrabold">Boards</h1>
-    <div
-      class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-    >
-      <template v-if="isPending">
-        <Skeleton v-for="i in 3" :key="i" class="min-h-[100px] rounded-lg" />
-      </template>
-      <template v-else>
-        <Card v-for="board in data" :key="board.id">
-          <CardHeader
-            ><CardTitle>{{ board.name }}</CardTitle></CardHeader
+  <AppLayout class="dark:bg-muted/40">
+    <template #left-items>
+      <AppBreadcrumbs :entries="[{ title: 'Home', link: '/app' }]" />
+    </template>
+    <div class="flex-grow flex flex-col gap-8 px-8">
+      <h1 class="text-3xl font-extrabold">Your Workspaces</h1>
+      <div class="standard-grid auto-rows-fr">
+        <template v-if="areWorkspacesPending">
+          <Skeleton v-for="i in 3" :key="i" class="min-h-[100px] rounded-lg" />
+        </template>
+        <template v-else>
+          <Card v-for="workspace in workspaces" :key="workspace.id">
+            <CardHeader>
+              <CardTitle>{{ workspace.name }}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <NuxtLink :to="`/app/w/${workspace.id}`" class="text-sm">
+                Open Workspace
+              </NuxtLink>
+            </CardContent>
+          </Card>
+        </template>
+        <Card
+          class="flex flex-col items-center justify-center p-4 border-2 border-dashed bg-transparent"
+        >
+          <Button
+            variant="secondary"
+            size="sm"
+            class="flex items-center gap-2"
+            @click="() => (showCreateWorkspace = true)"
           >
-          <CardContent>
-            <nuxt-link :to="`/app/board/${board.id}`" class="text-sm">
-              <span>Open Board</span>
-            </nuxt-link>
-          </CardContent>
+            Create <Icon name="lucide:plus" />
+          </Button>
         </Card>
-      </template>
-      <Card class="flex flex-col items-center justify-center p-4 border-dashed">
-        <CreateBoard />
-      </Card>
+      </div>
+
+      <CreateWorkspace v-model:is-open="showCreateWorkspace" />
     </div>
-  </div>
+  </AppLayout>
 </template>

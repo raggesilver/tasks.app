@@ -1,7 +1,16 @@
 import { z } from "zod";
 
+export const createWorkspaceSchema = z.object({
+  name: z.string().min(5).max(255),
+});
+
+export const updateWorkspaceSchema = z.object({
+  name: z.string().min(5).max(255),
+});
+
 export const createBoardSchema = z.object({
   name: z.string().min(5).max(255),
+  workspaceId: z.string().uuid(),
 });
 
 export const updateBoardSchema = z.object({
@@ -10,6 +19,7 @@ export const updateBoardSchema = z.object({
 
 export const createStatusColumnSchema = z.object({
   name: z.string().min(5).max(255),
+  workspaceId: z.string().uuid(),
 });
 
 export const updateStatusColumnSchema = createStatusColumnSchema
@@ -22,13 +32,20 @@ export const updateStatusColumnSchema = createStatusColumnSchema
 
 export const createTaskSchema = z.object({
   title: z.string().min(4),
-  description: z.string().min(5),
+  description: z
+    .string()
+    .nullable()
+    .default(null)
+    .transform((v) => (v?.trim() === "" ? null : v)),
 });
 
 export const updateTaskSchema = z
   .object({
     title: z.string().min(4),
-    description: z.string().min(5),
+    description: z
+      .string()
+      .nullable()
+      .transform((v) => (v?.trim() === "" ? null : v)),
     statusColumnId: z.string().uuid(),
     order: z.number().int(),
   })
@@ -46,14 +63,23 @@ export const publicUserSchema = z.object({
   profilePictureUrl: z.string().url().optional(),
 });
 
-export const createInvitationSchema = z.object({
-  boardId: z.string().uuid(),
-});
+export const createInvitationSchema = z
+  .object({
+    boardId: z.string().uuid(),
+  })
+  .or(z.object({ workspaceId: z.string().uuid() }));
 
-export const deactivateInvitationSchema = z.object({
-  invitationId: z.string().uuid(),
-  boardId: z.string().uuid(),
-});
+export const deactivateInvitationSchema = z
+  .object({
+    invitationId: z.string().uuid(),
+    boardId: z.string().uuid(),
+  })
+  .or(
+    z.object({
+      invitationId: z.string().uuid(),
+      workspaceId: z.string().uuid(),
+    }),
+  );
 
 export const addAssigneeSchema = z.object({
   userId: z.string().uuid(),
@@ -77,6 +103,11 @@ export const uploadAttachmentSchema = z.object({
   originalName: z.string().min(1).max(255),
   contentLength: z.number().int().min(1).optional(),
 });
+
+export type CreateTaskInput = z.infer<typeof createTaskSchema>;
+
+export type CreateWorkspaceInput = z.infer<typeof createWorkspaceSchema>;
+export type UpdateWorkspaceInput = z.infer<typeof updateWorkspaceSchema>;
 
 export type CreateBoardInput = z.infer<typeof createBoardSchema>;
 export type UpdateBoardInput = z.infer<typeof updateBoardSchema>;

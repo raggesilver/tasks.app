@@ -120,6 +120,62 @@
       "when": 1728496643476,
       "tag": "0016_cute_northstar",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1728622006330,
+      "tag": "0017_slow_the_hand",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1728622100053,
+      "tag": "0018_simple_tarantula",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1728623686872,
+      "tag": "0019_fair_overlord",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1728623814367,
+      "tag": "0020_huge_multiple_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1728942606440,
+      "tag": "0021_noisy_sauron",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1728942620245,
+      "tag": "0022_jittery_lord_tyger",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1730920247678,
+      "tag": "0023_normal_phil_sheldon",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1732737304772,
+      "tag": "0024_dark_gorgon",
+      "breakpoints": true
     }
   ]
 }

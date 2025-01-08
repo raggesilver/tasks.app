@@ -17,6 +17,8 @@ export default defineNitroPlugin((nitro) => {
     integrations: [...Sentry.getAutoPerformanceIntegrations()],
     tracesSampleRate: import.meta.dev ? 0 : 0.6,
     profilesSampleRate: import.meta.dev ? 0 : 1,
+    // https://docs.sentry.io/platforms/javascript/guides/node/install/esm/#troubleshooting-instrumentation
+    registerEsmLoaderHooks: false,
   });
 
   nitro.hooks.hook("request", (event) => {

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { addCollaboratorById } from "~~/server/services/board";
 import { getInvitationByToken } from "~~/server/services/invitation";
+import { addWorkspaceCollaborator } from "~~/server/services/workspace";
 
 const schema = z.object({
   token: z.string(),
@@ -41,7 +42,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  await addCollaboratorById(invitation.boardId, user.id);
+  // Workspace invitation
+  if (invitation.workspaceId != null) {
+    await addWorkspaceCollaborator(invitation.workspaceId, user.id);
+    return sendRedirect(event, `/app/w/${invitation.workspaceId}`);
+  }
 
-  return sendRedirect(event, `/app/board/${invitation.boardId}`);
+  // Board invitation
+  await addCollaboratorById(invitation.boardId, user.id);
+  return sendRedirect(event, `/app/b/${invitation.boardId}`);
 });

@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import type { SerializeObject } from "nitropack";
+import { FetchError } from "ofetch";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -14,6 +15,7 @@ export function getInitials(name: string) {
     .join("");
 }
 
+/** @deprecated Use `formatBytes` instead. */
 export function formatFileSize(bytes: number, decimals = 2) {
   const sizes = ["B", "KB", "MB", "GB", "TB"];
 
@@ -25,6 +27,22 @@ export function formatFileSize(bytes: number, decimals = 2) {
   return `${(bytes / Math.pow(1024, i)).toFixed(decimals)} ${sizes[i]}`;
 }
 
+export function formatBytes(bytes: number, decimals = 2) {
+  const units = ["bytes", "KiB", "MiB", "GiB", "TiB"];
+  let unitIndex = 0;
+
+  while (bytes >= 1024 && unitIndex < units.length - 1) {
+    bytes /= 1024;
+    unitIndex++;
+  }
+
+  const formatter = new Intl.NumberFormat("en", {
+    style: "decimal",
+    maximumFractionDigits: decimals,
+  });
+
+  return `${formatter.format(bytes)} ${units[unitIndex]}`;
+}
 type ObjectWithDates = { createdAt: Date; updatedAt?: Date };
 
 export function normalizeDates<T extends ObjectWithDates>(
@@ -42,4 +60,26 @@ export function normalizeDates<T extends ObjectWithDates>(input: T | T[]) {
   });
 
   return Array.isArray(input) ? input.map(normalize) : normalize(input);
+}
+
+/**
+ * Returns a specific error message from a FetchError or a default error
+ * message.
+ *
+ * This function will return the `{ message }` passed in to createError in the
+ * backend.
+ *
+ * @param error - The error object to inspect for a specific message.
+ * @param defaultErrorMessage - The default error message to use if the error
+ *   object does not have a specific message.
+ * @returns The error message extracted from the error object or the default
+ *   error message.
+ */
+export function getFetchErrorMessage(
+  error: unknown,
+  defaultErrorMessage = "An unexpected error occurred.",
+) {
+  return (
+    (error instanceof FetchError && error.data?.message) || defaultErrorMessage
+  );
 }

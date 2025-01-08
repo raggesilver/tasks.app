@@ -1,13 +1,20 @@
 <script lang="ts" setup>
 import { useMediaQuery } from "@vueuse/core";
+import type { Workspace } from "~~/server/db/schema";
 import Form from "./form.vue";
+
+const props = defineProps<{
+  workspace: Workspace;
+}>();
 
 const isDesktop = useMediaQuery("(min-width: 640px)");
 
 const isOpen = ref(false);
 
-const title = "Create Board";
-const description = "Create a new board to organize your tasks.";
+const title = "Create a new board";
+const description = computed(
+  () => `Create a new board in the ${props.workspace.name} workspace.`,
+);
 </script>
 
 <template>
@@ -19,7 +26,7 @@ const description = "Create a new board to organize your tasks.";
           <DialogTitle>{{ title }}</DialogTitle>
           <DialogDescription>{{ description }}</DialogDescription>
         </DialogHeader>
-        <Form @dismiss="isOpen = false" />
+        <Form :workspace @dismiss="isOpen = false" />
       </DialogContent>
     </Dialog>
     <!-- And an iOS-like bottom sheet on mobile -->
@@ -29,7 +36,7 @@ const description = "Create a new board to organize your tasks.";
           <DrawerTitle>{{ title }}</DrawerTitle>
           <DrawerDescription>{{ description }}</DrawerDescription>
         </DrawerHeader>
-        <Form @dismiss="isOpen = false" />
+        <Form :workspace @dismiss="isOpen = false" />
         <DrawerFooter class="pt-2">
           <DrawerClose as-child>
             <Button variant="outline">Cancel</Button>
@@ -40,7 +47,7 @@ const description = "Create a new board to organize your tasks.";
   </ClientOnly>
 
   <Button
-    variant="outline"
+    variant="secondary"
     size="sm"
     class="flex items-center gap-2"
     @click="isOpen = true"

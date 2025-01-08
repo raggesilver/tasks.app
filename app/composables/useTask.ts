@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/vue-query";
 import { normalizeDates } from "~/lib/utils";
-import type { UpdateTaskInput } from "~/lib/validation";
+import type { CreateTaskInput, UpdateTaskInput } from "~/lib/validation";
 import type { Assignee, Task, TaskWithEverything } from "~~/server/db/schema";
 
 export const getTaskOptions = (id: MaybeRefOrGetter<string>) =>
@@ -22,6 +22,42 @@ export const useTask = (
           normalizeDates<TaskWithEverything>(task),
         ),
       ...options,
+    },
+    client,
+  );
+};
+
+export const useCreateTaskMutation = () => {
+  const client = useQueryClient();
+
+  return useMutation(
+    {
+      mutationFn: ({
+        boardId,
+        statusColumnId,
+        data,
+      }: {
+        boardId: string;
+        statusColumnId: string;
+        data: CreateTaskInput;
+      }) =>
+        // @ts-ignore
+        useRequestFetch()(`/api/column/${boardId}/${statusColumnId}/add-task`, {
+          method: "POST",
+          body: data,
+        }),
+      onSuccess: (data, { statusColumnId }) => {
+        const normalized = normalizeDates<TaskWithEverything>(data);
+        client.setQueryData(getTaskOptions(normalized.id).queryKey, normalized);
+
+        client.setQueryData(
+          getStatusColumnTasksOptions(statusColumnId).queryKey,
+          (old) => {
+            if (!old) return [normalized];
+            return [normalized, ...old];
+          },
+        );
+      },
     },
     client,
   );

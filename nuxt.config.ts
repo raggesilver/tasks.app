@@ -40,6 +40,9 @@ export default defineNuxtConfig({
     redis: {
       url: "",
     },
+    stripe: {
+      secretKey: "",
+    },
   },
 
   // nitro: {

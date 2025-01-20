@@ -39,10 +39,10 @@ async function invalidateCache(
  * @param args The arguments passed to the function
  * @returns A string key combining the function name and arguments
  */
-function getCacheKey<F extends (...args: unknown[]) => unknown>(
-  fn: F,
-  args: Parameters<F>,
-): string {
+function getCacheKey<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  F extends (...args: any[]) => any,
+>(fn: F, args: Parameters<F>): string {
   return `${fn.name}_${args.join("_")}`;
 }
 

@@ -2,6 +2,7 @@
 import {
   LazyWorkspaceGeneralSettings,
   LazyWorkspaceMemberSettings,
+  LazyWorkspacePlanSettings,
   LazyWorkspaceRuleSettings,
   LazyWorkspaceUsage,
 } from "#components";
@@ -11,7 +12,7 @@ defineProps<{
   workspace: Workspace;
 }>();
 
-const validPages = ["general", "members", "rules", "usage"] as const;
+const validPages = ["general", "members", "rules", "usage", "billing"] as const;
 type ValidPage = (typeof validPages)[number];
 
 const components = {
@@ -19,6 +20,7 @@ const components = {
   members: LazyWorkspaceMemberSettings,
   rules: LazyWorkspaceRuleSettings,
   usage: LazyWorkspaceUsage,
+  billing: LazyWorkspacePlanSettings,
 };
 
 const page = useQueryParam<ValidPage>("settings", {

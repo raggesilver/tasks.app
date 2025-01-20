@@ -37,6 +37,7 @@
     "radix-vue": "^1.9.12",
     "shadcn-nuxt": "^0.10.4",
     "slug": "^10.0.0",
+    "stripe": "^17.5.0",
     "tailwind-merge": "^2.6.0",
     "vaul-vue": "^0.2.0",
     "vee-validate": "^4.15.0",
@@ -76,5 +77,5 @@
     "vitest": "^2.1.8",
     "vue-tsc": "^2.2.0"
   },
-  "packageManager": "pnpm@9.15.2+sha512.93e57b0126f0df74ce6bff29680394c0ba54ec47246b9cf321f0121d8d9bb03f750a705f24edc3c1180853afd7c2c3b94196d0a3d53d3e069d9e2793ef11f321"
+  "packageManager": "pnpm@9.15.3+sha512.1f79bc245a66eb0b07c5d4d83131240774642caaa86ef7d0434ab47c0d16f66b04e21e0c086eb61e62c77efc4d7f7ec071afad3796af64892fae66509173893a"
 }

@@ -43,6 +43,9 @@ export const workspaces = pgTable("workspaces", (t) => ({
     .uuid("owner_id")
     .notNull()
     .references(() => users.id),
+
+  // Each workspace is its own customer in Stripe.
+  customerId: t.varchar("customer_id", { length: 255 }),
   createdAt: t.timestamp("created_at").notNull().defaultNow(),
   updatedAt: t.timestamp("updated_at").notNull().defaultNow(),
 }));
@@ -295,6 +298,24 @@ export type InvitationLink = _InvitationLink &
       }
   );
 export type NewInvitationLink = typeof invitationLinks.$inferInsert;
+
+export const plans = pgTable("plans", (t) => ({
+  id: t.uuid("id").primaryKey().defaultRandom(),
+  name: t.varchar("name", { length: 255 }).notNull(),
+  // We store the price in Stripe only to avoid out-of-sync issues.
+
+  // Subscription id in Stripe.
+  subscriptionId: t.varchar("subscription_id", { length: 255 }).notNull(),
+  // FIXME: onDelete: "cascade" could be problematic if we delete a workspace
+  //  without canceling the subscription first.
+  workspaceId: t
+    .uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+}));
+
+export type Plan = typeof plans.$inferSelect;
+export type NewPlan = typeof plans.$inferInsert;
 
 // Relations
 

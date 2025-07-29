@@ -7,6 +7,7 @@ const props = defineProps<{
   onDragStart?: (event: DragEvent, task: Task) => void;
 }>();
 
+const route = useRoute();
 const { labels } = inject(BOARD_DATA_KEY)!;
 
 const isDragging = ref(false);
@@ -36,6 +37,10 @@ const labelMap = computed(() => {
     }, {}) ?? {}
   );
 });
+
+const toLink = computed(() => {
+  return { query: { ...route.query, "view-task": props.task.id } };
+});
 </script>
 
 <template>
@@ -46,7 +51,7 @@ const labelMap = computed(() => {
     @dragstart="onDragStart"
     @dragend="onDragEnd"
   >
-    <NuxtLink :to="{ query: { 'view-task': task.id } }">
+    <NuxtLink :to="toLink">
       <CardHeader class="p-4 gap-4">
         <div
           v-if="task.labels.length > 0"

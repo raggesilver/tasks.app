@@ -1,7 +1,4 @@
-import {
-  queryOptions,
-  type UndefinedInitialQueryOptions,
-} from "@tanstack/vue-query";
+import { queryOptions, type UseQueryOptions } from "@tanstack/vue-query";
 import { getWorkspacesOptions } from "~/composables/useWorkspaces";
 import { normalizeDates } from "~/lib/utils";
 import type {
@@ -15,7 +12,7 @@ export const getWorkspaceOptions = (id: MaybeRefOrGetter<string>) =>
     queryKey: ["workspace", id],
   });
 
-export const useWorkspace = <T extends UndefinedInitialQueryOptions>(
+export const useWorkspace = <T extends UseQueryOptions>(
   id: MaybeRefOrGetter<string>,
   extraOptions: Partial<T> = {},
 ) => {

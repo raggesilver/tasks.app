@@ -1,0 +1,11 @@
+onlyBuiltDependencies:
+  - '@hebilicious/vue-query-nuxt'
+  - '@parcel/watcher'
+  - core-js
+  - esbuild
+  - sharp
+  - unrs-resolver
+  - vue-demi
+
+patchedDependencies:
+  '@hebilicious/vue-query-nuxt': patches/@hebilicious__vue-query-nuxt.patch

@@ -1,0 +1,39 @@
+diff --git a/dist/module.cjs b/dist/module.cjs
+index 1c35169c18c63d033bf36cb873f17ce0026a1fd4..91053c64861482408295d307930f82ce12f77b78 100644
+--- a/dist/module.cjs
++++ b/dist/module.cjs
+@@ -32,7 +32,7 @@ const module$1 = kit.defineNuxtModule({
+     name: NAME,
+     configKey,
+     compatibility: {
+-      nuxt: "^3"
++      nuxt: ">=3"
+     }
+   },
+   defaults,
+diff --git a/dist/module.json b/dist/module.json
+index d4c621ed6c774b0152a155cbf1815d3e4c6b5255..da67d685cb066731033e5dd6e58a9022185bdc7d 100644
+--- a/dist/module.json
++++ b/dist/module.json
+@@ -2,7 +2,7 @@
+   "name": "vue-query-nuxt",
+   "configKey": "vueQuery",
+   "compatibility": {
+-    "nuxt": "^3"
++    "nuxt": ">=3"
+   },
+   "version": "0.3.0"
+ }
+diff --git a/dist/module.mjs b/dist/module.mjs
+index 95938870a62ccf04f0230cb8718129d5866a637f..02442379aab8f38f6ea393f3b713b828b899e617 100644
+--- a/dist/module.mjs
++++ b/dist/module.mjs
+@@ -29,7 +29,7 @@ const module = defineNuxtModule({
+     name: NAME,
+     configKey,
+     compatibility: {
+-      nuxt: "^3"
++      nuxt: ">=3"
+     }
+   },
+   defaults,

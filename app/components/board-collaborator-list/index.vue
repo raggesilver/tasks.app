@@ -10,12 +10,11 @@ const props = withDefaults(
      */
     ownerFirst?: boolean;
     /**
-     * If provided, the list will render at most `limit` collaborators. If
-     * there are more than `limit` collaborators, the `limit`-th element on the
-     * list will be a placeholder for the number of remaining collaborators.
+     * If provided, the list will render at most `limit` collaborators. If there
+     * are more than `limit` collaborators, the `limit`-th element on the list
+     * will be a placeholder for the number of remaining collaborators.
      *
      * If this number is less than 1, the list will render all collaborators.
-     *
      */
     limit?: number;
   }>(),
@@ -64,6 +63,8 @@ const collapsedCollaboratorsText = computed(() =>
         .join("\n")
     : "",
 );
+
+const { toggleAssignee, filters } = useBoardFilters();
 </script>
 
 <template>
@@ -99,8 +100,14 @@ const collapsedCollaboratorsText = computed(() =>
       >
         <UniversalUserAvatar
           :user="collaborator"
-          class="avatar border border-foreground"
+          class="avatar cursor-pointer transition-[border] transition-duration-[300ms]"
+          :class="{
+            'border-blue-500 border-3': filters.assignees?.includes(
+              collaborator.id,
+            ),
+          }"
           :data-testid="`user-avatar-${collaborator.id}`"
+          @click="() => toggleAssignee(collaborator.id)"
         />
       </li>
     </template>

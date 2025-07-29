@@ -10,6 +10,11 @@ declare module "#auth-utils" {
   interface UserSession {
     // Add your own fields
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface SecureSessionData {
+    // Add your own fields
+  }
 }
 
 export {};

@@ -1,0 +1,8 @@
+onlyBuiltDependencies:
+  - '@hebilicious/vue-query-nuxt'
+  - esbuild
+  - unrs-resolver
+  - vue-demi
+
+patchedDependencies:
+  '@hebilicious/vue-query-nuxt': patches/@hebilicious__vue-query-nuxt.patch

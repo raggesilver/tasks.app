@@ -29,5 +29,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  await invalidateCache("getCollaboratorUsage_" + id);
+
   return sendNoContent(event, 204);
 });

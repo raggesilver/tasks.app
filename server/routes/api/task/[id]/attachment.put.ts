@@ -3,6 +3,7 @@ import { MAX_FILE_SIZE } from "~/lib/constants";
 import { validateId } from "~/lib/validation";
 import { attachmentService } from "~~/server/services/attachment";
 import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization";
+import { _getBoardById } from "~~/server/services/board";
 // import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization";
 import { getTaskById } from "~~/server/services/task";
 
@@ -68,6 +69,11 @@ export default defineEventHandler(async (event) => {
       getRequestWebStream(event)!,
       { userId: user.id, task, name, mimeType, contentLength },
     );
+
+    const board = await _getBoardById(task.boardId);
+    if (board) {
+      await invalidateCache("getUsageForWorkspace_" + board.workspaceId);
+    }
 
     return attachment;
   } catch (e: unknown) {

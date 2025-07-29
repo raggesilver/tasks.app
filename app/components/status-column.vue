@@ -235,6 +235,17 @@ const doDeleteColumn = async () => {
 
   await deleteColumn(props.column);
 };
+
+const { filters } = useBoardFilters();
+const filteredTasks = computed(() => {
+  return filters.value.assignees
+    ? tasks.value?.filter((task) =>
+        task.assignees.some((assignee) =>
+          filters.value.assignees!.includes(assignee.userId),
+        ),
+      )
+    : tasks.value;
+});
 </script>
 
 <template>
@@ -270,7 +281,7 @@ const doDeleteColumn = async () => {
               v-if="isPending"
               class="inline-block w-[1em] h-[3em]"
             />
-            <span v-else-if="tasks">{{ tasks!.length }} tasks</span>
+            <span v-else-if="tasks">{{ filteredTasks!.length }} tasks</span>
           </span>
         </CardTitle>
         <EasyTooltip :tooltip="collapsed ? 'Expand Column' : 'Collapse Column'">
@@ -334,7 +345,7 @@ const doDeleteColumn = async () => {
     <CardContent class="px-2 overflow-y-auto expanded-only">
       <ol v-if="tasks" ref="tasksRef" class="flex flex-col gap-2">
         <MiniTask
-          v-for="task in tasks"
+          v-for="task in filteredTasks"
           :key="task.id"
           :task
           draggable="true"

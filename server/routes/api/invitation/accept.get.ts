@@ -45,6 +45,7 @@ export default defineEventHandler(async (event) => {
   // Workspace invitation
   if (invitation.workspaceId != null) {
     await addWorkspaceCollaborator(invitation.workspaceId, user.id);
+    await invalidateCache("getCollaboratorUsage_" + invitation.workspaceId);
     return sendRedirect(event, `/app/w/${invitation.workspaceId}`);
   }
 

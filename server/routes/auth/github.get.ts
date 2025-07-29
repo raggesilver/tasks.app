@@ -1,5 +1,5 @@
 import { AUTHORIZED_REDIRECT, UNAUTHORIZED_REDIRECT } from "~/lib/constants";
-import { getOrCreateUser } from "~~/server/services/user";
+import { getOrCreateUser, type GitHubProfile } from "~~/server/services/user";
 
 export default defineOAuthGitHubEventHandler({
   config: {
@@ -9,7 +9,7 @@ export default defineOAuthGitHubEventHandler({
     }),
   },
   async onSuccess(event, { user: profile }) {
-    const user = await getOrCreateUser("github", profile);
+    const user = await getOrCreateUser("github", profile as GitHubProfile);
     await setUserSession(event, {
       user,
     });

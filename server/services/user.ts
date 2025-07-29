@@ -7,7 +7,7 @@ import { db } from "../db/db";
 
 type Providers = "google" | "github";
 
-type GitHubProfile = {
+export type GitHubProfile = {
   login: string;
   id: number;
   node_id: string;
@@ -27,7 +27,7 @@ type GitHubProfile = {
   type: "User";
   site_admin: boolean;
   name: string;
-  company: null;
+  company: string | null;
   blog: string;
   location: string;
   email: string;
@@ -42,7 +42,7 @@ type GitHubProfile = {
   updated_at: string;
 };
 
-type GoogleProfile = {
+export type GoogleProfile = {
   sub: string;
   name: string;
   given_name: string;

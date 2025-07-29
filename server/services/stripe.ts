@@ -14,7 +14,7 @@ class StripeService {
     const config = useRuntimeConfig();
 
     this.stripe = new Stripe(config.stripe.secretKey, {
-      apiVersion: "2024-12-18.acacia",
+      apiVersion: "2025-06-30.basil",
     });
   }
 

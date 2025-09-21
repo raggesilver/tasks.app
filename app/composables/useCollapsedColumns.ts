@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const schema = z.array(z.string().uuid());
+const schema = z.array(z.uuid());
 
 type CollapsedColumns = z.infer<typeof schema>;
 

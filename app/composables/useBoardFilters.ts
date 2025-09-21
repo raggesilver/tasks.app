@@ -4,7 +4,7 @@ const boardFiltersSchema = z.object({
   assignees: z
     .string()
     .transform((str) => (str === "" ? [] : str.split(",")))
-    .pipe(z.array(z.string().uuid()))
+    .pipe(z.array(z.uuid()))
     .optional(),
 });
 

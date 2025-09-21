@@ -10,7 +10,7 @@ export const updateWorkspaceSchema = z.object({
 
 export const createBoardSchema = z.object({
   name: z.string().min(5).max(255),
-  workspaceId: z.string().uuid(),
+  workspaceId: z.uuid(),
 });
 
 export const updateBoardSchema = z.object({
@@ -19,7 +19,7 @@ export const updateBoardSchema = z.object({
 
 export const createStatusColumnSchema = z.object({
   name: z.string().min(5).max(255),
-  workspaceId: z.string().uuid(),
+  workspaceId: z.uuid(),
 });
 
 export const updateStatusColumnSchema = createStatusColumnSchema
@@ -46,7 +46,7 @@ export const updateTaskSchema = z
       .string()
       .nullable()
       .transform((v) => (v?.trim() === "" ? null : v)),
-    statusColumnId: z.string().uuid(),
+    statusColumnId: z.uuid(),
     order: z.number().int(),
   })
   .partial();
@@ -57,7 +57,7 @@ export const searchUsersSchema = z.object({
 });
 
 export const publicUserSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   fullName: z.string(),
   email: z.string().email().optional(),
   profilePictureUrl: z.string().url().optional(),
@@ -65,30 +65,30 @@ export const publicUserSchema = z.object({
 
 export const createInvitationSchema = z
   .object({
-    boardId: z.string().uuid(),
+    boardId: z.uuid(),
   })
-  .or(z.object({ workspaceId: z.string().uuid() }));
+  .or(z.object({ workspaceId: z.uuid() }));
 
 export const deactivateInvitationSchema = z
   .object({
-    invitationId: z.string().uuid(),
-    boardId: z.string().uuid(),
+    invitationId: z.uuid(),
+    boardId: z.uuid(),
   })
   .or(
     z.object({
-      invitationId: z.string().uuid(),
-      workspaceId: z.string().uuid(),
+      invitationId: z.uuid(),
+      workspaceId: z.uuid(),
     }),
   );
 
 export const addAssigneeSchema = z.object({
-  userId: z.string().uuid(),
+  userId: z.uuid(),
 });
 
 export const createBoardLabelSchema = z.object({
   name: z.string().min(3).max(255),
   color: z.string(),
-  boardId: z.string().uuid(),
+  boardId: z.uuid(),
 });
 
 export const updateBoardLabelSchema = createBoardLabelSchema
@@ -96,7 +96,7 @@ export const updateBoardLabelSchema = createBoardLabelSchema
   .partial();
 
 export const addTaskLabelSchema = z.object({
-  labelId: z.string().uuid(),
+  labelId: z.uuid(),
 });
 
 export const uploadAttachmentSchema = z.object({
@@ -135,4 +135,4 @@ export type UpdateBoardLabelInput = z.infer<typeof updateBoardLabelSchema>;
 export type AddTaskLabelInput = z.infer<typeof addTaskLabelSchema>;
 
 export const validateId = <T extends string>(id: T) =>
-  z.object({ [id]: z.string().uuid() });
+  z.object({ [id]: z.uuid() });

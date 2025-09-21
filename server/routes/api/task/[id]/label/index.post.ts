@@ -4,7 +4,7 @@ import { isPostgresError, PgErrorCode } from "~~/server/lib/errors";
 import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization";
 import { addLabelToTask } from "~~/server/services/task";
 
-const paramSchema = z.object({ id: z.string().uuid() });
+const paramSchema = z.object({ id: z.uuid() });
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);

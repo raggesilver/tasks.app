@@ -7,8 +7,8 @@ export default defineEventHandler(async (event) => {
   const { id: taskId, assigneeId } = await getValidatedRouterParams(
     event,
     z.object({
-      id: z.string().uuid(),
-      assigneeId: z.string().uuid(),
+      id: z.uuid(),
+      assigneeId: z.uuid(),
     }).parseAsync,
   );
 

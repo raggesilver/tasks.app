@@ -1,20 +1,17 @@
-FROM node:22-alpine AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+FROM oven/bun:1-alpine AS base
 COPY . /app
 WORKDIR /app
 
 FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile --ignore-scripts
+RUN --mount=type=cache,id=bun,target=/root/.bun bun install --production --frozen-lockfile --ignore-scripts
 
 FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --ignore-scripts
-RUN pnpm run build
+RUN --mount=type=cache,id=bun,target=/root/.bun bun install --frozen-lockfile --ignore-scripts
+RUN bun run build --preset=bun
 
 FROM base
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/.output /app/.output
 
 EXPOSE 3000
-CMD [ "node", ".output/server/index.mjs" ]
+CMD [ "bun", ".output/server/index.mjs" ]

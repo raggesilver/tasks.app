@@ -3,8 +3,8 @@ import { isUserBoardCollaboratorForTask } from "~~/server/services/authorization
 import { removeLabelFromTask } from "~~/server/services/task";
 
 const paramsSchema = z.object({
-  id: z.string().uuid(),
-  labelId: z.string().uuid(),
+  id: z.uuid(),
+  labelId: z.uuid(),
 });
 
 export default defineEventHandler(async (event) => {

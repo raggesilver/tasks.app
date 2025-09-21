@@ -8,8 +8,8 @@ export default defineEventHandler(async (event) => {
   const { id, collaborator } = await getValidatedRouterParams(
     event,
     z.object({
-      id: z.string().uuid(),
-      collaborator: z.string().uuid(),
+      id: z.uuid(),
+      collaborator: z.uuid(),
     }).parseAsync,
   );
 

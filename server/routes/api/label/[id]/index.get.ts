@@ -3,7 +3,7 @@ import { isUserBoardCollaboratorForLabel } from "~~/server/services/authorizatio
 import { getLabelById } from "~~/server/services/label";
 
 const schema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
 });
 
 export default defineEventHandler(async (event) => {
